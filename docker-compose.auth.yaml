@@ -1,0 +1,48 @@
+version: "3.8"
+
+services:
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      CORS_ORIGIN: http://play.workadventure.localhost
+      
+      # Banco de Dados SQLite (desenvolvimento) / PostgreSQL (produção)
+      SQLITE_DB_PATH: ./data/auth.db
+      
+      # JWT
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
+      JWT_EXPIRES_IN: 1h
+      REFRESH_TOKEN_EXPIRES_IN: 30d
+      
+      # OIDC
+      OIDC_ISSUER: http://auth.workadventure.localhost
+      OIDC_CLIENT_ID: workadventure-client
+      OIDC_CLIENT_SECRET: workadventure-secret
+      
+      # Logs
+      LOG_LEVEL: info
+    ports:
+      - "3001:3000"
+    volumes:
+      - auth_data:/app/data
+      - ./auth-service/logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.auth.rule=Host(`auth.workadventure.localhost`)"
+      - "traefik.http.routers.auth.entryPoints=web"
+      - "traefik.http.services.auth.loadbalancer.server.port=3000"
+      - "traefik.http.routers.auth.tls=true"
+      - "traefik.http.routers.auth.tls.certresolver=letsencrypt"
+
+volumes:
+  auth_data:

@@ -1,0 +1,1092 @@
+{
+  service: 'auth-service',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro ao obter conexão com banco de dados: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string',
+  stack: 'Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string\n' +
+    '    at /Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/pg-pool/index.js:45:11\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async DatabaseConnection.getConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/database.ts:45:22)\n' +
+    '    at async DatabaseConnection.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/database.ts:54:20)\n' +
+    '    at async DatabaseConnection.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/database.ts:84:22)\n' +
+    '    at async runMigrations (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/database/migrate.ts:11:25)',
+  timestamp: '2025-09-21 11:53:01'
+}
+{
+  service: 'auth-service',
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '::',
+  port: 3000,
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Exceção não capturada: listen EADDRINUSE: address already in use :::3000',
+  stack: 'Error: listen EADDRINUSE: address already in use :::3000\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n' +
+    '    at listenInCluster (node:net:1997:12)\n' +
+    '    at Server.listen (node:net:2102:7)\n' +
+    '    at Function.listen (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/express/lib/application.js:635:24)\n' +
+    '    at startServer (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/app.js:107:13)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  timestamp: '2025-09-21 11:56:27'
+}
+{
+  service: 'auth-service',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro ao obter conexão com banco de dados: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string',
+  stack: 'Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string\n' +
+    '    at /Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/pg-pool/index.js:45:11\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async DatabaseConnection.getConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:38:28)\n' +
+    '    at async DatabaseConnection.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:47:24)\n' +
+    '    at async DatabaseConnection.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:79:28)\n' +
+    '    at async startServer (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/app.js:88:29)',
+  timestamp: '2025-09-21 12:49:03'
+}
+{
+  service: 'auth-service',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro ao obter conexão com banco de dados: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string',
+  stack: 'Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string\n' +
+    '    at /Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/pg-pool/index.js:45:11\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async DatabaseConnection.getConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:38:28)\n' +
+    '    at async DatabaseConnection.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:47:24)\n' +
+    '    at async DatabaseConnection.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:79:28)\n' +
+    '    at async startServer (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/app.js:88:29)',
+  timestamp: '2025-09-21 12:49:47'
+}
+{
+  service: 'auth-service',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro ao obter conexão com banco de dados: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string',
+  stack: 'Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string\n' +
+    '    at /Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/pg-pool/index.js:45:11\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async DatabaseConnection.getConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:38:28)\n' +
+    '    at async DatabaseConnection.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:47:24)\n' +
+    '    at async DatabaseConnection.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:79:28)\n' +
+    '    at async startServer (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/app.js:88:29)',
+  timestamp: '2025-09-21 12:50:20'
+}
+{
+  service: 'auth-service',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro ao obter conexão com banco de dados: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string',
+  stack: 'Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string\n' +
+    '    at /Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/pg-pool/index.js:45:11\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async DatabaseConnection.getConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/database.ts:45:22)\n' +
+    '    at async DatabaseConnection.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/database.ts:54:20)\n' +
+    '    at async DatabaseConnection.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/database.ts:84:22)\n' +
+    '    at async runMigrations (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/database/migrate.ts:11:25)',
+  timestamp: '2025-09-21 12:54:13'
+}
+{
+  service: 'auth-service',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro ao obter conexão com banco de dados: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string',
+  stack: 'Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string\n' +
+    '    at /Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/pg-pool/index.js:45:11\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async DatabaseConnection.getConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/database.ts:45:22)\n' +
+    '    at async DatabaseConnection.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/database.ts:54:20)\n' +
+    '    at async DatabaseConnection.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/database.ts:84:22)\n' +
+    '    at async runMigrations (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/database/migrate.ts:11:25)',
+  timestamp: '2025-09-21 12:57:35'
+}
+{
+  service: 'auth-service',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro ao obter conexão com banco de dados: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string',
+  stack: 'Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string\n' +
+    '    at /Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/pg-pool/index.js:45:11\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async DatabaseConnection.getConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:38:28)\n' +
+    '    at async DatabaseConnection.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:47:24)\n' +
+    '    at async DatabaseConnection.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:79:28)\n' +
+    '    at async startServer (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/app.js:88:29)',
+  timestamp: '2025-09-21 12:57:57'
+}
+{
+  service: 'auth-service',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro ao obter conexão com banco de dados: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string',
+  stack: 'Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string\n' +
+    '    at /Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/pg-pool/index.js:45:11\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async DatabaseConnection.getConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:38:28)\n' +
+    '    at async DatabaseConnection.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:47:24)\n' +
+    '    at async DatabaseConnection.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:79:28)\n' +
+    '    at async startServer (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/app.js:88:29)',
+  timestamp: '2025-09-21 12:58:22'
+}
+{
+  service: 'auth-service',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro ao obter conexão com banco de dados: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string',
+  stack: 'Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string\n' +
+    '    at /Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/pg-pool/index.js:45:11\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async DatabaseConnection.getConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:38:28)\n' +
+    '    at async DatabaseConnection.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:47:24)\n' +
+    '    at async DatabaseConnection.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:79:28)\n' +
+    '    at async startServer (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/app.js:88:29)',
+  timestamp: '2025-09-21 12:58:46'
+}
+{
+  service: 'auth-service',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro ao obter conexão com banco de dados: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string',
+  stack: 'Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string\n' +
+    '    at /Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/pg-pool/index.js:45:11\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async DatabaseConnection.getConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:38:28)\n' +
+    '    at async DatabaseConnection.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:47:24)\n' +
+    '    at async DatabaseConnection.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:79:28)\n' +
+    '    at async startServer (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/app.js:88:29)',
+  timestamp: '2025-09-21 12:59:24'
+}
+{
+  service: 'auth-service',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro ao obter conexão com banco de dados: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string',
+  stack: 'Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string\n' +
+    '    at /Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/pg-pool/index.js:45:11\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async DatabaseConnection.getConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:38:28)\n' +
+    '    at async DatabaseConnection.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:47:24)\n' +
+    '    at async DatabaseConnection.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:79:28)',
+  timestamp: '2025-09-21 13:00:02'
+}
+{
+  service: 'auth-service',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Falha no teste de conexão com banco de dados: Falha na conexão com banco de dados',
+  stack: 'Error: Falha na conexão com banco de dados\n' +
+    '    at DatabaseConnection.getConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:43:19)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async DatabaseConnection.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:47:24)\n' +
+    '    at async DatabaseConnection.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:79:28)',
+  timestamp: '2025-09-21 13:00:03'
+}
+{
+  service: 'auth-service',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro ao obter conexão com banco de dados: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string',
+  stack: 'Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string\n' +
+    '    at /Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/pg-pool/index.js:45:11\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async DatabaseConnection.getConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:38:28)\n' +
+    '    at async DatabaseConnection.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:47:24)\n' +
+    '    at async DatabaseConnection.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:79:28)\n' +
+    '    at async /Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/app.js:47:31',
+  timestamp: '2025-09-21 13:00:10'
+}
+{
+  service: 'auth-service',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Falha no teste de conexão com banco de dados: Falha na conexão com banco de dados',
+  stack: 'Error: Falha na conexão com banco de dados\n' +
+    '    at DatabaseConnection.getConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:43:19)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async DatabaseConnection.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:47:24)\n' +
+    '    at async DatabaseConnection.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:79:28)\n' +
+    '    at async /Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/app.js:47:31',
+  timestamp: '2025-09-21 13:00:10'
+}
+{
+  service: 'auth-service',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro ao obter conexão com banco de dados: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string',
+  stack: 'Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string\n' +
+    '    at /Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/pg-pool/index.js:45:11\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async DatabaseConnection.getConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:38:28)\n' +
+    '    at async DatabaseConnection.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/utils/database.js:47:24)\n' +
+    '    at async UserService.findByEmail (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/services/UserService.js:65:28)\n' +
+    '    at async AuthController.register (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/controllers/AuthController.js:15:45)',
+  timestamp: '2025-09-21 13:00:28'
+}
+{
+  service: 'auth-service',
+  sql: 'SELECT datetime("now") as current_time',
+  params: [],
+  error: SqliteError: no such column: now
+      at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)
+      at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)
+      at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)
+      at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:117:16)
+      at Object.onceWrapper (node:events:633:28)
+      at Server.emit (node:events:531:35)
+      at Server.emit (node:domain:489:12)
+      at emitListeningNT (node:net:1983:10)
+      at processTicksAndRejections (node:internal/process/task_queues:89:21) {
+    code: 'SQLITE_ERROR'
+  },
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro na query SQLite:',
+  timestamp: '2025-09-21 13:44:42'
+}
+{
+  service: 'auth-service',
+  code: 'SQLITE_ERROR',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Falha no teste de conexão com SQLite: no such column: now',
+  stack: 'SqliteError: no such column: now\n' +
+    '    at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)\n' +
+    '    at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)\n' +
+    '    at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)\n' +
+    '    at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:117:16)\n' +
+    '    at Object.onceWrapper (node:events:633:28)\n' +
+    '    at Server.emit (node:events:531:35)\n' +
+    '    at Server.emit (node:domain:489:12)\n' +
+    '    at emitListeningNT (node:net:1983:10)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:89:21)',
+  timestamp: '2025-09-21 13:44:42'
+}
+{
+  service: 'auth-service',
+  sql: 'SELECT datetime("now") as current_time',
+  params: [],
+  error: SqliteError: no such column: now
+      at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)
+      at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)
+      at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)
+      at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:117:16)
+      at Object.onceWrapper (node:events:633:28)
+      at Server.emit (node:events:531:35)
+      at Server.emit (node:domain:489:12)
+      at emitListeningNT (node:net:1983:10)
+      at processTicksAndRejections (node:internal/process/task_queues:89:21) {
+    code: 'SQLITE_ERROR'
+  },
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro na query SQLite:',
+  timestamp: '2025-09-21 13:44:50'
+}
+{
+  service: 'auth-service',
+  code: 'SQLITE_ERROR',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Falha no teste de conexão com SQLite: no such column: now',
+  stack: 'SqliteError: no such column: now\n' +
+    '    at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)\n' +
+    '    at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)\n' +
+    '    at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)\n' +
+    '    at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:117:16)\n' +
+    '    at Object.onceWrapper (node:events:633:28)\n' +
+    '    at Server.emit (node:events:531:35)\n' +
+    '    at Server.emit (node:domain:489:12)\n' +
+    '    at emitListeningNT (node:net:1983:10)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:89:21)',
+  timestamp: '2025-09-21 13:44:50'
+}
+{
+  service: 'auth-service',
+  sql: 'SELECT datetime("now") as current_time',
+  params: [],
+  error: SqliteError: no such column: now
+      at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)
+      at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)
+      at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)
+      at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:117:16)
+      at Object.onceWrapper (node:events:633:28)
+      at Server.emit (node:events:531:35)
+      at Server.emit (node:domain:489:12)
+      at emitListeningNT (node:net:1983:10)
+      at processTicksAndRejections (node:internal/process/task_queues:89:21) {
+    code: 'SQLITE_ERROR'
+  },
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro na query SQLite:',
+  timestamp: '2025-09-21 13:45:20'
+}
+{
+  service: 'auth-service',
+  code: 'SQLITE_ERROR',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Falha no teste de conexão com SQLite: no such column: now',
+  stack: 'SqliteError: no such column: now\n' +
+    '    at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)\n' +
+    '    at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)\n' +
+    '    at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)\n' +
+    '    at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:117:16)\n' +
+    '    at Object.onceWrapper (node:events:633:28)\n' +
+    '    at Server.emit (node:events:531:35)\n' +
+    '    at Server.emit (node:domain:489:12)\n' +
+    '    at emitListeningNT (node:net:1983:10)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:89:21)',
+  timestamp: '2025-09-21 13:45:20'
+}
+{
+  service: 'auth-service',
+  sql: 'SELECT datetime("now") as current_time',
+  params: [],
+  error: SqliteError: no such column: now
+      at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)
+      at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)
+      at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)
+      at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:117:16)
+      at Object.onceWrapper (node:events:633:28)
+      at Server.emit (node:events:531:35)
+      at Server.emit (node:domain:489:12)
+      at emitListeningNT (node:net:1983:10)
+      at processTicksAndRejections (node:internal/process/task_queues:89:21) {
+    code: 'SQLITE_ERROR'
+  },
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro na query SQLite:',
+  timestamp: '2025-09-21 13:45:30'
+}
+{
+  service: 'auth-service',
+  code: 'SQLITE_ERROR',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Falha no teste de conexão com SQLite: no such column: now',
+  stack: 'SqliteError: no such column: now\n' +
+    '    at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)\n' +
+    '    at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)\n' +
+    '    at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)\n' +
+    '    at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:117:16)\n' +
+    '    at Object.onceWrapper (node:events:633:28)\n' +
+    '    at Server.emit (node:events:531:35)\n' +
+    '    at Server.emit (node:domain:489:12)\n' +
+    '    at emitListeningNT (node:net:1983:10)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:89:21)',
+  timestamp: '2025-09-21 13:45:30'
+}
+{
+  service: 'auth-service',
+  sql: 'SELECT datetime("now") as current_time',
+  params: [],
+  error: SqliteError: no such column: now
+      at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)
+      at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)
+      at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)
+      at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:117:16)
+      at Object.onceWrapper (node:events:633:28)
+      at Server.emit (node:events:531:35)
+      at Server.emit (node:domain:489:12)
+      at emitListeningNT (node:net:1983:10)
+      at processTicksAndRejections (node:internal/process/task_queues:89:21) {
+    code: 'SQLITE_ERROR'
+  },
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro na query SQLite:',
+  timestamp: '2025-09-21 13:48:22'
+}
+{
+  service: 'auth-service',
+  code: 'SQLITE_ERROR',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Falha no teste de conexão com SQLite: no such column: now',
+  stack: 'SqliteError: no such column: now\n' +
+    '    at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)\n' +
+    '    at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)\n' +
+    '    at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)\n' +
+    '    at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:117:16)\n' +
+    '    at Object.onceWrapper (node:events:633:28)\n' +
+    '    at Server.emit (node:events:531:35)\n' +
+    '    at Server.emit (node:domain:489:12)\n' +
+    '    at emitListeningNT (node:net:1983:10)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:89:21)',
+  timestamp: '2025-09-21 13:48:22'
+}
+{
+  service: 'auth-service',
+  sql: 'SELECT datetime("now") as current_time',
+  params: [],
+  error: SqliteError: no such column: now
+      at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)
+      at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)
+      at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)
+      at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:117:16)
+      at Object.onceWrapper (node:events:633:28)
+      at Server.emit (node:events:531:35)
+      at Server.emit (node:domain:489:12)
+      at emitListeningNT (node:net:1983:10)
+      at processTicksAndRejections (node:internal/process/task_queues:89:21) {
+    code: 'SQLITE_ERROR'
+  },
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro na query SQLite:',
+  timestamp: '2025-09-21 13:51:11'
+}
+{
+  service: 'auth-service',
+  code: 'SQLITE_ERROR',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Falha no teste de conexão com SQLite: no such column: now',
+  stack: 'SqliteError: no such column: now\n' +
+    '    at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)\n' +
+    '    at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)\n' +
+    '    at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)\n' +
+    '    at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:117:16)\n' +
+    '    at Object.onceWrapper (node:events:633:28)\n' +
+    '    at Server.emit (node:events:531:35)\n' +
+    '    at Server.emit (node:domain:489:12)\n' +
+    '    at emitListeningNT (node:net:1983:10)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:89:21)',
+  timestamp: '2025-09-21 13:51:11'
+}
+{
+  service: 'auth-service',
+  sql: 'SELECT datetime("now") as current_time',
+  params: [],
+  error: SqliteError: no such column: now
+      at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)
+      at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)
+      at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)
+      at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:117:16)
+      at Object.onceWrapper (node:events:633:28)
+      at Server.emit (node:events:531:35)
+      at Server.emit (node:domain:489:12)
+      at emitListeningNT (node:net:1983:10)
+      at processTicksAndRejections (node:internal/process/task_queues:89:21) {
+    code: 'SQLITE_ERROR'
+  },
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro na query SQLite:',
+  timestamp: '2025-09-21 13:51:16'
+}
+{
+  service: 'auth-service',
+  code: 'SQLITE_ERROR',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Falha no teste de conexão com SQLite: no such column: now',
+  stack: 'SqliteError: no such column: now\n' +
+    '    at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)\n' +
+    '    at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)\n' +
+    '    at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)\n' +
+    '    at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:117:16)\n' +
+    '    at Object.onceWrapper (node:events:633:28)\n' +
+    '    at Server.emit (node:events:531:35)\n' +
+    '    at Server.emit (node:domain:489:12)\n' +
+    '    at emitListeningNT (node:net:1983:10)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:89:21)',
+  timestamp: '2025-09-21 13:51:16'
+}
+{
+  service: 'auth-service',
+  sql: 'SELECT datetime("now") as current_time',
+  params: [],
+  error: SqliteError: no such column: now
+      at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)
+      at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)
+      at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)
+      at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:117:16)
+      at Object.onceWrapper (node:events:633:28)
+      at Server.emit (node:events:531:35)
+      at Server.emit (node:domain:489:12)
+      at emitListeningNT (node:net:1983:10)
+      at processTicksAndRejections (node:internal/process/task_queues:89:21) {
+    code: 'SQLITE_ERROR'
+  },
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro na query SQLite:',
+  timestamp: '2025-09-21 13:52:37'
+}
+{
+  service: 'auth-service',
+  code: 'SQLITE_ERROR',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Falha no teste de conexão com SQLite: no such column: now',
+  stack: 'SqliteError: no such column: now\n' +
+    '    at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)\n' +
+    '    at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)\n' +
+    '    at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)\n' +
+    '    at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:117:16)\n' +
+    '    at Object.onceWrapper (node:events:633:28)\n' +
+    '    at Server.emit (node:events:531:35)\n' +
+    '    at Server.emit (node:domain:489:12)\n' +
+    '    at emitListeningNT (node:net:1983:10)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:89:21)',
+  timestamp: '2025-09-21 13:52:37'
+}
+{
+  service: 'auth-service',
+  sql: 'SELECT datetime("now") as current_time',
+  params: [],
+  error: SqliteError: no such column: now
+      at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)
+      at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)
+      at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)
+      at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:117:16)
+      at Object.onceWrapper (node:events:633:28)
+      at Server.emit (node:events:531:35)
+      at Server.emit (node:domain:489:12)
+      at emitListeningNT (node:net:1983:10)
+      at processTicksAndRejections (node:internal/process/task_queues:89:21) {
+    code: 'SQLITE_ERROR'
+  },
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro na query SQLite:',
+  timestamp: '2025-09-21 14:08:43'
+}
+{
+  service: 'auth-service',
+  code: 'SQLITE_ERROR',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Falha no teste de conexão com SQLite: no such column: now',
+  stack: 'SqliteError: no such column: now\n' +
+    '    at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)\n' +
+    '    at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)\n' +
+    '    at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)\n' +
+    '    at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:117:16)\n' +
+    '    at Object.onceWrapper (node:events:633:28)\n' +
+    '    at Server.emit (node:events:531:35)\n' +
+    '    at Server.emit (node:domain:489:12)\n' +
+    '    at emitListeningNT (node:net:1983:10)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:89:21)',
+  timestamp: '2025-09-21 14:08:43'
+}
+{
+  service: 'auth-service',
+  sql: 'SELECT datetime("now") as current_time',
+  params: [],
+  error: SqliteError: no such column: now
+      at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)
+      at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)
+      at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)
+      at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:117:16)
+      at Object.onceWrapper (node:events:633:28)
+      at Server.emit (node:events:531:35)
+      at Server.emit (node:domain:489:12)
+      at emitListeningNT (node:net:1983:10)
+      at processTicksAndRejections (node:internal/process/task_queues:89:21) {
+    code: 'SQLITE_ERROR'
+  },
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro na query SQLite:',
+  timestamp: '2025-09-21 14:08:50'
+}
+{
+  service: 'auth-service',
+  code: 'SQLITE_ERROR',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Falha no teste de conexão com SQLite: no such column: now',
+  stack: 'SqliteError: no such column: now\n' +
+    '    at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)\n' +
+    '    at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)\n' +
+    '    at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)\n' +
+    '    at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:117:16)\n' +
+    '    at Object.onceWrapper (node:events:633:28)\n' +
+    '    at Server.emit (node:events:531:35)\n' +
+    '    at Server.emit (node:domain:489:12)\n' +
+    '    at emitListeningNT (node:net:1983:10)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:89:21)',
+  timestamp: '2025-09-21 14:08:50'
+}
+{
+  service: 'auth-service',
+  sql: 'SELECT datetime("now") as current_time',
+  params: [],
+  error: SqliteError: no such column: now
+      at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)
+      at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)
+      at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)
+      at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:127:16)
+      at Object.onceWrapper (node:events:633:28)
+      at Server.emit (node:events:531:35)
+      at Server.emit (node:domain:489:12)
+      at emitListeningNT (node:net:1983:10)
+      at processTicksAndRejections (node:internal/process/task_queues:89:21) {
+    code: 'SQLITE_ERROR'
+  },
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro na query SQLite:',
+  timestamp: '2025-09-21 14:12:12'
+}
+{
+  service: 'auth-service',
+  code: 'SQLITE_ERROR',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Falha no teste de conexão com SQLite: no such column: now',
+  stack: 'SqliteError: no such column: now\n' +
+    '    at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)\n' +
+    '    at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)\n' +
+    '    at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)\n' +
+    '    at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:127:16)\n' +
+    '    at Object.onceWrapper (node:events:633:28)\n' +
+    '    at Server.emit (node:events:531:35)\n' +
+    '    at Server.emit (node:domain:489:12)\n' +
+    '    at emitListeningNT (node:net:1983:10)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:89:21)',
+  timestamp: '2025-09-21 14:12:12'
+}
+{
+  service: 'auth-service',
+  sql: 'SELECT datetime("now") as current_time',
+  params: [],
+  error: SqliteError: no such column: now
+      at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)
+      at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)
+      at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)
+      at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:127:16)
+      at Object.onceWrapper (node:events:633:28)
+      at Server.emit (node:events:531:35)
+      at Server.emit (node:domain:489:12)
+      at emitListeningNT (node:net:1983:10)
+      at processTicksAndRejections (node:internal/process/task_queues:89:21) {
+    code: 'SQLITE_ERROR'
+  },
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro na query SQLite:',
+  timestamp: '2025-09-21 14:12:24'
+}
+{
+  service: 'auth-service',
+  code: 'SQLITE_ERROR',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Falha no teste de conexão com SQLite: no such column: now',
+  stack: 'SqliteError: no such column: now\n' +
+    '    at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)\n' +
+    '    at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)\n' +
+    '    at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)\n' +
+    '    at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:127:16)\n' +
+    '    at Object.onceWrapper (node:events:633:28)\n' +
+    '    at Server.emit (node:events:531:35)\n' +
+    '    at Server.emit (node:domain:489:12)\n' +
+    '    at emitListeningNT (node:net:1983:10)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:89:21)',
+  timestamp: '2025-09-21 14:12:24'
+}
+{
+  service: 'auth-service',
+  sql: 'SELECT datetime("now") as current_time',
+  params: [],
+  error: SqliteError: no such column: now
+      at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)
+      at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)
+      at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)
+      at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:127:16)
+      at Object.onceWrapper (node:events:633:28)
+      at Server.emit (node:events:531:35)
+      at Server.emit (node:domain:489:12)
+      at emitListeningNT (node:net:1983:10)
+      at processTicksAndRejections (node:internal/process/task_queues:89:21) {
+    code: 'SQLITE_ERROR'
+  },
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro na query SQLite:',
+  timestamp: '2025-09-21 14:15:31'
+}
+{
+  service: 'auth-service',
+  code: 'SQLITE_ERROR',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Falha no teste de conexão com SQLite: no such column: now',
+  stack: 'SqliteError: no such column: now\n' +
+    '    at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)\n' +
+    '    at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)\n' +
+    '    at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)\n' +
+    '    at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:127:16)\n' +
+    '    at Object.onceWrapper (node:events:633:28)\n' +
+    '    at Server.emit (node:events:531:35)\n' +
+    '    at Server.emit (node:domain:489:12)\n' +
+    '    at emitListeningNT (node:net:1983:10)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:89:21)',
+  timestamp: '2025-09-21 14:15:31'
+}
+{
+  service: 'auth-service',
+  sql: 'SELECT datetime("now") as current_time',
+  params: [],
+  error: SqliteError: no such column: now
+      at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)
+      at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)
+      at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)
+      at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:127:16)
+      at Object.onceWrapper (node:events:633:28)
+      at Server.emit (node:events:531:35)
+      at Server.emit (node:domain:489:12)
+      at emitListeningNT (node:net:1983:10)
+      at processTicksAndRejections (node:internal/process/task_queues:89:21) {
+    code: 'SQLITE_ERROR'
+  },
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro na query SQLite:',
+  timestamp: '2025-09-21 14:15:38'
+}
+{
+  service: 'auth-service',
+  code: 'SQLITE_ERROR',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Falha no teste de conexão com SQLite: no such column: now',
+  stack: 'SqliteError: no such column: now\n' +
+    '    at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)\n' +
+    '    at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)\n' +
+    '    at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)\n' +
+    '    at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:127:16)\n' +
+    '    at Object.onceWrapper (node:events:633:28)\n' +
+    '    at Server.emit (node:events:531:35)\n' +
+    '    at Server.emit (node:domain:489:12)\n' +
+    '    at emitListeningNT (node:net:1983:10)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:89:21)',
+  timestamp: '2025-09-21 14:15:38'
+}
+{
+  service: 'auth-service',
+  sql: 'SELECT datetime("now") as current_time',
+  params: [],
+  error: SqliteError: no such column: now
+      at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)
+      at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)
+      at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)
+      at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:127:16)
+      at Object.onceWrapper (node:events:633:28)
+      at Server.emit (node:events:531:35)
+      at Server.emit (node:domain:489:12)
+      at emitListeningNT (node:net:1983:10)
+      at processTicksAndRejections (node:internal/process/task_queues:89:21) {
+    code: 'SQLITE_ERROR'
+  },
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro na query SQLite:',
+  timestamp: '2025-09-21 14:15:49'
+}
+{
+  service: 'auth-service',
+  code: 'SQLITE_ERROR',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Falha no teste de conexão com SQLite: no such column: now',
+  stack: 'SqliteError: no such column: now\n' +
+    '    at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)\n' +
+    '    at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)\n' +
+    '    at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)\n' +
+    '    at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:127:16)\n' +
+    '    at Object.onceWrapper (node:events:633:28)\n' +
+    '    at Server.emit (node:events:531:35)\n' +
+    '    at Server.emit (node:domain:489:12)\n' +
+    '    at emitListeningNT (node:net:1983:10)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:89:21)',
+  timestamp: '2025-09-21 14:15:49'
+}
+{
+  service: 'auth-service',
+  sql: 'SELECT datetime("now") as current_time',
+  params: [],
+  error: SqliteError: no such column: now
+      at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)
+      at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)
+      at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)
+      at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:127:16)
+      at Object.onceWrapper (node:events:633:28)
+      at Server.emit (node:events:531:35)
+      at Server.emit (node:domain:489:12)
+      at emitListeningNT (node:net:1983:10)
+      at processTicksAndRejections (node:internal/process/task_queues:89:21) {
+    code: 'SQLITE_ERROR'
+  },
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro na query SQLite:',
+  timestamp: '2025-09-21 14:16:00'
+}
+{
+  service: 'auth-service',
+  code: 'SQLITE_ERROR',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Falha no teste de conexão com SQLite: no such column: now',
+  stack: 'SqliteError: no such column: now\n' +
+    '    at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)\n' +
+    '    at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)\n' +
+    '    at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)\n' +
+    '    at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:127:16)\n' +
+    '    at Object.onceWrapper (node:events:633:28)\n' +
+    '    at Server.emit (node:events:531:35)\n' +
+    '    at Server.emit (node:domain:489:12)\n' +
+    '    at emitListeningNT (node:net:1983:10)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:89:21)',
+  timestamp: '2025-09-21 14:16:00'
+}
+{
+  service: 'auth-service',
+  sql: 'SELECT datetime("now") as current_time',
+  params: [],
+  error: SqliteError: no such column: now
+      at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)
+      at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)
+      at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)
+      at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:127:16)
+      at Object.onceWrapper (node:events:633:28)
+      at Server.emit (node:events:531:35)
+      at Server.emit (node:domain:489:12)
+      at emitListeningNT (node:net:1983:10)
+      at processTicksAndRejections (node:internal/process/task_queues:89:21) {
+    code: 'SQLITE_ERROR'
+  },
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro na query SQLite:',
+  timestamp: '2025-09-21 14:16:06'
+}
+{
+  service: 'auth-service',
+  code: 'SQLITE_ERROR',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Falha no teste de conexão com SQLite: no such column: now',
+  stack: 'SqliteError: no such column: now\n' +
+    '    at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)\n' +
+    '    at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)\n' +
+    '    at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)\n' +
+    '    at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:127:16)\n' +
+    '    at Object.onceWrapper (node:events:633:28)\n' +
+    '    at Server.emit (node:events:531:35)\n' +
+    '    at Server.emit (node:domain:489:12)\n' +
+    '    at emitListeningNT (node:net:1983:10)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:89:21)',
+  timestamp: '2025-09-21 14:16:06'
+}
+{
+  service: 'auth-service',
+  sql: 'SELECT datetime("now") as current_time',
+  params: [],
+  error: SqliteError: no such column: now
+      at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)
+      at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)
+      at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)
+      at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:127:16)
+      at Object.onceWrapper (node:events:633:28)
+      at Server.emit (node:events:531:35)
+      at Server.emit (node:domain:489:12)
+      at emitListeningNT (node:net:1983:10)
+      at processTicksAndRejections (node:internal/process/task_queues:89:21) {
+    code: 'SQLITE_ERROR'
+  },
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro na query SQLite:',
+  timestamp: '2025-09-21 14:16:20'
+}
+{
+  service: 'auth-service',
+  code: 'SQLITE_ERROR',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Falha no teste de conexão com SQLite: no such column: now',
+  stack: 'SqliteError: no such column: now\n' +
+    '    at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)\n' +
+    '    at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)\n' +
+    '    at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)\n' +
+    '    at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:127:16)\n' +
+    '    at Object.onceWrapper (node:events:633:28)\n' +
+    '    at Server.emit (node:events:531:35)\n' +
+    '    at Server.emit (node:domain:489:12)\n' +
+    '    at emitListeningNT (node:net:1983:10)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:89:21)',
+  timestamp: '2025-09-21 14:16:20'
+}
+{
+  service: 'auth-service',
+  sql: 'SELECT datetime("now") as current_time',
+  params: [],
+  error: SqliteError: no such column: now
+      at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)
+      at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)
+      at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)
+      at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:127:16)
+      at Object.onceWrapper (node:events:633:28)
+      at Server.emit (node:events:531:35)
+      at Server.emit (node:domain:489:12)
+      at emitListeningNT (node:net:1983:10)
+      at processTicksAndRejections (node:internal/process/task_queues:89:21) {
+    code: 'SQLITE_ERROR'
+  },
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro na query SQLite:',
+  timestamp: '2025-09-21 14:16:33'
+}
+{
+  service: 'auth-service',
+  code: 'SQLITE_ERROR',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Falha no teste de conexão com SQLite: no such column: now',
+  stack: 'SqliteError: no such column: now\n' +
+    '    at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)\n' +
+    '    at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)\n' +
+    '    at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)\n' +
+    '    at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:127:16)\n' +
+    '    at Object.onceWrapper (node:events:633:28)\n' +
+    '    at Server.emit (node:events:531:35)\n' +
+    '    at Server.emit (node:domain:489:12)\n' +
+    '    at emitListeningNT (node:net:1983:10)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:89:21)',
+  timestamp: '2025-09-21 14:16:33'
+}
+{
+  service: 'auth-service',
+  sql: 'SELECT datetime("now") as current_time',
+  params: [],
+  error: SqliteError: no such column: now
+      at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)
+      at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)
+      at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)
+      at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:127:16)
+      at Object.onceWrapper (node:events:633:28)
+      at Server.emit (node:events:531:35)
+      at Server.emit (node:domain:489:12)
+      at emitListeningNT (node:net:1983:10)
+      at processTicksAndRejections (node:internal/process/task_queues:89:21) {
+    code: 'SQLITE_ERROR'
+  },
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro na query SQLite:',
+  timestamp: '2025-09-21 14:16:52'
+}
+{
+  service: 'auth-service',
+  code: 'SQLITE_ERROR',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Falha no teste de conexão com SQLite: no such column: now',
+  stack: 'SqliteError: no such column: now\n' +
+    '    at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)\n' +
+    '    at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)\n' +
+    '    at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)\n' +
+    '    at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:127:16)\n' +
+    '    at Object.onceWrapper (node:events:633:28)\n' +
+    '    at Server.emit (node:events:531:35)\n' +
+    '    at Server.emit (node:domain:489:12)\n' +
+    '    at emitListeningNT (node:net:1983:10)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:89:21)',
+  timestamp: '2025-09-21 14:16:52'
+}
+{
+  service: 'auth-service',
+  sql: 'SELECT datetime("now") as current_time',
+  params: [],
+  error: SqliteError: no such column: now
+      at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)
+      at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)
+      at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)
+      at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:127:16)
+      at Object.onceWrapper (node:events:633:28)
+      at Server.emit (node:events:531:35)
+      at Server.emit (node:domain:489:12)
+      at emitListeningNT (node:net:1983:10)
+      at processTicksAndRejections (node:internal/process/task_queues:89:21) {
+    code: 'SQLITE_ERROR'
+  },
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Erro na query SQLite:',
+  timestamp: '2025-09-21 14:24:16'
+}
+{
+  service: 'auth-service',
+  code: 'SQLITE_ERROR',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Falha no teste de conexão com SQLite: no such column: now',
+  stack: 'SqliteError: no such column: now\n' +
+    '    at Database.prepare (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)\n' +
+    '    at SQLiteDatabase.query (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:46:28)\n' +
+    '    at SQLiteDatabase.testConnection (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/utils/sqlite-database.ts:95:33)\n' +
+    '    at Server.<anonymous> (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/app.ts:127:16)\n' +
+    '    at Object.onceWrapper (node:events:633:28)\n' +
+    '    at Server.emit (node:events:531:35)\n' +
+    '    at Server.emit (node:domain:489:12)\n' +
+    '    at emitListeningNT (node:net:1983:10)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:89:21)',
+  timestamp: '2025-09-21 14:24:16'
+}
+{
+  service: 'auth-service',
+  errno: -32,
+  code: 'EPIPE',
+  syscall: 'write',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Exceção não capturada: write EPIPE',
+  stack: 'Error: write EPIPE\n' +
+    '    at afterWriteDispatched (node:internal/stream_base_commons:159:15)\n' +
+    '    at writeGeneric (node:internal/stream_base_commons:150:3)\n' +
+    '    at Socket._writeGeneric (node:net:966:11)\n' +
+    '    at Socket._write (node:net:978:8)\n' +
+    '    at writeOrBuffer (node:internal/streams/writable:572:12)\n' +
+    '    at _write (node:internal/streams/writable:501:10)\n' +
+    '    at Socket.Writable.write (node:internal/streams/writable:510:10)\n' +
+    '    at Console.log (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/winston/lib/winston/transports/console.js:87:23)\n' +
+    '    at Console._write (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/winston-transport/modern.js:103:17)\n' +
+    '    at doWrite (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/readable-stream/lib/_stream_writable.js:390:139)',
+  timestamp: '2025-09-22 13:42:43'
+}
+{
+  service: 'auth-service',
+  statusCode: 401,
+  isOperational: true,
+  code: 'INVALID_CREDENTIALS',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Login error: Credenciais inválidas',
+  stack: 'Error: Credenciais inválidas\n' +
+    '    at createBusinessError (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/middleware/errorHandler.js:87:12)\n' +
+    '    at AuthController.login (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/controllers/AuthController.js:75:66)',
+  timestamp: '2025-09-22 22:48:23'
+}
+{
+  service: 'auth-service',
+  statusCode: 400,
+  isOperational: true,
+  code: 'EMAIL_ALREADY_EXISTS',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Registration error: Email já está em uso',
+  stack: 'Error: Email já está em uso\n' +
+    '    at createBusinessError (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/middleware/errorHandler.ts:135:10)\n' +
+    '    at AuthController.register (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/controllers/AuthController.ts:37:34)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  timestamp: '2025-09-22 22:54:17'
+}
+{
+  service: 'auth-service',
+  error: 'Rota /openid/authorize?client_id=workadventure-client&response_type=code&redirect_uri=http://play.workadventure.localhost/openid-callback&scope=openid%20profile%20email&state=test123&playUri=http://play.workadventure.localhost/_/global/maps.workadventure.localhost/starter/map.json não encontrada',
+  stack: 'Error: Rota /openid/authorize?client_id=workadventure-client&response_type=code&redirect_uri=http://play.workadventure.localhost/openid-callback&scope=openid%20profile%20email&state=test123&playUri=http://play.workadventure.localhost/_/global/maps.workadventure.localhost/starter/map.json não encontrada\n' +
+    '    at notFoundHandler (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/middleware/errorHandler.ts:120:17)\n' +
+    '    at Layer.handle [as handle_request] (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/express/lib/router/layer.js:95:5)\n' +
+    '    at trim_prefix (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/express/lib/router/index.js:328:13)\n' +
+    '    at /Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/express/lib/router/index.js:286:9\n' +
+    '    at param (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/express/lib/router/index.js:365:14)\n' +
+    '    at param (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/express/lib/router/index.js:376:14)\n' +
+    '    at Function.process_params (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/express/lib/router/index.js:421:3)\n' +
+    '    at next (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/express/lib/router/index.js:280:10)\n' +
+    '    at /Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/express/lib/router/index.js:646:15\n' +
+    '    at next (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/node_modules/express/lib/router/index.js:265:14)',
+  url: '/openid/authorize?client_id=workadventure-client&response_type=code&redirect_uri=http://play.workadventure.localhost/openid-callback&scope=openid%20profile%20email&state=test123&playUri=http://play.workadventure.localhost/_/global/maps.workadventure.localhost/starter/map.json',
+  method: 'GET',
+  ip: '::1',
+  userAgent: 'curl/8.7.1',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Error occurred:',
+  timestamp: '2025-09-22 22:54:49'
+}
+{
+  service: 'auth-service',
+  statusCode: 400,
+  isOperational: true,
+  code: 'EMAIL_ALREADY_EXISTS',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Registration error: Email já está em uso',
+  stack: 'Error: Email já está em uso\n' +
+    '    at createBusinessError (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/middleware/errorHandler.ts:135:10)\n' +
+    '    at AuthController.register (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/src/controllers/AuthController.ts:37:34)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  timestamp: '2025-09-22 22:55:03'
+}
+{
+  service: 'auth-service',
+  statusCode: 400,
+  isOperational: true,
+  code: 'EMAIL_ALREADY_EXISTS',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Registration error: Email já está em uso',
+  stack: 'Error: Email já está em uso\n' +
+    '    at createBusinessError (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/middleware/errorHandler.js:87:12)\n' +
+    '    at AuthController.register (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/controllers/AuthController.js:19:66)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  timestamp: '2025-09-22 22:55:46'
+}
+{
+  service: 'auth-service',
+  statusCode: 400,
+  isOperational: true,
+  code: 'EMAIL_ALREADY_EXISTS',
+  level: '\x1B[31merror\x1B[39m',
+  message: 'Registration error: Email já está em uso',
+  stack: 'Error: Email já está em uso\n' +
+    '    at createBusinessError (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/middleware/errorHandler.js:87:12)\n' +
+    '    at AuthController.register (/Users/user/Black Hand/01.gitHub/workcodeforge_v1/auth-service/dist/controllers/AuthController.js:19:66)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  timestamp: '2025-09-22 22:56:21'
+}

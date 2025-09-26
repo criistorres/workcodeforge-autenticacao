@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - WorkAdventure Auth</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔐</text></svg>">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="container">
+            <div class="auth-card fade-in">
+                <div class="auth-header">
+                    <div class="auth-logo">🔐</div>
+                    <h1 class="auth-title">Entrar</h1>
+                    <p class="auth-subtitle">Acesse sua conta do WorkAdventure</p>
+                </div>
+
+                <form data-auth-form="login" novalidate>
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            class="form-input" 
+                            data-validate="email"
+                            placeholder="seu@email.com"
+                            required
+                            autocomplete="email"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" class="form-label">Senha</label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            class="form-input" 
+                            data-validate="password"
+                            placeholder="Sua senha"
+                            required
+                            autocomplete="current-password"
+                        >
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        Entrar
+                    </button>
+                </form>
+
+                <div class="auth-links">
+                    <p>Não tem uma conta? <a href="/register.html" class="auth-link">Criar conta</a></p>
+                    <p><a href="/forgot-password.html" class="auth-link">Esqueceu sua senha?</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/auth.js"></script>
+</body>
+</html>

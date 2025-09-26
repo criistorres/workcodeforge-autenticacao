@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecionamento - WorkAdventure Auth</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔐</text></svg>">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="container">
+            <div class="auth-card fade-in">
+                <div class="auth-header">
+                    <div class="auth-logo">🔐</div>
+                    <h1 class="auth-title">Redirecionando...</h1>
+                    <p class="auth-subtitle">Você será redirecionado para o WorkAdventure</p>
+                </div>
+
+                <div class="text-center">
+                    <div class="spinner" style="width: 40px; height: 40px; margin: 0 auto 1rem;"></div>
+                    <p>Processando autenticação...</p>
+                </div>
+
+                <div class="auth-links" style="margin-top: 2rem;">
+                    <p><a href="/login.html" class="auth-link">Voltar ao Login</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Processar redirecionamento OIDC
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const state = urlParams.get('state');
+            const error = urlParams.get('error');
+            const errorDescription = urlParams.get('error_description');
+
+            if (error) {
+                // Mostrar erro
+                document.querySelector('.auth-title').textContent = 'Erro de Autenticação';
+                document.querySelector('.auth-subtitle').textContent = errorDescription || 'Ocorreu um erro durante a autenticação';
+                document.querySelector('.spinner').style.display = 'none';
+                document.querySelector('.text-center p').textContent = 'Tente novamente ou entre em contato com o suporte.';
+                return;
+            }
+
+            if (code && state) {
+                // Processar código de autorização
+                processAuthorizationCode(code, state);
+            } else {
+                // Redirecionar para login se não houver parâmetros
+                setTimeout(() => {
+                    window.location.href = '/login.html';
+                }, 2000);
+            }
+        });
+
+        async function processAuthorizationCode(code, state) {
+            try {
+                // Simular processamento do código de autorização
+                // Em uma implementação real, isso seria feito pelo backend
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                // Redirecionar de volta para o WorkAdventure
+                const redirectUri = localStorage.getItem('oidc_redirect_uri') || 'http://play.workadventure.localhost';
+                const redirectUrl = new URL(redirectUri);
+                redirectUrl.searchParams.set('code', code);
+                redirectUrl.searchParams.set('state', state);
+
+                window.location.href = redirectUrl.toString();
+            } catch (error) {
+                console.error('Erro ao processar código de autorização:', error);
+                document.querySelector('.auth-title').textContent = 'Erro de Processamento';
+                document.querySelector('.auth-subtitle').textContent = 'Não foi possível processar a autenticação';
+                document.querySelector('.spinner').style.display = 'none';
+                document.querySelector('.text-center p').textContent = 'Tente novamente.';
+            }
+        }
+    </script>
+</body>
+</html>

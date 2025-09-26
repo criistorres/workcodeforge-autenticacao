@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar - WorkAdventure Auth</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔐</text></svg>">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="container">
+            <div class="auth-card fade-in">
+                <div class="auth-header">
+                    <div class="auth-logo">🔐</div>
+                    <h1 class="auth-title">Criar Conta</h1>
+                    <p class="auth-subtitle">Junte-se ao WorkAdventure</p>
+                </div>
+
+                <form data-auth-form="register" novalidate>
+                    <div class="form-group">
+                        <label for="name" class="form-label">Nome Completo</label>
+                        <input 
+                            type="text" 
+                            id="name" 
+                            name="name" 
+                            class="form-input" 
+                            data-validate="name"
+                            placeholder="Seu nome completo"
+                            required
+                            autocomplete="name"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            class="form-input" 
+                            data-validate="email"
+                            placeholder="seu@email.com"
+                            required
+                            autocomplete="email"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="username" class="form-label">Username</label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            class="form-input" 
+                            data-validate="username"
+                            placeholder="seu_username"
+                            required
+                            autocomplete="username"
+                        >
+                        <div class="form-help">Apenas letras, números e underscore</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" class="form-label">Senha</label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            class="form-input" 
+                            data-validate="password"
+                            placeholder="Sua senha"
+                            required
+                            autocomplete="new-password"
+                        >
+                        <div class="form-help">
+                            Mínimo 8 caracteres, incluindo: letra minúscula, maiúscula, número e caractere especial
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword" class="form-label">Confirmar Senha</label>
+                        <input 
+                            type="password" 
+                            id="confirmPassword" 
+                            name="confirmPassword" 
+                            class="form-input" 
+                            data-validate="confirmPassword"
+                            placeholder="Confirme sua senha"
+                            required
+                            autocomplete="new-password"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tags" class="form-label">Tags (Opcional)</label>
+                        <div class="tags-container" id="user-tags">
+                            <!-- Tags serão adicionadas dinamicamente -->
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                            <input 
+                                type="text" 
+                                id="tag-input" 
+                                class="form-input tag-input" 
+                                placeholder="Adicionar tag"
+                            >
+                            <button type="button" id="add-tag-btn" class="btn btn-secondary" style="width: auto; padding: 0.75rem 1rem;">
+                                Adicionar
+                            </button>
+                        </div>
+                        <div class="form-help">Tags ajudam a personalizar sua experiência</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        Criar Conta
+                    </button>
+                </form>
+
+                <div class="auth-links">
+                    <p>Já tem uma conta? <a href="/login.html" class="auth-link">Fazer login</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/auth.js"></script>
+</body>
+</html>
