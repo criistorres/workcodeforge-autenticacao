@@ -1,0 +1,64 @@
+version: "3.6"
+services:
+  # Desabilitar o OIDC mock server
+  oidc-server-mock:
+    deploy:
+      replicas: 0
+
+  # Backend de autenticação customizado (APIs)
+  auth-backend:
+    build:
+      context: ./workadventure-auth/backend
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - ISSUER_URL=http://auth.workadventure.localhost
+      - FRONTEND_URL=http://auth.workadventure.localhost
+      - WORKADVENTURE_CLIENT_ID=workadventure-local
+      - WORKADVENTURE_CLIENT_SECRET=my-super-secret-key-for-local-dev
+      - ALLOWED_REDIRECT_URIS=http://play.workadventure.localhost/login-callback,http://play.workadventure.localhost/oauth2/callback,http://play.workadventure.localhost/openid-callback,http://matrix.workadventure.localhost/_synapse/client/oidc/callback
+      - CORS_ORIGIN=http://play.workadventure.localhost
+      - DEFAULT_LOGOUT_REDIRECT=http://play.workadventure.localhost
+    volumes:
+      - ./workadventure-auth/backend/keys:/app/keys:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.auth-api.rule=Host(`auth.workadventure.localhost`) && (PathPrefix(`/.well-known`) || PathPrefix(`/auth`) || PathPrefix(`/authorize`) || PathPrefix(`/token`) || PathPrefix(`/userinfo`) || PathPrefix(`/logout`))"
+      - "traefik.http.routers.auth-api.entryPoints=web"
+      - "traefik.http.routers.auth-api.priority=200"
+      - "traefik.http.services.auth-api.loadbalancer.server.port=3000"
+    networks:
+      - default
+
+  # Frontend Svelte para login (catch-all para outras rotas)
+  auth-frontend:
+    build:
+      context: ./workadventure-auth/frontend
+      dockerfile: Dockerfile
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.auth-front.rule=Host(`auth.workadventure.localhost`)"
+      - "traefik.http.routers.auth-front.entryPoints=web"
+      - "traefik.http.routers.auth-front.priority=10"
+      - "traefik.http.services.auth-front.loadbalancer.server.port=5173"
+    networks:
+      - default
+
+  # Adicionar extra_hosts ao container play para resolver auth.workadventure.localhost internamente
+  play:
+    extra_hosts:
+      - "auth.workadventure.localhost:172.17.0.1"
+    environment:
+      OPENID_CLIENT_ID: "${OPENID_CLIENT_ID}"
+      OPENID_CLIENT_SECRET: "${OPENID_CLIENT_SECRET}"
+      OPENID_CLIENT_ISSUER: "${OPENID_CLIENT_ISSUER}"
+      OPENID_SCOPE: "${OPENID_SCOPE}"
+      OPENID_USERNAME_CLAIM: "${OPENID_USERNAME_CLAIM}"
+      OPENID_TAGS_CLAIM: "${OPENID_TAGS_CLAIM}"
+      DISABLE_ANONYMOUS: "${DISABLE_ANONYMOUS}"
+
+  # Adicionar extra_hosts ao container synapse para resolver auth.workadventure.localhost internamente
+  synapse:
+    extra_hosts:
+      - "auth.workadventure.localhost:172.17.0.1"

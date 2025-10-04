@@ -1,0 +1,47 @@
+import { Controller, Post, Body, Get } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { LoginDto, RegisterDto } from './dto/login.dto';
+import { UsersService } from '../users/users.service';
+
+@Controller('auth')
+export class AuthController {
+  constructor(
+    private authService: AuthService,
+    private usersService: UsersService
+  ) {}
+
+  @Post('login')
+  async login(@Body() loginDto: LoginDto) {
+    console.log(`[LOGIN] Tentativa de login: ${loginDto.email}`);
+    const result = await this.authService.login(loginDto);
+    console.log(`[LOGIN] Login bem-sucedido: ${loginDto.email} - UserID: ${result.userId}`);
+    return result;
+  }
+
+  @Post('register')
+  async register(@Body() registerDto: RegisterDto) {
+    console.log(`[REGISTER] Novo registro: ${registerDto.email} - Nome: ${registerDto.name}`);
+    const result = await this.authService.register(registerDto);
+    console.log(`[REGISTER] Registro bem-sucedido: ${registerDto.email} - UserID: ${result.userId}`);
+    return result;
+  }
+
+  @Post('authorize')
+  async authorize(@Body() body: any) {
+    console.log(`[AUTHORIZE] Gerando código de autorização para UserID: ${body.userId}`);
+    return this.authService.authorize(body.userId, body);
+  }
+
+  @Get('users')
+  async listUsers() {
+    const users = await this.usersService.getAllUsers();
+    return users.map(u => ({
+      id: u.id,
+      email: u.email,
+      name: u.name,
+      username: u.username,
+      tags: u.tags,
+      createdAt: u.createdAt
+    }));
+  }
+}

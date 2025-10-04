@@ -20,20 +20,20 @@ done
 
 envsubst < /data/homeserver.template.yaml > /data/homeserver.yaml
 
-# Wait for the OIDC mock server to be up, exit with an error after 2 minutes
+# Wait for the auth server to be up, exit with an error after 2 minutes
 timeout=120
 elapsed=0
-echo "Waiting for OIDC mock server to be up..."
-while ! wget -q http://oidc.workadventure.localhost/.well-known/openid-configuration; do
+echo "Waiting for auth server to be up..."
+while ! wget -q http://auth.workadventure.localhost/.well-known/openid-configuration; do
     if [ $elapsed -ge $timeout ]; then
-        echo "Error: OIDC mock server did not start within 2 minutes."
+        echo "Error: Auth server did not start within 2 minutes."
         exit 1
     fi
-    echo "Waiting for OIDC mock server to be up..."
+    echo "Waiting for auth server to be up..."
     sleep 1
     elapsed=$((elapsed + 1))
 done
-echo "OIDC mock server is up."
+echo "Auth server is up."
 
 python -m synapse.app.homeserver \
     --config-path /data/homeserver.yaml \
