@@ -20,16 +20,24 @@ services:
       - ALLOWED_REDIRECT_URIS=http://play.workadventure.localhost/login-callback,http://play.workadventure.localhost/oauth2/callback,http://play.workadventure.localhost/openid-callback,http://matrix.workadventure.localhost/_synapse/client/oidc/callback
       - CORS_ORIGIN=http://play.workadventure.localhost
       - DEFAULT_LOGOUT_REDIRECT=http://play.workadventure.localhost
+      - DATABASE_HOST=auth-postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USER=auth_user
+      - DATABASE_PASSWORD=auth_password_dev_123
+      - DATABASE_NAME=workadventure_auth
     volumes:
       - ./workadventure-auth/backend/keys:/app/keys:ro
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.auth-api.rule=Host(`auth.workadventure.localhost`) && (PathPrefix(`/.well-known`) || PathPrefix(`/auth`) || PathPrefix(`/authorize`) || PathPrefix(`/token`) || PathPrefix(`/userinfo`) || PathPrefix(`/logout`))"
+      - "traefik.http.routers.auth-api.rule=Host(`auth.workadventure.localhost`) && (PathPrefix(`/.well-known`) || PathPrefix(`/auth`) || PathPrefix(`/authorize`) || PathPrefix(`/token`) || PathPrefix(`/userinfo`) || PathPrefix(`/logout`) || PathPrefix(`/admin`))"
       - "traefik.http.routers.auth-api.entryPoints=web"
       - "traefik.http.routers.auth-api.priority=200"
       - "traefik.http.services.auth-api.loadbalancer.server.port=3000"
     networks:
       - default
+    depends_on:
+      auth-postgres:
+        condition: service_healthy
 
   # Frontend Svelte para login (catch-all para outras rotas)
   auth-frontend:
@@ -62,3 +70,41 @@ services:
   synapse:
     extra_hosts:
       - "auth.workadventure.localhost:172.17.0.1"
+
+  # PostgreSQL para persistência de dados do auth
+  auth-postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: workadventure_auth
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: auth_password_dev_123
+    volumes:
+      - auth-postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"  # Porta 5433 no host para evitar conflito
+    networks:
+      - default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auth_user -d workadventure_auth"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PgAdmin para gerenciar o banco (opcional, útil para debug)
+  auth-pgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@workadventure.localhost
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pgadmin.rule=Host(`pgadmin.workadventure.localhost`)"
+      - "traefik.http.routers.pgadmin.entryPoints=web"
+      - "traefik.http.services.pgadmin.loadbalancer.server.port=80"
+    networks:
+      - default
+    depends_on:
+      - auth-postgres
+
+volumes:
+  auth-postgres-data:

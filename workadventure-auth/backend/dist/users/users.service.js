@@ -31,78 +31,119 @@ var __importStar = (this && this.__importStar) || function (mod) {
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
+const typeorm_1 = require("@nestjs/typeorm");
+const typeorm_2 = require("typeorm");
+const user_entity_1 = require("./entities/user.entity");
+const audit_log_entity_1 = require("./entities/audit-log.entity");
 const bcrypt = __importStar(require("bcrypt"));
-const uuid_1 = require("uuid");
 let UsersService = class UsersService {
-    constructor() {
-        this.users = new Map();
-        this.createInitialUsers();
-    }
-    async createInitialUsers() {
-        const hashedPwd = await bcrypt.hash('pwd', 10);
-        const users = [
-            {
-                id: '1',
-                email: '[email protected]',
-                password: hashedPwd,
-                name: 'User 1',
-                username: 'user1',
-                tags: ['admin', 'moderator'],
-                createdAt: new Date()
-            },
-            {
-                id: '2',
-                email: '[email protected]',
-                password: hashedPwd,
-                name: 'User 2',
-                username: 'user2',
-                tags: ['member'],
-                createdAt: new Date()
-            }
-        ];
-        users.forEach(user => this.users.set(user.id, user));
+    constructor(usersRepository, auditLogRepository) {
+        this.usersRepository = usersRepository;
+        this.auditLogRepository = auditLogRepository;
     }
     async findByEmail(email) {
-        return Array.from(this.users.values()).find(u => u.email === email);
+        console.log(`[FIND BY EMAIL] Procurando email: "${email}"`);
+        const user = await this.usersRepository.findOne({ where: { email } });
+        console.log(`[FIND BY EMAIL] Usuário encontrado?`, user ? `SIM (ID: ${user.id})` : 'NÃO');
+        return user;
     }
     async findById(id) {
-        return this.users.get(id);
+        return this.usersRepository.findOne({ where: { id } });
     }
     async create(userData) {
         const hashedPassword = await bcrypt.hash(userData.password, 10);
-        const user = {
-            id: (0, uuid_1.v4)(),
+        const user = this.usersRepository.create({
             email: userData.email,
             password: hashedPassword,
             name: userData.name,
             username: userData.username || userData.email.split('@')[0],
             tags: userData.tags || ['member'],
-            createdAt: new Date()
-        };
-        this.users.set(user.id, user);
-        return user;
+        });
+        const savedUser = await this.usersRepository.save(user);
+        await this.createAuditLog(savedUser.id, 'register', null, {
+            email: savedUser.email,
+            name: savedUser.name,
+        });
+        return savedUser;
     }
     async validatePassword(user, password) {
         return bcrypt.compare(password, user.password);
     }
     async getAllUsers() {
-        return Array.from(this.users.values());
+        return this.usersRepository.find({
+            select: ['id', 'email', 'name', 'username', 'tags', 'createdAt', 'lastLogin'],
+            order: { createdAt: 'DESC' },
+        });
     }
     async updateTags(userId, tags) {
-        const user = this.users.get(userId);
-        if (user) {
-            user.tags = tags;
-            this.users.set(userId, user);
+        const user = await this.findById(userId);
+        if (!user)
+            return null;
+        const oldTags = [...user.tags];
+        user.tags = tags;
+        const updated = await this.usersRepository.save(user);
+        await this.createAuditLog(userId, 'update_tags', userId, {
+            oldTags,
+            newTags: tags,
+        });
+        return updated;
+    }
+    async updateLastLogin(userId) {
+        await this.usersRepository.update(userId, {
+            lastLogin: new Date(),
+        });
+    }
+    async deleteUser(userId) {
+        const result = await this.usersRepository.delete(userId);
+        if (result.affected > 0) {
+            await this.createAuditLog(userId, 'delete', userId, {});
+            return true;
         }
-        return user;
+        return false;
+    }
+    async createAuditLog(userId, action, targetId, metadata) {
+        const log = this.auditLogRepository.create({
+            userId,
+            action,
+            targetId,
+            metadata,
+        });
+        return this.auditLogRepository.save(log);
+    }
+    async getAuditLogs(limit = 100) {
+        return this.auditLogRepository.find({
+            relations: ['user'],
+            order: { createdAt: 'DESC' },
+            take: limit,
+        });
+    }
+    async getUserStats() {
+        const total = await this.usersRepository.count();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const newToday = await this.usersRepository.count({
+            where: {
+                createdAt: { $gte: today },
+            },
+        });
+        return {
+            total,
+            newToday,
+        };
     }
 };
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [])
+    __param(0, (0, typeorm_1.InjectRepository)(user_entity_1.UserEntity)),
+    __param(1, (0, typeorm_1.InjectRepository)(audit_log_entity_1.AuditLogEntity)),
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository])
 ], UsersService);
 //# sourceMappingURL=users.service.js.map

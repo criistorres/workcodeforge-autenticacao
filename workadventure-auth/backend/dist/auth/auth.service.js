@@ -19,14 +19,23 @@ let AuthService = class AuthService {
         this.oidcService = oidcService;
     }
     async login(loginDto) {
+        console.log(`[LOGIN DEBUG] Email recebido: "${loginDto.email}" | Length: ${loginDto.email.length}`);
+        console.log(`[LOGIN DEBUG] Senha recebida: "${loginDto.password}" | Length: ${loginDto.password.length}`);
         const user = await this.usersService.findByEmail(loginDto.email);
         if (!user) {
+            console.log(`[LOGIN DEBUG] Usuário NÃO encontrado para email: ${loginDto.email}`);
             throw new common_1.UnauthorizedException('Invalid credentials');
         }
+        console.log(`[LOGIN DEBUG] Usuário encontrado! ID: ${user.id}, Email: ${user.email}`);
         const isPasswordValid = await this.usersService.validatePassword(user, loginDto.password);
+        console.log(`[LOGIN DEBUG] Senha válida? ${isPasswordValid}`);
         if (!isPasswordValid) {
             throw new common_1.UnauthorizedException('Invalid credentials');
         }
+        await this.usersService.updateLastLogin(user.id);
+        await this.usersService.createAuditLog(user.id, 'login', null, {
+            timestamp: new Date(),
+        });
         return {
             userId: user.id,
             email: user.email,

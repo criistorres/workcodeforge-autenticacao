@@ -40,7 +40,7 @@ export declare class OidcController {
         }[];
     }>;
     authorize(clientId: string, redirectUri: string, responseType: string, scope: string, state: string, nonce: string, res: Response): Promise<void | Response<any, Record<string, any>>>;
-    token(grantType: string, code: string, clientId: string, clientSecret: string, redirectUri: string): Promise<{
+    token(grantType: string, code: string, clientIdBody: string, clientSecretBody: string, redirectUri: string, req: Request): Promise<{
         access_token: string;
         token_type: string;
         expires_in: number;

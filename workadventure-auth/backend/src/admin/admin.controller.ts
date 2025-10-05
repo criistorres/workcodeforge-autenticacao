@@ -1,0 +1,143 @@
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Req } from '@nestjs/common';
+import { AdminService } from './admin.service';
+import { AdminGuard } from './guards/admin.guard';
+import { PermissionsGuard, Permissions } from './guards/permissions.guard';
+
+@Controller('admin')
+@UseGuards(AdminGuard, PermissionsGuard)
+export class AdminController {
+  constructor(private readonly adminService: AdminService) {}
+
+  // ============ USERS ============
+
+  @Get('users')
+  @Permissions('users.view')
+  async getUsers(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('search') search?: string,
+    @Query('role') role?: string,
+    @Query('status') status?: string,
+    @Query('sort') sort?: string,
+    @Query('order') order?: 'ASC' | 'DESC',
+  ) {
+    return this.adminService.getUsers({
+      page: page ? parseInt(page) : 1,
+      limit: limit ? parseInt(limit) : 20,
+      search,
+      role,
+      status,
+      sort,
+      order,
+    });
+  }
+
+  @Get('users/:id')
+  @Permissions('users.view.details')
+  async getUserDetails(@Param('id') id: string) {
+    return this.adminService.getUserDetails(id);
+  }
+
+  @Put('users/:id')
+  @Permissions('users.edit')
+  async updateUser(
+    @Param('id') id: string,
+    @Body() data: { name?: string; email?: string; isActive?: boolean },
+  ) {
+    return this.adminService.updateUser(id, data);
+  }
+
+  @Put('users/:id/roles')
+  @Permissions('roles.assign')
+  async assignRoles(
+    @Param('id') id: string,
+    @Body() data: { roleIds: string[] },
+    @Req() req: any,
+  ) {
+    const adminId = req.user.id;
+    return this.adminService.assignRolesToUser(id, data.roleIds, adminId);
+  }
+
+  @Put('users/:id/block')
+  @Permissions('users.block')
+  async blockUser(
+    @Param('id') id: string,
+    @Body() data: { blocked: boolean; reason?: string },
+    @Req() req: any,
+  ) {
+    const adminId = req.user.id;
+
+    if (data.blocked) {
+      return this.adminService.blockUser(id, data.reason || 'No reason provided', adminId);
+    } else {
+      return this.adminService.unblockUser(id, adminId);
+    }
+  }
+
+  @Delete('users/:id')
+  @Permissions('users.delete')
+  async deleteUser(@Param('id') id: string, @Req() req: any) {
+    const adminId = req.user.id;
+    return this.adminService.deleteUser(id, adminId);
+  }
+
+  // ============ ROLES ============
+
+  @Get('roles')
+  @Permissions('roles.view')
+  async getRoles() {
+    return this.adminService.getRoles();
+  }
+
+  @Post('roles')
+  @Permissions('roles.create')
+  async createRole(
+    @Body() data: {
+      name: string;
+      displayName: string;
+      description?: string;
+      color?: string;
+      permissions: string[];
+    },
+  ) {
+    return this.adminService.createRole(data);
+  }
+
+  @Put('roles/:id')
+  @Permissions('roles.edit')
+  async updateRole(@Param('id') id: string, @Body() data: any) {
+    return this.adminService.updateRole(id, data);
+  }
+
+  @Delete('roles/:id')
+  @Permissions('roles.delete')
+  async deleteRole(@Param('id') id: string) {
+    return this.adminService.deleteRole(id);
+  }
+
+  // ============ AUDIT LOGS ============
+
+  @Get('audit-logs')
+  @Permissions('audit.view')
+  async getAuditLogs(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('userId') userId?: string,
+    @Query('action') action?: string,
+  ) {
+    return this.adminService.getAuditLogs({
+      page: page ? parseInt(page) : 1,
+      limit: limit ? parseInt(limit) : 50,
+      userId,
+      action,
+    });
+  }
+
+  // ============ STATS ============
+
+  @Get('stats')
+  @Permissions('users.view')
+  async getStats() {
+    return this.adminService.getStats();
+  }
+}

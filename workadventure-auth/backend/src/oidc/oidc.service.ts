@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
 import { UsersService } from '../users/users.service';
+import { SessionEntity } from '../users/entities/session.entity';
 
 interface AuthorizationData {
   userId: string;
@@ -22,7 +25,9 @@ export class OidcService {
 
   constructor(
     private jwtService: JwtService,
-    private usersService: UsersService
+    private usersService: UsersService,
+    @InjectRepository(SessionEntity)
+    private sessionsRepository: Repository<SessionEntity>,
   ) {
     this.privateKey = fs.readFileSync('keys/private.key', 'utf8');
     this.publicKey = fs.readFileSync('keys/public.key', 'utf8');
@@ -107,6 +112,23 @@ export class OidcService {
       header: { kid: 'key-1', alg: 'RS256', typ: 'JWT' }
     });
 
+    // Criar sessão no banco de dados
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 1); // 1 hora de validade
+
+    const session = this.sessionsRepository.create({
+      userId: user.id,
+      token: accessToken,
+      expiresAt,
+      isActive: true,
+      ipAddress: null, // TODO: capturar IP da requisição
+      userAgent: null, // TODO: capturar user-agent da requisição
+    });
+
+    await this.sessionsRepository.save(session);
+
+    console.log(`[SESSION] Sessão criada para usuário ${user.email} (ID: ${user.id})`);
+
     return { idToken, accessToken };
   }
 
@@ -119,6 +141,32 @@ export class OidcService {
       return decoded;
     } catch (error) {
       return null;
+    }
+  }
+
+  async revokeSessionByToken(token: string): Promise<void> {
+    try {
+      // Decodificar token para obter userId
+      const decoded = this.jwtService.verify(token, {
+        publicKey: this.publicKey,
+        algorithms: ['RS256']
+      });
+
+      const userId = decoded.sub;
+
+      // Marcar todas as sessões ativas deste usuário como inativas
+      const result = await this.sessionsRepository.update(
+        { userId, isActive: true },
+        {
+          isActive: false,
+          revokedAt: new Date()
+        }
+      );
+
+      console.log(`[LOGOUT] ${result.affected || 0} sessão(ões) revogada(s) para usuário ${userId}`);
+    } catch (error) {
+      console.error('[LOGOUT] Erro ao decodificar token:', error.message);
+      throw new Error('Invalid token');
     }
   }
 }

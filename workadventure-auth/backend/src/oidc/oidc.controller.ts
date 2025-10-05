@@ -149,8 +149,18 @@ export class OidcController {
   @Get('logout')
   async logout(
     @Query('post_logout_redirect_uri') redirectUri: string,
+    @Query('id_token_hint') idTokenHint: string,
     @Res() res: Response
   ) {
+    // Revogar sessão se id_token_hint for fornecido
+    if (idTokenHint) {
+      try {
+        await this.oidcService.revokeSessionByToken(idTokenHint);
+      } catch (err) {
+        console.error('[LOGOUT] Erro ao revogar sessão:', err.message);
+      }
+    }
+
     const finalRedirectUri = redirectUri || process.env.DEFAULT_LOGOUT_REDIRECT;
     return res.redirect(finalRedirectUri);
   }

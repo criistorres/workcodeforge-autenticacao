@@ -29,6 +29,14 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    // Atualizar último login
+    await this.usersService.updateLastLogin(user.id);
+
+    // Criar log de auditoria
+    await this.usersService.createAuditLog(user.id, 'login', null, {
+      timestamp: new Date(),
+    });
+
     return {
       userId: user.id,
       email: user.email,

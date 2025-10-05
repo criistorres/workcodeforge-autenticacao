@@ -88,13 +88,15 @@ let OidcService = class OidcService {
             aud: authData.clientId,
             exp: now + 3600,
             iat: now,
-            nonce: authData.nonce,
             email: user.email,
             email_verified: true,
             name: user.name,
             preferred_username: user.username,
             tags: user.tags
         };
+        if (authData.nonce && authData.nonce !== 'undefined') {
+            idTokenPayload.nonce = authData.nonce;
+        }
         const idToken = this.jwtService.sign(idTokenPayload, {
             algorithm: 'RS256',
             privateKey: this.privateKey,

@@ -11,12 +11,14 @@ const common_1 = require("@nestjs/common");
 const auth_module_1 = require("./auth/auth.module");
 const oidc_module_1 = require("./oidc/oidc.module");
 const users_module_1 = require("./users/users.module");
+const database_module_1 = require("./database/database.module");
+const admin_module_1 = require("./admin/admin.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [auth_module_1.AuthModule, oidc_module_1.OidcModule, users_module_1.UsersModule]
+        imports: [database_module_1.DatabaseModule, auth_module_1.AuthModule, oidc_module_1.OidcModule, users_module_1.UsersModule, admin_module_1.AdminModule]
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

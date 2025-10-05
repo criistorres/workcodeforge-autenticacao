@@ -16,18 +16,38 @@ exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
 const login_dto_1 = require("./dto/login.dto");
+const users_service_1 = require("../users/users.service");
 let AuthController = class AuthController {
-    constructor(authService) {
+    constructor(authService, usersService) {
         this.authService = authService;
+        this.usersService = usersService;
     }
     async login(loginDto) {
-        return this.authService.login(loginDto);
+        console.log(`[LOGIN] Tentativa de login: ${loginDto.email}`);
+        const result = await this.authService.login(loginDto);
+        console.log(`[LOGIN] Login bem-sucedido: ${loginDto.email} - UserID: ${result.userId}`);
+        return result;
     }
     async register(registerDto) {
-        return this.authService.register(registerDto);
+        console.log(`[REGISTER] Novo registro: ${registerDto.email} - Nome: ${registerDto.name}`);
+        const result = await this.authService.register(registerDto);
+        console.log(`[REGISTER] Registro bem-sucedido: ${registerDto.email} - UserID: ${result.userId}`);
+        return result;
     }
     async authorize(body) {
+        console.log(`[AUTHORIZE] Gerando código de autorização para UserID: ${body.userId}`);
         return this.authService.authorize(body.userId, body);
+    }
+    async listUsers() {
+        const users = await this.usersService.getAllUsers();
+        return users.map(u => ({
+            id: u.id,
+            email: u.email,
+            name: u.name,
+            username: u.username,
+            tags: u.tags,
+            createdAt: u.createdAt
+        }));
     }
 };
 exports.AuthController = AuthController;
@@ -52,8 +72,15 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "authorize", null);
+__decorate([
+    (0, common_1.Get)('users'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "listUsers", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
-    __metadata("design:paramtypes", [auth_service_1.AuthService])
+    __metadata("design:paramtypes", [auth_service_1.AuthService,
+        users_service_1.UsersService])
 ], AuthController);
 //# sourceMappingURL=auth.controller.js.map

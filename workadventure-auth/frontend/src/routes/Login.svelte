@@ -46,6 +46,9 @@
 
       const { userId } = await response.json();
 
+      // Salvar userId no localStorage para uso no admin panel
+      localStorage.setItem('userId', userId);
+
       const authResponse = await fetch('/auth/authorize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -72,7 +75,7 @@
 
 <div class="container">
   <div class="login-box">
-    <h1>{isRegister ? 'Registrar' : 'Entrar'} no WorkAdventure</h1>
+    <h1>{isRegister ? 'Registrar' : 'Entrar'} no WorkCodeForge</h1>
 
     {#if error}
       <div class="error">{error}</div>
@@ -142,6 +145,9 @@
       </ul>
       <p style="margin-top: 1rem; color: #666; font-size: 0.8rem;">
         💡 Dica: Use <code>admin@example.com</code> para login como admin
+      </p>
+      <p style="margin-top: 0.5rem; color: #d9534f; font-size: 0.8rem; font-weight: 600;">
+        ⚠️ A senha é <code>pwd</code> (tudo minúscula!)
       </p>
     </div>
   </div>

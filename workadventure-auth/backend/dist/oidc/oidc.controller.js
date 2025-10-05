@@ -49,16 +49,30 @@ let OidcController = class OidcController {
         if (!allowedRedirectUris.includes(redirectUri)) {
             return res.status(400).json({ error: 'invalid_redirect_uri' });
         }
-        const loginUrl = `${process.env.FRONTEND_URL}/login?` +
+        let loginUrl = `${process.env.FRONTEND_URL}/login?` +
             `client_id=${encodeURIComponent(clientId)}&` +
             `redirect_uri=${encodeURIComponent(redirectUri)}&` +
             `response_type=${encodeURIComponent(responseType)}&` +
             `scope=${encodeURIComponent(scope)}&` +
-            `state=${encodeURIComponent(state)}&` +
-            `nonce=${encodeURIComponent(nonce)}`;
+            `state=${encodeURIComponent(state)}`;
+        if (nonce && nonce !== 'undefined') {
+            loginUrl += `&nonce=${encodeURIComponent(nonce)}`;
+        }
         return res.redirect(loginUrl);
     }
-    async token(grantType, code, clientId, clientSecret, redirectUri) {
+    async token(grantType, code, clientIdBody, clientSecretBody, redirectUri, req) {
+        let clientId = clientIdBody;
+        let clientSecret = clientSecretBody;
+        if (!clientId || !clientSecret) {
+            const authHeader = req.headers['authorization'];
+            if (authHeader && authHeader.startsWith('Basic ')) {
+                const base64Credentials = authHeader.substring(6);
+                const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
+                const [id, secret] = credentials.split(':');
+                clientId = id;
+                clientSecret = secret;
+            }
+        }
         if (clientId !== process.env.WORKADVENTURE_CLIENT_ID ||
             clientSecret !== process.env.WORKADVENTURE_CLIENT_SECRET) {
             throw new common_1.HttpException('invalid_client', common_1.HttpStatus.UNAUTHORIZED);
@@ -131,14 +145,16 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], OidcController.prototype, "authorize", null);
 __decorate([
+    (0, common_1.HttpCode)(200),
     (0, common_1.Post)('token'),
     __param(0, (0, common_1.Body)('grant_type')),
     __param(1, (0, common_1.Body)('code')),
     __param(2, (0, common_1.Body)('client_id')),
     __param(3, (0, common_1.Body)('client_secret')),
     __param(4, (0, common_1.Body)('redirect_uri')),
+    __param(5, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, String, String, String]),
+    __metadata("design:paramtypes", [String, String, String, String, String, Object]),
     __metadata("design:returntype", Promise)
 ], OidcController.prototype, "token", null);
 __decorate([
