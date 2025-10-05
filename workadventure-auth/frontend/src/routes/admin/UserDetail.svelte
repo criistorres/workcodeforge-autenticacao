@@ -7,14 +7,17 @@
   export let params = {};
 
   let user = null;
-  let roles = [];
+  let allRoles = [];
   let loading = true;
   let error = '';
   let editing = false;
+  let editingRoles = false;
+  let selectedRoles = [];
 
   let formData = {
     name: '',
     email: '',
+    username: '',
     isActive: true,
   };
 
@@ -25,8 +28,10 @@
       formData = {
         name: user.name,
         email: user.email,
+        username: user.username,
         isActive: user.isActive,
       };
+      selectedRoles = user.roles ? user.roles.map(r => r.id) : [];
     } catch (err) {
       error = err.message;
     } finally {
@@ -36,7 +41,7 @@
 
   async function loadRoles() {
     try {
-      roles = await adminAPI.getRoles();
+      allRoles = await adminAPI.getRoles();
     } catch (err) {
       console.error('Error loading roles:', err);
     }
@@ -47,9 +52,21 @@
       await adminAPI.updateUser(params.id, formData);
       editing = false;
       await loadUser();
-      alert('Usuário atualizado com sucesso!');
+      alert('✅ Usuário atualizado com sucesso!');
     } catch (err) {
-      alert('Erro ao atualizar: ' + err.message);
+      alert('❌ Erro ao atualizar: ' + err.message);
+    }
+  }
+
+  async function handleSaveRoles() {
+    try {
+      const userId = localStorage.getItem('userId');
+      await adminAPI.assignRoles(params.id, selectedRoles);
+      editingRoles = false;
+      await loadUser();
+      alert('✅ Roles atualizadas com sucesso!');
+    } catch (err) {
+      alert('❌ Erro ao atualizar roles: ' + err.message);
     }
   }
 
@@ -60,9 +77,9 @@
     try {
       await adminAPI.blockUser(params.id, true, reason);
       await loadUser();
-      alert('Usuário bloqueado!');
+      alert('✅ Usuário bloqueado!');
     } catch (err) {
-      alert('Erro: ' + err.message);
+      alert('❌ Erro: ' + err.message);
     }
   }
 
@@ -72,21 +89,29 @@
     try {
       await adminAPI.blockUser(params.id, false);
       await loadUser();
-      alert('Usuário desbloqueado!');
+      alert('✅ Usuário desbloqueado!');
     } catch (err) {
-      alert('Erro: ' + err.message);
+      alert('❌ Erro: ' + err.message);
     }
   }
 
   async function handleDelete() {
-    if (!confirm('ATENÇÃO: Deletar este usuário? Esta ação não pode ser desfeita!')) return;
+    if (!confirm('⚠️ ATENÇÃO: Deletar este usuário? Esta ação não pode ser desfeita!')) return;
 
     try {
       await adminAPI.deleteUser(params.id);
-      alert('Usuário deletado!');
+      alert('✅ Usuário deletado!');
       push('/admin/users');
     } catch (err) {
-      alert('Erro: ' + err.message);
+      alert('❌ Erro: ' + err.message);
+    }
+  }
+
+  function toggleRole(roleId) {
+    if (selectedRoles.includes(roleId)) {
+      selectedRoles = selectedRoles.filter(id => id !== roleId);
+    } else {
+      selectedRoles = [...selectedRoles, roleId];
     }
   }
 
@@ -98,141 +123,281 @@
 
 <AdminLayout title="Detalhes do Usuário">
   {#if loading}
-    <div class="loading">⏳ Carregando...</div>
+    <div class="flex items-center justify-center py-12">
+      <div class="text-center">
+        <div class="text-4xl mb-2">⏳</div>
+        <p class="text-dark-500">Carregando...</p>
+      </div>
+    </div>
   {:else if error}
-    <div class="error">❌ Erro: {error}</div>
+    <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800">
+      ❌ Erro: {error}
+    </div>
   {:else if user}
-    <div class="user-detail">
-      <div class="header-actions">
-        <button on:click={() => push('/admin/users')} class="btn-back">
+    <div class="max-w-6xl space-y-6">
+      <!-- Header com ações -->
+      <div class="flex justify-between items-center">
+        <button on:click={() => push('/admin/users')} class="btn-secondary">
           ← Voltar
         </button>
-        <div class="actions">
+        <div class="flex gap-2">
           {#if !editing}
-            <button on:click={() => editing = true} class="btn-edit">✏️ Editar</button>
+            <button on:click={() => editing = true} class="btn bg-blue-600 text-white hover:bg-blue-700">
+              ✏️ Editar
+            </button>
           {/if}
           {#if user.blockedAt}
-            <button on:click={handleUnblock} class="btn-unblock">✅ Desbloquear</button>
+            <button on:click={handleUnblock} class="btn-success">✅ Desbloquear</button>
           {:else}
-            <button on:click={handleBlock} class="btn-block">🚫 Bloquear</button>
+            <button on:click={handleBlock} class="btn bg-yellow-600 text-white hover:bg-yellow-700">
+              🚫 Bloquear
+            </button>
           {/if}
-          <button on:click={handleDelete} class="btn-delete">🗑️ Deletar</button>
+          <button on:click={handleDelete} class="btn-danger">🗑️ Deletar</button>
         </div>
       </div>
 
-      <div class="info-card">
-        <h2>Informações Básicas</h2>
+      <!-- Card de Informações Básicas -->
+      <div class="card">
+        <h2 class="text-xl font-bold text-dark-900 mb-6 flex items-center gap-2">
+          <span class="text-2xl">👤</span>
+          Informações Básicas
+        </h2>
 
         {#if editing}
-          <div class="form">
-            <div class="form-group">
-              <label>Nome:</label>
-              <input type="text" bind:value={formData.name} />
+          <form on:submit|preventDefault={handleSave} class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-dark-700 mb-2">Nome</label>
+                <input type="text" bind:value={formData.name} class="input" required />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-dark-700 mb-2">Username</label>
+                <input type="text" bind:value={formData.username} class="input" required />
+              </div>
             </div>
 
-            <div class="form-group">
-              <label>Email:</label>
-              <input type="email" bind:value={formData.email} />
+            <div>
+              <label class="block text-sm font-medium text-dark-700 mb-2">Email</label>
+              <input type="email" bind:value={formData.email} class="input" required />
             </div>
 
-            <div class="form-group">
-              <label>
-                <input type="checkbox" bind:checked={formData.isActive} />
-                Conta Ativa
-              </label>
+            <div class="flex items-center gap-2">
+              <input type="checkbox" bind:checked={formData.isActive} class="w-4 h-4 text-primary-600" />
+              <label class="text-sm font-medium text-dark-700">Conta Ativa</label>
             </div>
 
-            <div class="form-actions">
-              <button on:click={handleSave} class="btn-save">💾 Salvar</button>
-              <button on:click={() => editing = false} class="btn-cancel">❌ Cancelar</button>
+            <div class="flex gap-2 pt-4">
+              <button type="submit" class="btn-success">💾 Salvar</button>
+              <button type="button" on:click={() => editing = false} class="btn-secondary">❌ Cancelar</button>
             </div>
-          </div>
+          </form>
         {:else}
-          <div class="info-grid">
-            <div class="info-item">
-              <strong>ID:</strong>
-              <span>{user.id}</span>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div>
+              <p class="text-xs text-dark-500 uppercase tracking-wide mb-1">ID</p>
+              <p class="text-dark-900 font-mono text-sm">{user.id.substring(0, 8)}...</p>
             </div>
-            <div class="info-item">
-              <strong>Nome:</strong>
-              <span>{user.name}</span>
+            <div>
+              <p class="text-xs text-dark-500 uppercase tracking-wide mb-1">Nome</p>
+              <p class="text-dark-900 font-medium">{user.name}</p>
             </div>
-            <div class="info-item">
-              <strong>Email:</strong>
-              <span>{user.email}</span>
+            <div>
+              <p class="text-xs text-dark-500 uppercase tracking-wide mb-1">Email</p>
+              <p class="text-dark-900">{user.email}</p>
             </div>
-            <div class="info-item">
-              <strong>Username:</strong>
-              <span>@{user.username}</span>
+            <div>
+              <p class="text-xs text-dark-500 uppercase tracking-wide mb-1">Username</p>
+              <p class="text-dark-900">@{user.username}</p>
             </div>
-            <div class="info-item">
-              <strong>Status:</strong>
-              <span>
+            <div>
+              <p class="text-xs text-dark-500 uppercase tracking-wide mb-1">Status</p>
+              <p class="text-dark-900">
                 {#if user.blockedAt}
-                  🚫 Bloqueado desde {new Date(user.blockedAt).toLocaleDateString('pt-BR')}
+                  <span class="badge-danger">🚫 Bloqueado</span>
                 {:else if user.isActive}
-                  ✅ Ativo
+                  <span class="badge-success">✅ Ativo</span>
                 {:else}
-                  ⚠️ Inativo
+                  <span class="badge-warning">⚠️ Inativo</span>
                 {/if}
-              </span>
+              </p>
             </div>
-            <div class="info-item">
-              <strong>Email Verificado:</strong>
-              <span>{user.isEmailVerified ? '✅ Sim' : '❌ Não'}</span>
+            <div>
+              <p class="text-xs text-dark-500 uppercase tracking-wide mb-1">Email Verificado</p>
+              <p class="text-dark-900">{user.isEmailVerified ? '✅ Sim' : '❌ Não'}</p>
             </div>
-            <div class="info-item">
-              <strong>Criado em:</strong>
-              <span>{new Date(user.createdAt).toLocaleString('pt-BR')}</span>
+            <div>
+              <p class="text-xs text-dark-500 uppercase tracking-wide mb-1">Criado em</p>
+              <p class="text-dark-900 text-sm">{new Date(user.createdAt).toLocaleDateString('pt-BR')}</p>
             </div>
-            <div class="info-item">
-              <strong>Último Login:</strong>
-              <span>{user.lastLogin ? new Date(user.lastLogin).toLocaleString('pt-BR') : 'Nunca'}</span>
+            <div>
+              <p class="text-xs text-dark-500 uppercase tracking-wide mb-1">Último Login</p>
+              <p class="text-dark-900 text-sm">{user.lastLogin ? new Date(user.lastLogin).toLocaleDateString('pt-BR') : 'Nunca'}</p>
             </div>
           </div>
 
           {#if user.blockedReason}
-            <div class="blocked-reason">
-              <strong>Motivo do Bloqueio:</strong>
-              <p>{user.blockedReason}</p>
+            <div class="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
+              <p class="text-sm font-medium text-yellow-800">Motivo do Bloqueio:</p>
+              <p class="text-sm text-yellow-700 mt-1">{user.blockedReason}</p>
             </div>
           {/if}
         {/if}
       </div>
 
-      <div class="info-card">
-        <h2>Roles & Permissões</h2>
-        <div class="roles">
-          {#if user.roles && user.roles.length > 0}
-            {#each user.roles as role}
-              <div class="role-badge" style="background-color: {role.color}20; border-color: {role.color}">
-                <span class="role-name">{role.displayName}</span>
-                {#if role.description}
-                  <span class="role-desc">{role.description}</span>
-                {/if}
+      <!-- Card de Roles - Estilo Gamer Premium -->
+      <div class="relative overflow-hidden rounded-2xl border border-gray-800 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 shadow-2xl">
+        <!-- Efeito de brilho gamer -->
+        <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 opacity-50"></div>
+
+        <!-- Borda neon -->
+        <div class="absolute inset-0 rounded-2xl border border-cyan-500/30"></div>
+
+        <div class="relative p-6">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent flex items-center gap-3">
+              <span class="text-3xl">🎭</span>
+              Roles & Permissões
+            </h2>
+            {#if !editingRoles}
+              <button on:click={() => editingRoles = true}
+                      class="px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-lg font-semibold hover:from-cyan-500 hover:to-blue-500 transition-all duration-300 shadow-lg hover:shadow-cyan-500/50 transform hover:scale-105">
+                <span class="flex items-center gap-2">
+                  <span>✏️</span>
+                  <span>Editar Roles</span>
+                </span>
+              </button>
+            {/if}
+          </div>
+
+          {#if editingRoles}
+            <div class="space-y-6">
+              <div class="flex items-center gap-2 text-cyan-300">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p class="text-sm font-medium">Selecione as roles para este usuário:</p>
               </div>
-            {/each}
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {#each allRoles as role}
+                  <label class="group relative cursor-pointer">
+                    <!-- Borda com gradiente animado quando selecionado -->
+                    <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300
+                                {selectedRoles.includes(role.id) ? 'opacity-75' : ''}"></div>
+
+                    <div class="relative m-[2px] p-4 rounded-xl bg-gray-800 transition-all duration-300
+                                {selectedRoles.includes(role.id) ? 'bg-gradient-to-br from-gray-800 to-gray-900' : 'hover:bg-gray-750'}">
+                      <div class="flex items-start gap-3">
+                        <!-- Checkbox customizado -->
+                        <div class="relative flex items-center justify-center mt-1">
+                          <input
+                            type="checkbox"
+                            checked={selectedRoles.includes(role.id)}
+                            on:change={() => toggleRole(role.id)}
+                            class="w-5 h-5 opacity-0 absolute"
+                          />
+                          <div class="w-5 h-5 rounded border-2 transition-all duration-300 flex items-center justify-center
+                                      {selectedRoles.includes(role.id)
+                                        ? 'bg-gradient-to-br from-cyan-500 to-purple-500 border-cyan-400'
+                                        : 'border-gray-600 group-hover:border-cyan-500'}">
+                            {#if selectedRoles.includes(role.id)}
+                              <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                              </svg>
+                            {/if}
+                          </div>
+                        </div>
+
+                        <div class="flex-1">
+                          <div class="flex items-center gap-2 mb-1">
+                            <!-- Indicador de cor da role com glow -->
+                            <div class="w-3 h-3 rounded-full shadow-lg"
+                                 style="background-color: {role.color}; box-shadow: 0 0 10px {role.color}80;"></div>
+                            <span class="font-bold text-white">{role.displayName}</span>
+                          </div>
+                          {#if role.description}
+                            <p class="text-sm text-gray-400 leading-relaxed">{role.description}</p>
+                          {/if}
+                        </div>
+                      </div>
+                    </div>
+                  </label>
+                {/each}
+              </div>
+
+              <div class="flex gap-3 pt-4">
+                <button on:click={handleSaveRoles}
+                        class="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-bold hover:from-green-500 hover:to-emerald-500 transition-all duration-300 shadow-lg hover:shadow-green-500/50 transform hover:scale-105">
+                  <span class="flex items-center justify-center gap-2">
+                    <span>💾</span>
+                    <span>Salvar Roles</span>
+                  </span>
+                </button>
+                <button on:click={() => { editingRoles = false; selectedRoles = user.roles.map(r => r.id); }}
+                        class="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-xl font-bold hover:bg-gray-600 transition-all duration-300">
+                  <span class="flex items-center justify-center gap-2">
+                    <span>❌</span>
+                    <span>Cancelar</span>
+                  </span>
+                </button>
+              </div>
+            </div>
           {:else}
-            <p>Nenhuma role atribuída</p>
+            <div class="flex flex-wrap gap-4">
+              {#if user.roles && user.roles.length > 0}
+                {#each user.roles as role}
+                  <div class="group relative">
+                    <!-- Glow effect -->
+                    <div class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                         style="background: radial-gradient(circle at center, {role.color}40 0%, transparent 70%); filter: blur(10px);"></div>
+
+                    <div class="relative px-6 py-4 rounded-xl border-2 transition-all duration-300 transform group-hover:scale-105 bg-gradient-to-br from-gray-800 to-gray-900"
+                         style="border-color: {role.color}60; box-shadow: 0 4px 20px {role.color}20;">
+                      <div class="flex items-center gap-3 mb-2">
+                        <div class="w-4 h-4 rounded-full shadow-lg"
+                             style="background-color: {role.color}; box-shadow: 0 0 15px {role.color};"></div>
+                        <span class="font-bold text-white text-lg">{role.displayName}</span>
+                      </div>
+                      {#if role.description}
+                        <p class="text-sm text-gray-400 leading-relaxed">{role.description}</p>
+                      {/if}
+                    </div>
+                  </div>
+                {/each}
+              {:else}
+                <div class="w-full text-center py-8">
+                  <div class="text-5xl mb-3 opacity-50">🎭</div>
+                  <p class="text-gray-500 font-medium">Nenhuma role atribuída</p>
+                  <p class="text-gray-600 text-sm mt-1">Clique em "Editar Roles" para atribuir permissões</p>
+                </div>
+              {/if}
+            </div>
           {/if}
         </div>
       </div>
 
+      <!-- Card de Sessões -->
       {#if user.sessions && user.sessions.length > 0}
-        <div class="info-card">
-          <h2>Sessões Ativas ({user.sessions.length})</h2>
-          <div class="sessions">
+        <div class="card">
+          <h2 class="text-xl font-bold text-dark-900 mb-4 flex items-center gap-2">
+            <span class="text-2xl">🔌</span>
+            Sessões Ativas ({user.sessions.length})
+          </h2>
+          <div class="space-y-2">
             {#each user.sessions as session}
-              <div class="session-item">
-                <div>
-                  <strong>IP:</strong> {session.ipAddress || 'N/A'}
+              <div class="p-3 bg-dark-50 rounded-lg flex justify-between items-center">
+                <div class="flex gap-6 text-sm">
+                  <div>
+                    <span class="text-dark-500">IP:</span>
+                    <span class="text-dark-900 font-mono">{session.ipAddress || 'N/A'}</span>
+                  </div>
+                  <div>
+                    <span class="text-dark-500">Criada:</span>
+                    <span class="text-dark-900">{new Date(session.createdAt).toLocaleString('pt-BR')}</span>
+                  </div>
                 </div>
-                <div>
-                  <strong>Criada:</strong> {new Date(session.createdAt).toLocaleString('pt-BR')}
-                </div>
-                <div>
-                  <strong>Expira:</strong> {new Date(session.expiresAt).toLocaleString('pt-BR')}
-                </div>
+                <span class="badge-info">Ativa</span>
               </div>
             {/each}
           </div>
@@ -241,208 +406,3 @@
     </div>
   {/if}
 </AdminLayout>
-
-<style>
-  .loading, .error {
-    padding: 2rem;
-    text-align: center;
-  }
-
-  .error {
-    color: #dc2626;
-  }
-
-  .user-detail {
-    max-width: 1000px;
-  }
-
-  .header-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-  }
-
-  .actions {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .btn-back, .btn-edit, .btn-block, .btn-unblock, .btn-delete {
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: opacity 0.2s;
-  }
-
-  .btn-back {
-    background: #6b7280;
-    color: white;
-  }
-
-  .btn-edit {
-    background: #3b82f6;
-    color: white;
-  }
-
-  .btn-block {
-    background: #f59e0b;
-    color: white;
-  }
-
-  .btn-unblock {
-    background: #10b981;
-    color: white;
-  }
-
-  .btn-delete {
-    background: #dc2626;
-    color: white;
-  }
-
-  button:hover {
-    opacity: 0.9;
-  }
-
-  .info-card {
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-
-  .info-card h2 {
-    margin: 0 0 1rem 0;
-    color: #1f2937;
-    font-size: 1.2rem;
-  }
-
-  .info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
-  }
-
-  .info-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  .info-item strong {
-    color: #6b7280;
-    font-size: 0.85rem;
-  }
-
-  .info-item span {
-    color: #1f2937;
-    font-size: 1rem;
-  }
-
-  .blocked-reason {
-    margin-top: 1rem;
-    padding: 1rem;
-    background: #fef3c7;
-    border-left: 4px solid #f59e0b;
-    border-radius: 4px;
-  }
-
-  .blocked-reason p {
-    margin: 0.5rem 0 0 0;
-  }
-
-  .form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .form-group label {
-    font-weight: 500;
-    color: #374151;
-  }
-
-  .form-group input[type="text"],
-  .form-group input[type="email"] {
-    padding: 0.75rem;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    font-size: 1rem;
-  }
-
-  .form-actions {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
-  }
-
-  .btn-save {
-    padding: 0.75rem 1.5rem;
-    background: #10b981;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-  }
-
-  .btn-cancel {
-    padding: 0.75rem 1.5rem;
-    background: #6b7280;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-  }
-
-  .roles {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-
-  .role-badge {
-    padding: 1rem;
-    border: 2px solid;
-    border-radius: 8px;
-    min-width: 200px;
-  }
-
-  .role-name {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-  }
-
-  .role-desc {
-    display: block;
-    font-size: 0.85rem;
-    color: #6b7280;
-  }
-
-  .sessions {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .session-item {
-    padding: 0.75rem;
-    background: #f9fafb;
-    border-radius: 6px;
-    display: flex;
-    gap: 2rem;
-  }
-
-  .session-item strong {
-    color: #6b7280;
-    font-size: 0.85rem;
-  }
-</style>

@@ -1,0 +1,17 @@
+
+ ▐▛███▜▌   Claude Code v2.0.5
+▝▜█████▛▘  Sonnet 4.5 · Claude Pro
+  ▘▘ ▝▝    /Users/cristiantorres/Documents/GitHub/workcodeforge-autenticacao
+═════════════════════════════════════════════════════════════════ Conversation compacted · ctrl+o for history ════════════════════════════════════════════════════════════════
+  ⎿  Read workadventure-auth/frontend/src/routes/admin/UserDetail.svelte (341 lines)
+  ⎿  Read workadventure-auth/frontend/src/routes/admin/AdminLogin.svelte (130 lines)
+  ⎿  Read workadventure-auth/frontend/src/app.css (148 lines)
+  ⎿  Read workadventure-auth/frontend/postcss.config.js (7 lines)
+  ⎿  Read workadventure-auth/frontend/tailwind.config.js (95 lines)
+  ⎿  Todo list read (7 items)
+  ⎿  Session limit reached ∙ resets 12am
+     /upgrade to increase your usage limit.
+
+
+
+

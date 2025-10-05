@@ -55,5 +55,5 @@ export declare class OidcController {
         preferred_username: string;
         tags: string[];
     }>;
-    logout(redirectUri: string, res: Response): Promise<void>;
+    logout(redirectUri: string, idTokenHint: string, res: Response): Promise<void>;
 }

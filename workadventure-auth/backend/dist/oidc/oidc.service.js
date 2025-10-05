@@ -31,17 +31,24 @@ var __importStar = (this && this.__importStar) || function (mod) {
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OidcService = void 0;
 const common_1 = require("@nestjs/common");
+const typeorm_1 = require("@nestjs/typeorm");
+const typeorm_2 = require("typeorm");
 const jwt_1 = require("@nestjs/jwt");
 const fs = __importStar(require("fs"));
 const crypto = __importStar(require("crypto"));
 const users_service_1 = require("../users/users.service");
+const session_entity_1 = require("../users/entities/session.entity");
 let OidcService = class OidcService {
-    constructor(jwtService, usersService) {
+    constructor(jwtService, usersService, sessionsRepository) {
         this.jwtService = jwtService;
         this.usersService = usersService;
+        this.sessionsRepository = sessionsRepository;
         this.authorizationCodes = new Map();
         this.privateKey = fs.readFileSync('keys/private.key', 'utf8');
         this.publicKey = fs.readFileSync('keys/public.key', 'utf8');
@@ -113,6 +120,18 @@ let OidcService = class OidcService {
             privateKey: this.privateKey,
             header: { kid: 'key-1', alg: 'RS256', typ: 'JWT' }
         });
+        const expiresAt = new Date();
+        expiresAt.setHours(expiresAt.getHours() + 1);
+        const session = this.sessionsRepository.create({
+            userId: user.id,
+            token: accessToken,
+            expiresAt,
+            isActive: true,
+            ipAddress: null,
+            userAgent: null,
+        });
+        await this.sessionsRepository.save(session);
+        console.log(`[SESSION] Sessão criada para usuário ${user.email} (ID: ${user.id})`);
         return { idToken, accessToken };
     }
     async validateAccessToken(token) {
@@ -127,11 +146,31 @@ let OidcService = class OidcService {
             return null;
         }
     }
+    async revokeSessionByToken(token) {
+        try {
+            const decoded = this.jwtService.verify(token, {
+                publicKey: this.publicKey,
+                algorithms: ['RS256']
+            });
+            const userId = decoded.sub;
+            const result = await this.sessionsRepository.update({ userId, isActive: true }, {
+                isActive: false,
+                revokedAt: new Date()
+            });
+            console.log(`[LOGOUT] ${result.affected || 0} sessão(ões) revogada(s) para usuário ${userId}`);
+        }
+        catch (error) {
+            console.error('[LOGOUT] Erro ao decodificar token:', error.message);
+            throw new Error('Invalid token');
+        }
+    }
 };
 exports.OidcService = OidcService;
 exports.OidcService = OidcService = __decorate([
     (0, common_1.Injectable)(),
+    __param(2, (0, typeorm_1.InjectRepository)(session_entity_1.SessionEntity)),
     __metadata("design:paramtypes", [jwt_1.JwtService,
-        users_service_1.UsersService])
+        users_service_1.UsersService,
+        typeorm_2.Repository])
 ], OidcService);
 //# sourceMappingURL=oidc.service.js.map

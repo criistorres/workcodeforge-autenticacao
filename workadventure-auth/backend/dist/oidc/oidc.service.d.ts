@@ -1,5 +1,7 @@
+import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
+import { SessionEntity } from '../users/entities/session.entity';
 interface AuthorizationData {
     userId: string;
     clientId: string;
@@ -12,10 +14,11 @@ interface AuthorizationData {
 export declare class OidcService {
     private jwtService;
     private usersService;
+    private sessionsRepository;
     private authorizationCodes;
     private privateKey;
     private publicKey;
-    constructor(jwtService: JwtService, usersService: UsersService);
+    constructor(jwtService: JwtService, usersService: UsersService, sessionsRepository: Repository<SessionEntity>);
     getPublicKeys(): Promise<{
         keys: {
             kid: string;
@@ -43,5 +46,6 @@ export declare class OidcService {
         accessToken: string;
     }>;
     validateAccessToken(token: string): Promise<any>;
+    revokeSessionByToken(token: string): Promise<void>;
 }
 export {};

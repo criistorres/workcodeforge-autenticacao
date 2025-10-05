@@ -9,9 +9,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.OidcModule = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
+const typeorm_1 = require("@nestjs/typeorm");
 const oidc_controller_1 = require("./oidc.controller");
 const oidc_service_1 = require("./oidc.service");
 const users_module_1 = require("../users/users.module");
+const session_entity_1 = require("../users/entities/session.entity");
 let OidcModule = class OidcModule {
 };
 exports.OidcModule = OidcModule;
@@ -19,6 +21,7 @@ exports.OidcModule = OidcModule = __decorate([
     (0, common_1.Module)({
         imports: [
             jwt_1.JwtModule.register({}),
+            typeorm_1.TypeOrmModule.forFeature([session_entity_1.SessionEntity]),
             users_module_1.UsersModule
         ],
         controllers: [oidc_controller_1.OidcController],

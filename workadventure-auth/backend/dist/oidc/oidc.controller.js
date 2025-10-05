@@ -113,7 +113,15 @@ let OidcController = class OidcController {
             tags: user.tags
         };
     }
-    async logout(redirectUri, res) {
+    async logout(redirectUri, idTokenHint, res) {
+        if (idTokenHint) {
+            try {
+                await this.oidcService.revokeSessionByToken(idTokenHint);
+            }
+            catch (err) {
+                console.error('[LOGOUT] Erro ao revogar sessão:', err.message);
+            }
+        }
         const finalRedirectUri = redirectUri || process.env.DEFAULT_LOGOUT_REDIRECT;
         return res.redirect(finalRedirectUri);
     }
@@ -167,9 +175,10 @@ __decorate([
 __decorate([
     (0, common_1.Get)('logout'),
     __param(0, (0, common_1.Query)('post_logout_redirect_uri')),
-    __param(1, (0, common_1.Res)()),
+    __param(1, (0, common_1.Query)('id_token_hint')),
+    __param(2, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, String, Object]),
     __metadata("design:returntype", Promise)
 ], OidcController.prototype, "logout", null);
 exports.OidcController = OidcController = __decorate([

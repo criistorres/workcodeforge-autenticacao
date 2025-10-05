@@ -419,7 +419,7 @@ Quando você testa o login sem os parâmetros OIDC (`client_id`, `redirect_uri`,
 
 **Isso é CORRETO!** O servidor OIDC está funcionando perfeitamente.
 
-**Status:** [ ] ✅ Passou | [ ] ❌ Falhou
+**Status:** [ x] ✅ Passou | [ ] ❌ Falhou
 
 ---
 
@@ -493,7 +493,7 @@ echo "ID_TOKEN_AQUI" | cut -d'.' -f2 | base64 -d 2>/dev/null | jq
   - Novos Hoje: 3
   - Sessões Ativas: 0
 
-**Status:** [ ] ✅ Passou | [ ] ❌ Falhou
+**Status:** [ x] ✅ Passou | [ ] ❌ Falhou
 
 **Screenshots:**
 - [ ] Dashboard
@@ -512,7 +512,8 @@ echo "ID_TOKEN_AQUI" | cut -d'.' -f2 | base64 -d 2>/dev/null | jq
 - Colunas: Nome, Email, Username, Tags, Status, Último Login, Ações
 - Campo de busca no topo
 
-**Status:** [ ] ✅ Passou | [ ] ❌ Falhou
+**Status:** [ x] ✅ Passou | [ ] ❌ Falhou
+OBS: Mas os estilos estao ruins,  por exemplo visualmente os nomes nao da pra ver pois estao com a mesma cor do fundo
 
 **Dados Esperados:**
 | Nome | Email | Tags | Status |
@@ -534,7 +535,7 @@ echo "ID_TOKEN_AQUI" | cut -d'.' -f2 | base64 -d 2>/dev/null | jq
 - Tabela atualiza automaticamente
 - Mostra apenas "Admin User"
 
-**Status:** [ ] ✅ Passou | [ ] ❌ Falhou
+**Status:** [x ] ✅ Passou | [ ] ❌ Falhou
 
 ---
 
@@ -550,8 +551,8 @@ echo "ID_TOKEN_AQUI" | cut -d'.' -f2 | base64 -d 2>/dev/null | jq
 - Card "Roles & Permissões" mostrando role "Administrador"
 - Botões: ← Voltar, ✏️ Editar, 🚫 Bloquear, 🗑️ Deletar
 
-**Status:** [ ] ✅ Passou | [ ] ❌ Falhou
-
+**Status:** [x ] ✅ Passou | [ ] ❌ Falhou
+OBS: PROBLEMAS NAO DA PRA VER OS DADOS POIS ESTA TUDO COM A MESMA COR DO FUNDO
 ---
 
 ### Teste 15: Editar Usuário
@@ -568,7 +569,7 @@ echo "ID_TOKEN_AQUI" | cut -d'.' -f2 | base64 -d 2>/dev/null | jq
 - Ao salvar: alerta "Usuário atualizado com sucesso!"
 - Nome atualizado na tela
 
-**Status:** [ ] ✅ Passou | [ ] ❌ Falhou
+**Status:** [X] ✅ Passou | [ ] ❌ Falhou
 
 ---
 
@@ -587,7 +588,7 @@ echo "ID_TOKEN_AQUI" | cut -d'.' -f2 | base64 -d 2>/dev/null | jq
 - Status muda para "🚫 Bloqueado desde [data]"
 - Aparece box amarelo com motivo do bloqueio
 
-**Status:** [ ] ✅ Passou | [ ] ❌ Falhou
+**Status:** [X ] ✅ Passou | [ ] ❌ Falhou
 
 ---
 
@@ -605,7 +606,7 @@ echo "ID_TOKEN_AQUI" | cut -d'.' -f2 | base64 -d 2>/dev/null | jq
 - Status volta para "✅ Ativo"
 - Box amarelo desaparece
 
-**Status:** [ ] ✅ Passou | [ ] ❌ Falhou
+**Status:** [X ] ✅ Passou | [ ] ❌ Falhou
 
 ---
 
