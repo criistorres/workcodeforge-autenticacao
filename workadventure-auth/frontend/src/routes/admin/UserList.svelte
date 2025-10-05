@@ -2,7 +2,11 @@
   import { onMount } from 'svelte';
   import { link } from 'svelte-spa-router';
   import AdminLayout from '../../components/AdminLayout.svelte';
+  import ConfirmModal from '../../components/ConfirmModal.svelte';
+  import SkeletonLoader from '../../components/SkeletonLoader.svelte';
   import { adminAPI } from '../../utils/api.js';
+  import { toast } from '../../stores/toastStore.js';
+  import { debounce } from '../../utils/debounce.js';
 
   let users = [];
   let loading = true;
@@ -10,13 +14,30 @@
   let page = 1;
   let totalPages = 1;
   let search = '';
+  let filters = {
+    status: '',
+    role: '',
+    sort: 'createdAt',
+    order: 'DESC'
+  };
+
+  // Modal states for quick actions
+  let showBlockModal = false;
+  let showUnblockModal = false;
+  let selectedUser = null;
+  let blockReason = '';
 
   async function loadUsers() {
     loading = true;
     error = '';
 
     try {
-      const response = await adminAPI.getUsers({ page, limit: 20, search });
+      const response = await adminAPI.getUsers({
+        page,
+        limit: 20,
+        search,
+        ...filters
+      });
       users = response.data;
       totalPages = response.meta.totalPages;
     } catch (err) {
@@ -26,7 +47,16 @@
     }
   }
 
+  const debouncedSearch = debounce(() => {
+    page = 1;
+    loadUsers();
+  }, 300);
+
   function handleSearch() {
+    debouncedSearch();
+  }
+
+  function handleFilterChange() {
     page = 1;
     loadUsers();
   }
@@ -36,18 +66,58 @@
     loadUsers();
   }
 
+  function openBlockModal(user) {
+    selectedUser = user;
+    blockReason = '';
+    showBlockModal = true;
+  }
+
+  function openUnblockModal(user) {
+    selectedUser = user;
+    showUnblockModal = true;
+  }
+
+  async function confirmBlock() {
+    if (!blockReason.trim()) {
+      toast.warning('Por favor, informe o motivo do bloqueio');
+      return;
+    }
+
+    try {
+      await adminAPI.blockUser(selectedUser.id, true, blockReason);
+      showBlockModal = false;
+      blockReason = '';
+      selectedUser = null;
+      toast.success('Usuário bloqueado com sucesso!');
+      await loadUsers();
+    } catch (err) {
+      toast.error('Erro ao bloquear: ' + err.message);
+    }
+  }
+
+  async function confirmUnblock() {
+    try {
+      await adminAPI.blockUser(selectedUser.id, false);
+      showUnblockModal = false;
+      selectedUser = null;
+      toast.success('Usuário desbloqueado com sucesso!');
+      await loadUsers();
+    } catch (err) {
+      toast.error('Erro ao desbloquear: ' + err.message);
+    }
+  }
+
   onMount(() => {
     loadUsers();
   });
 </script>
 
 <AdminLayout title="Gerenciar Usuários">
-  <!-- Barra de Pesquisa com design gamer -->
-  <div class="mb-6">
+  <!-- Barra de Pesquisa e Filtros -->
+  <div class="mb-6 space-y-4">
+    <!-- Busca -->
     <div class="relative max-w-xl">
-      <!-- Glow effect -->
       <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-xl blur-xl opacity-50"></div>
-
       <div class="relative">
         <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
           <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -63,18 +133,71 @@
         />
       </div>
     </div>
+
+    <!-- Filtros Avançados -->
+    <div class="relative overflow-hidden rounded-xl border border-gray-800 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-purple-500/5"></div>
+
+      <div class="relative p-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <!-- Filtro de Status -->
+          <div>
+            <label class="block text-sm font-medium text-gray-400 mb-2">📊 Status</label>
+            <select
+              bind:value={filters.status}
+              on:change={handleFilterChange}
+              class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50 text-sm"
+            >
+              <option value="">Todos</option>
+              <option value="active">✅ Ativos</option>
+              <option value="inactive">⚠️ Inativos</option>
+              <option value="blocked">🚫 Bloqueados</option>
+            </select>
+          </div>
+
+          <!-- Ordenar por -->
+          <div>
+            <label class="block text-sm font-medium text-gray-400 mb-2">📑 Ordenar por</label>
+            <select
+              bind:value={filters.sort}
+              on:change={handleFilterChange}
+              class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50 text-sm"
+            >
+              <option value="createdAt">Data de Criação</option>
+              <option value="lastLogin">Último Login</option>
+              <option value="name">Nome</option>
+              <option value="email">Email</option>
+            </select>
+          </div>
+
+          <!-- Ordem -->
+          <div>
+            <label class="block text-sm font-medium text-gray-400 mb-2">⬆️⬇️ Ordem</label>
+            <select
+              bind:value={filters.order}
+              on:change={handleFilterChange}
+              class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50 text-sm"
+            >
+              <option value="DESC">Decrescente</option>
+              <option value="ASC">Crescente</option>
+            </select>
+          </div>
+
+          <!-- Info -->
+          <div class="flex items-end">
+            <div class="w-full px-3 py-2 bg-gradient-to-r from-cyan-600/20 to-purple-600/20 border border-cyan-500/30 rounded-lg">
+              <span class="text-cyan-300 font-semibold text-sm">
+                📈 {users.length} usuários
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   {#if loading}
-    <div class="flex items-center justify-center py-20">
-      <div class="text-center">
-        <div class="relative inline-block">
-          <div class="absolute inset-0 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full blur-xl animate-pulse"></div>
-          <div class="relative text-6xl mb-4">⏳</div>
-        </div>
-        <p class="text-gray-400 font-medium text-lg">Carregando usuários...</p>
-      </div>
-    </div>
+    <SkeletonLoader rows={10} type="table" />
   {:else if error}
     <div class="bg-gradient-to-r from-red-900/50 to-red-800/50 border border-red-500/50 rounded-xl p-6 text-red-200">
       <div class="flex items-center gap-3">
@@ -171,14 +294,32 @@
                   </span>
                 </td>
                 <td class="px-6 py-4">
-                  <div class="flex justify-center">
+                  <div class="flex justify-center gap-2">
                     <a href="/admin/users/{user.id}" use:link
-                       class="relative px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-lg font-semibold hover:from-cyan-500 hover:to-blue-500 transition-all duration-300 shadow-lg hover:shadow-cyan-500/50 transform hover:scale-105 group">
-                      <span class="flex items-center gap-2">
+                       class="relative px-3 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-lg font-semibold hover:from-cyan-500 hover:to-blue-500 transition-all duration-300 shadow-lg hover:shadow-cyan-500/50 transform hover:scale-105">
+                      <span class="flex items-center gap-2 text-sm">
                         <span>👁️</span>
                         <span>Ver</span>
                       </span>
                     </a>
+
+                    {#if user.blockedAt}
+                      <button
+                        on:click={() => openUnblockModal(user)}
+                        class="relative px-3 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-semibold hover:from-green-500 hover:to-emerald-500 transition-all duration-300 shadow-lg hover:shadow-green-500/50 transform hover:scale-105">
+                        <span class="flex items-center gap-1 text-sm">
+                          <span>✅</span>
+                        </span>
+                      </button>
+                    {:else}
+                      <button
+                        on:click={() => openBlockModal(user)}
+                        class="relative px-3 py-2 bg-gradient-to-r from-yellow-600 to-orange-600 text-white rounded-lg font-semibold hover:from-yellow-500 hover:to-orange-500 transition-all duration-300 shadow-lg hover:shadow-yellow-500/50 transform hover:scale-105">
+                        <span class="flex items-center gap-1 text-sm">
+                          <span>🚫</span>
+                        </span>
+                      </button>
+                    {/if}
                   </div>
                 </td>
               </tr>
@@ -226,3 +367,31 @@
     </div>
   {/if}
 </AdminLayout>
+
+<!-- Modal de Bloqueio -->
+<ConfirmModal
+  bind:isOpen={showBlockModal}
+  title="Bloquear Usuário"
+  type="warning"
+  confirmText="Bloquear"
+  on:confirm={confirmBlock}
+>
+  <p class="text-gray-300 mb-4">Você está prestes a bloquear o usuário <strong>{selectedUser?.name}</strong>.</p>
+  <label class="block text-sm font-medium text-gray-400 mb-2">Motivo do bloqueio:</label>
+  <textarea
+    bind:value={blockReason}
+    class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/50"
+    rows="3"
+    placeholder="Digite o motivo do bloqueio..."
+  ></textarea>
+</ConfirmModal>
+
+<!-- Modal de Desbloqueio -->
+<ConfirmModal
+  bind:isOpen={showUnblockModal}
+  title="Desbloquear Usuário"
+  message="Tem certeza que deseja desbloquear o usuário {selectedUser?.name}? O usuário poderá fazer login novamente."
+  type="info"
+  confirmText="Desbloquear"
+  on:confirm={confirmUnblock}
+/>
