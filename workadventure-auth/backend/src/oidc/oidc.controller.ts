@@ -152,16 +152,29 @@ export class OidcController {
     @Query('id_token_hint') idTokenHint: string,
     @Res() res: Response
   ) {
+    console.log('[LOGOUT] Requisição de logout recebida');
+    console.log('[LOGOUT] post_logout_redirect_uri:', redirectUri);
+    console.log('[LOGOUT] id_token_hint:', idTokenHint ? 'presente' : 'ausente');
+
     // Revogar sessão se id_token_hint for fornecido
     if (idTokenHint) {
       try {
         await this.oidcService.revokeSessionByToken(idTokenHint);
+        console.log('[LOGOUT] Sessão revogada com sucesso');
       } catch (err) {
         console.error('[LOGOUT] Erro ao revogar sessão:', err.message);
       }
     }
 
-    const finalRedirectUri = redirectUri || process.env.DEFAULT_LOGOUT_REDIRECT;
-    return res.redirect(finalRedirectUri);
+    // Se não veio redirect_uri, usar o default (play.workadventure.localhost)
+    const finalRedirectUri = redirectUri || process.env.DEFAULT_LOGOUT_REDIRECT || 'http://play.workadventure.localhost';
+
+    // Redirecionar para o frontend com parâmetro de logout para limpar localStorage
+    // e depois redirecionar para o Play
+    const logoutPageUrl = `${process.env.FRONTEND_URL}/login?logout=true&post_logout_redirect_uri=${encodeURIComponent(finalRedirectUri)}`;
+
+    console.log('[LOGOUT] Redirecionando para página de logout:', logoutPageUrl);
+    console.log('[LOGOUT] Após limpeza, usuário será redirecionado para:', finalRedirectUri);
+    return res.redirect(logoutPageUrl);
   }
 }

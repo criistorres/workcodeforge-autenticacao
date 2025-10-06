@@ -2,7 +2,6 @@
   import { onMount } from 'svelte';
   import { push } from 'svelte-spa-router';
   import AdminLayout from '../../components/AdminLayout.svelte';
-  import SkeletonLoader from '../../components/SkeletonLoader.svelte';
   import { adminAPI } from '../../utils/api.js';
 
   let stats = null;
@@ -35,8 +34,14 @@
 
 <AdminLayout title="Dashboard">
   {#if loading}
-    <div class="max-w-7xl space-y-8">
-      <SkeletonLoader rows={5} type="stat" />
+    <div class="flex items-center justify-center py-20">
+      <div class="text-center">
+        <div class="relative inline-block">
+          <div class="absolute inset-0 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full blur-xl animate-pulse"></div>
+          <div class="relative text-6xl mb-4">⏳</div>
+        </div>
+        <p class="text-gray-400 font-medium text-lg">Carregando estatísticas...</p>
+      </div>
     </div>
   {:else if error}
     <div class="bg-gradient-to-r from-red-900/50 to-red-800/50 border border-red-500/50 rounded-xl p-6 text-red-200">

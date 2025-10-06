@@ -171,6 +171,7 @@ export const EnvironmentVariables = z.object({
     OPENID_CLIENT_ISSUER: z.string().optional(),
     OPENID_CLIENT_REDIRECT_URL: z.string().optional(),
     OPENID_CLIENT_REDIRECT_LOGOUT_URL: z.string().optional(),
+    OPENID_LOGOUT_REDIRECT_URL: z.string().optional(),
     OPENID_PROFILE_SCREEN_PROVIDER: z.string().optional(),
     OPENID_SCOPE: z.string().optional(),
     OPENID_PROMPT: z.string().optional(),

@@ -44,6 +44,9 @@ services:
     build:
       context: ./workadventure-auth/frontend
       dockerfile: Dockerfile
+    volumes:
+      - ./workadventure-auth/frontend/src:/app/src
+      - ./workadventure-auth/frontend/public:/app/public
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.auth-front.rule=Host(`auth.workadventure.localhost`)"

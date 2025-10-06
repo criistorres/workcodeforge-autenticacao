@@ -8,6 +8,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
+const serve_static_1 = require("@nestjs/serve-static");
+const path_1 = require("path");
 const auth_module_1 = require("./auth/auth.module");
 const oidc_module_1 = require("./oidc/oidc.module");
 const users_module_1 = require("./users/users.module");
@@ -18,7 +20,19 @@ let AppModule = class AppModule {
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [database_module_1.DatabaseModule, auth_module_1.AuthModule, oidc_module_1.OidcModule, users_module_1.UsersModule, admin_module_1.AdminModule]
+        imports: [
+            serve_static_1.ServeStaticModule.forRoot({
+                rootPath: (0, path_1.join)(__dirname, '..', '..', 'frontend', 'dist'),
+                exclude: ['/api*', '/.well-known*', '/auth*', '/admin/api*', '/admin/users*', '/admin/roles*', '/admin/audit-logs*', '/admin/stats*', '/authorize*', '/token*', '/userinfo*', '/logout*'],
+                serveRoot: '/',
+                renderPath: '/*',
+            }),
+            database_module_1.DatabaseModule,
+            auth_module_1.AuthModule,
+            oidc_module_1.OidcModule,
+            users_module_1.UsersModule,
+            admin_module_1.AdminModule
+        ]
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

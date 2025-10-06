@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindManyOptions, Like, MoreThan } from 'typeorm';
+import { Repository, FindManyOptions, Like, MoreThan, In } from 'typeorm';
 import { UserEntity } from '../users/entities/user.entity';
 import { RoleEntity } from '../users/entities/role.entity';
 import { UserRoleEntity } from '../users/entities/user-role.entity';
@@ -128,12 +128,23 @@ export class AdminService {
 
     await this.userRolesRepository.save(userRoles);
 
+    // Buscar os nomes das roles para atualizar as tags do usuário
+    const roles = await this.rolesRepository.find({
+      where: { id: In(roleIds) }
+    });
+    const tags = roles.map(role => role.name);
+
+    // Atualizar o campo tags do usuário com os nomes das roles
+    await this.usersRepository.update(userId, { tags });
+
+    console.log(`[ADMIN] Tags atualizadas para usuário ${userId}:`, tags);
+
     // Log admin action
     await this.logAdminAction({
       adminId,
       actionType: 'role.assign',
       targetUserId: userId,
-      metadata: { roleIds },
+      metadata: { roleIds, tags },
     });
 
     return this.getUserDetails(userId);

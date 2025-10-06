@@ -39,6 +39,7 @@ import {
     MATRIX_ADMIN_USER,
     MATRIX_ADMIN_PASSWORD,
     MATRIX_DOMAIN,
+    OPID_LOGOUT_REDIRECT_URL,
 } from "../enums/EnvironmentVariable";
 import type { AdminBannedData, FetchMemberDataByUuidResponse } from "./AdminApi";
 import type { AdminInterface } from "./AdminInterface";
@@ -265,7 +266,7 @@ class LocalAdmin implements AdminInterface {
             authenticationMandatory: DISABLE_ANONYMOUS,
             contactPage: null,
             group: wamUrl ? "default" : null,
-            opidLogoutRedirectUrl: null,
+            opidLogoutRedirectUrl: OPID_LOGOUT_REDIRECT_URL || null,
             opidUsernamePolicy: opidWokaNamePolicyCheck.success ? opidWokaNamePolicyCheck.data : null,
             loadingLogo: null,
             loginSceneLogo: null,

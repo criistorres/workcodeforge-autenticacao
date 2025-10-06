@@ -5,8 +5,6 @@
   import Dashboard from './routes/admin/Dashboard.svelte';
   import UserList from './routes/admin/UserList.svelte';
   import UserDetail from './routes/admin/UserDetail.svelte';
-  import AuditLogs from './routes/admin/AuditLogs.svelte';
-  import Toast from './components/Toast.svelte';
 
   const routes = {
     '/': Login,
@@ -14,12 +12,10 @@
     '/admin': Dashboard,
     '/admin/users': UserList,
     '/admin/users/:id': UserDetail,
-    '/admin/logs': AuditLogs,
   };
 </script>
 
 <Router {routes} />
-<Toast />
 
 <style>
   :global(body) {

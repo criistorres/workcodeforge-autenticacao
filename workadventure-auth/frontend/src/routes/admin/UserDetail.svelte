@@ -2,9 +2,7 @@
   import { onMount } from 'svelte';
   import { push } from 'svelte-spa-router';
   import AdminLayout from '../../components/AdminLayout.svelte';
-  import ConfirmModal from '../../components/ConfirmModal.svelte';
   import { adminAPI } from '../../utils/api.js';
-  import { toast } from '../../stores/toastStore.js';
 
   export let params = {};
 
@@ -15,12 +13,6 @@
   let editing = false;
   let editingRoles = false;
   let selectedRoles = [];
-
-  // Modal states
-  let showBlockModal = false;
-  let showUnblockModal = false;
-  let showDeleteModal = false;
-  let blockReason = '';
 
   let formData = {
     name: '',
@@ -60,9 +52,9 @@
       await adminAPI.updateUser(params.id, formData);
       editing = false;
       await loadUser();
-      toast.success('Usuário atualizado com sucesso!');
+      alert('✅ Usuário atualizado com sucesso!');
     } catch (err) {
-      toast.error('Erro ao atualizar: ' + err.message);
+      alert('❌ Erro ao atualizar: ' + err.message);
     }
   }
 
@@ -72,47 +64,46 @@
       await adminAPI.assignRoles(params.id, selectedRoles);
       editingRoles = false;
       await loadUser();
-      toast.success('Roles atualizadas com sucesso!');
+      alert('✅ Roles atualizadas com sucesso!');
     } catch (err) {
-      toast.error('Erro ao atualizar roles: ' + err.message);
+      alert('❌ Erro ao atualizar roles: ' + err.message);
     }
   }
 
-  async function confirmBlock() {
-    if (!blockReason.trim()) {
-      toast.warning('Por favor, informe o motivo do bloqueio');
-      return;
-    }
+  async function handleBlock() {
+    const reason = prompt('Motivo do bloqueio:');
+    if (!reason) return;
 
     try {
-      await adminAPI.blockUser(params.id, true, blockReason);
+      await adminAPI.blockUser(params.id, true, reason);
       await loadUser();
-      showBlockModal = false;
-      blockReason = '';
-      toast.success('Usuário bloqueado com sucesso!');
+      alert('✅ Usuário bloqueado!');
     } catch (err) {
-      toast.error('Erro ao bloquear: ' + err.message);
+      alert('❌ Erro: ' + err.message);
     }
   }
 
-  async function confirmUnblock() {
+  async function handleUnblock() {
+    if (!confirm('Desbloquear este usuário?')) return;
+
     try {
       await adminAPI.blockUser(params.id, false);
       await loadUser();
-      showUnblockModal = false;
-      toast.success('Usuário desbloqueado com sucesso!');
+      alert('✅ Usuário desbloqueado!');
     } catch (err) {
-      toast.error('Erro ao desbloquear: ' + err.message);
+      alert('❌ Erro: ' + err.message);
     }
   }
 
-  async function confirmDelete() {
+  async function handleDelete() {
+    if (!confirm('⚠️ ATENÇÃO: Deletar este usuário? Esta ação não pode ser desfeita!')) return;
+
     try {
       await adminAPI.deleteUser(params.id);
-      toast.success('Usuário deletado com sucesso!');
+      alert('✅ Usuário deletado!');
       push('/admin/users');
     } catch (err) {
-      toast.error('Erro ao deletar: ' + err.message);
+      alert('❌ Erro: ' + err.message);
     }
   }
 
@@ -156,13 +147,13 @@
             </button>
           {/if}
           {#if user.blockedAt}
-            <button on:click={() => showUnblockModal = true} class="btn-success">✅ Desbloquear</button>
+            <button on:click={handleUnblock} class="btn-success">✅ Desbloquear</button>
           {:else}
-            <button on:click={() => showBlockModal = true} class="btn bg-yellow-600 text-white hover:bg-yellow-700">
+            <button on:click={handleBlock} class="btn bg-yellow-600 text-white hover:bg-yellow-700">
               🚫 Bloquear
             </button>
           {/if}
-          <button on:click={() => showDeleteModal = true} class="btn-danger">🗑️ Deletar</button>
+          <button on:click={handleDelete} class="btn-danger">🗑️ Deletar</button>
         </div>
       </div>
 
@@ -415,41 +406,3 @@
     </div>
   {/if}
 </AdminLayout>
-
-<!-- Modal de Bloqueio -->
-<ConfirmModal
-  bind:isOpen={showBlockModal}
-  title="Bloquear Usuário"
-  type="warning"
-  confirmText="Bloquear"
-  on:confirm={confirmBlock}
->
-  <p class="text-gray-300 mb-4">Você está prestes a bloquear o usuário <strong>{user?.name}</strong>.</p>
-  <label class="block text-sm font-medium text-gray-400 mb-2">Motivo do bloqueio:</label>
-  <textarea
-    bind:value={blockReason}
-    class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/50"
-    rows="3"
-    placeholder="Digite o motivo do bloqueio..."
-  ></textarea>
-</ConfirmModal>
-
-<!-- Modal de Desbloqueio -->
-<ConfirmModal
-  bind:isOpen={showUnblockModal}
-  title="Desbloquear Usuário"
-  message="Tem certeza que deseja desbloquear o usuário {user?.name}? O usuário poderá fazer login novamente."
-  type="info"
-  confirmText="Desbloquear"
-  on:confirm={confirmUnblock}
-/>
-
-<!-- Modal de Deleção -->
-<ConfirmModal
-  bind:isOpen={showDeleteModal}
-  title="Deletar Usuário"
-  message="⚠️ ATENÇÃO: Você está prestes a deletar permanentemente o usuário {user?.name}. Esta ação NÃO pode ser desfeita! Todos os dados associados serão removidos."
-  type="danger"
-  confirmText="Deletar Permanentemente"
-  on:confirm={confirmDelete}
-/>
