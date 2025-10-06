@@ -130,6 +130,7 @@ const menu: BaseTranslation = {
     },
     sub: {
         profile: "Perfil",
+        editProfile: "Editar Perfil",
         settings: "Configurações",
         invite: "Convidar",
         credit: "Crédito",

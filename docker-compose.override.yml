@@ -29,9 +29,9 @@ services:
       - ./workadventure-auth/backend/keys:/app/keys:ro
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.auth-api.rule=Host(`auth.workadventure.localhost`) && (PathPrefix(`/.well-known`) || PathPrefix(`/auth`) || PathPrefix(`/authorize`) || PathPrefix(`/token`) || PathPrefix(`/userinfo`) || PathPrefix(`/logout`) || PathPrefix(`/admin`))"
+      - "traefik.http.routers.auth-api.rule=Host(`auth.workadventure.localhost`) && (PathPrefix(`/.well-known`) || PathPrefix(`/auth`) || PathPrefix(`/authorize`) || PathPrefix(`/token`) || PathPrefix(`/userinfo`) || PathPrefix(`/logout`) || PathPrefix(`/admin`) || PathPrefix(`/users`))"
       - "traefik.http.routers.auth-api.entryPoints=web"
-      - "traefik.http.routers.auth-api.priority=200"
+      - "traefik.http.routers.auth-api.priority=500"
       - "traefik.http.services.auth-api.loadbalancer.server.port=3000"
     networks:
       - default

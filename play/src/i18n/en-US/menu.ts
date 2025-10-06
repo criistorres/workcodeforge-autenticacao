@@ -131,6 +131,7 @@ const menu: BaseTranslation = {
     },
     sub: {
         profile: "Profile",
+        editProfile: "Edit Profile",
         settings: "Settings",
         invite: "Share",
         credit: "Credit",

@@ -192,6 +192,19 @@
                     </ActionBarButton>
                 {/if}
                 <ActionBarButton
+                    label={$LL.menu.sub.editProfile()}
+                    on:click={() => {
+                        showMenuItem(SubMenusInterface.editProfile);
+                        openedMenuStore.close("profileMenu");
+                    }}
+                >
+                    <ProfilIcon
+                        strokeColor="stroke-purple-400"
+                        fillColor="fill-transparent"
+                        hover="group-hover/btn-profil:fill-purple-400"
+                    />
+                </ActionBarButton>
+                <ActionBarButton
                     label={$LL.actionbar.woka()}
                     on:click={() => {
                         openEditSkinScene();

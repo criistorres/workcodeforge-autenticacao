@@ -19,6 +19,7 @@
     import ButtonClose from "../Input/ButtonClose.svelte";
     import SettingsSubMenu from "./SettingsSubMenu.svelte";
     import ProfileSubMenu from "./ProfileSubMenu.svelte";
+    import EditProfileSubMenu from "./EditProfileSubMenu.svelte";
     import AboutRoomSubMenu from "./AboutRoomSubMenu.svelte";
     import ContactSubMenu from "./ContactSubMenu.svelte";
     import CustomSubMenu from "./CustomSubMenu.svelte";
@@ -66,6 +67,9 @@
                 case SubMenusInterface.profile:
                     activeComponent = ProfileSubMenu;
                     analyticsClient.menuProfile();
+                    break;
+                case SubMenusInterface.editProfile:
+                    activeComponent = EditProfileSubMenu;
                     break;
                 case SubMenusInterface.settings:
                     activeComponent = SettingsSubMenu;

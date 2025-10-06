@@ -25,6 +25,15 @@ export class UserEntity {
   @Column({ nullable: true, length: 500 })
   avatarUrl: string;
 
+  @Column({ nullable: true, length: 20 })
+  telefone: string;
+
+  @Column({ nullable: true, unique: true, length: 14 })
+  cpf: string;
+
+  @Column({ nullable: true, length: 100 })
+  departamento: string;
+
   @Column({ default: true })
   isActive: boolean;
 
