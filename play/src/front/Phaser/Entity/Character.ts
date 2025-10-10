@@ -25,6 +25,8 @@ import { ProtobufClientUtils } from "../../Network/ProtobufClientUtils";
 import { SpeakerIcon } from "../Components/SpeakerIcon";
 import { MegaphoneIcon } from "../Components/MegaphoneIcon";
 import { StringUtils } from "../../Utils/StringUtils";
+import { LocationBadge } from "../Components/LocationBadge";
+import { LocationStatus } from "../Game/LocationStatus";
 
 import { lazyLoadPlayerCharacterTextures } from "./PlayerTexturesLoadingManager";
 import { SpeechBubble } from "./SpeechBubble";
@@ -51,6 +53,7 @@ export abstract class Character extends Container implements OutlineableInterfac
     protected readonly statusDot: PlayerStatusDot;
     protected readonly speakerIcon: SpeakerIcon;
     protected readonly megaphoneIcon: MegaphoneIcon;
+    protected readonly locationBadge: LocationBadge;
     public readonly playerName: string;
     public sprites: Map<string, Sprite>;
     protected _lastDirection: PositionMessage_Direction = PositionMessage_Direction.DOWN;
@@ -208,7 +211,8 @@ export abstract class Character extends Container implements OutlineableInterfac
         this.megaphoneIcon.visible = false;
         this.talkIcon = new TalkIcon(scene, 0, -45);
         this.speakerIcon = new SpeakerIcon(scene, 0, -45);
-        this.add([this.talkIcon, this.speakerIcon, this.statusDot, this.megaphoneIcon]);
+        this.locationBadge = new LocationBadge(scene, 0, -35, LocationStatus.UNKNOWN);
+        this.add([this.talkIcon, this.speakerIcon, this.statusDot, this.megaphoneIcon, this.locationBadge]);
 
         if (isClickable) {
             this.setInteractive({
@@ -346,6 +350,15 @@ export abstract class Character extends Container implements OutlineableInterfac
 
     public getAvailabilityStatus() {
         return this.statusDot.availabilityStatus;
+    }
+
+    public setLocationStatus(status: LocationStatus, show = true): void {
+        this.locationBadge.setStatus(status);
+        this.locationBadge.show(show);
+    }
+
+    public getLocationStatus(): LocationStatus {
+        return this.locationBadge.getStatus();
     }
 
     public addCompanion(texturePromise: CancelablePromise<string>): void {

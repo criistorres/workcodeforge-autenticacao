@@ -164,6 +164,15 @@ export const EnvironmentVariables = z.object({
             }
             return val;
         }),
+    OPID_DEFAULTMAP_CLAIM: z
+        .string()
+        .optional()
+        .transform((val) => {
+            if (val !== null && val !== undefined) {
+                console.warn("Using OPID_DEFAULTMAP_CLAIM is deprecated. Please use OPENID_DEFAULTMAP_CLAIM instead.");
+            }
+            return val;
+        }),
 
     // New OPENID variables (replacing deprecated OPID_ variables)
     OPENID_CLIENT_ID: z.string().optional(),
@@ -179,6 +188,7 @@ export const EnvironmentVariables = z.object({
     OPENID_LOCALE_CLAIM: z.string().optional(),
     OPENID_WOKA_NAME_POLICY: OpidWokaNamePolicy.optional(),
     OPENID_TAGS_CLAIM: z.string().optional(),
+    OPENID_DEFAULTMAP_CLAIM: z.string().optional(),
 
     USERNAME_POLICY: z.string().optional(),
     DISABLE_ANONYMOUS: BoolAsString.optional().transform((val) => toBool(val, false)),

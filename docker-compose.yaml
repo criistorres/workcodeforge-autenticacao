@@ -15,7 +15,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.port=8080"
-      - "traefik.http.routers.traefik.rule=Host(`traefik.workadventure.localhost`)"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN:-workadventure.localhost}`)"
       - "traefik.http.routers.traefik.service=api@internal"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -165,11 +165,11 @@ services:
     labels:
       - "traefik.enable=true"
 
-      - "traefik.http.routers.front.rule=Host(`front.workadventure.localhost`)"
+      - "traefik.http.routers.front.rule=Host(`front.${DOMAIN:-workadventure.localhost}`)"
       - "traefik.http.routers.front.service=front"
       - "traefik.http.services.front.loadbalancer.server.port=8080"
 
-      - "traefik.http.routers.room-api.rule=Host(`room-api.workadventure.localhost`)"
+      - "traefik.http.routers.room-api.rule=Host(`room-api.${DOMAIN:-workadventure.localhost}`)"
       - "traefik.http.routers.room-api.service=room-api"
       - "traefik.http.services.room-api.loadbalancer.server.port=50051"
       - "traefik.http.services.room-api.loadbalancer.server.scheme=h2c"
@@ -200,7 +200,7 @@ services:
       - ./maps:/var/www/html
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.maps.rule=Host(`maps.workadventure.localhost`)"
+      - "traefik.http.routers.maps.rule=Host(`maps.${DOMAIN:-workadventure.localhost}`)"
       - "traefik.http.routers.maps.entryPoints=web,traefik"
       - "traefik.http.services.maps.loadbalancer.server.port=80"
 
@@ -251,7 +251,7 @@ services:
       - "9232:9229"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.back.rule=Host(`api.workadventure.localhost`)"
+      - "traefik.http.routers.back.rule=Host(`api.${DOMAIN:-workadventure.localhost}`)"
       - "traefik.http.routers.back.entryPoints=web"
       - "traefik.http.services.back.loadbalancer.server.port=8080"
 
@@ -288,11 +288,11 @@ services:
       - "9233:9229"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.map-storage.rule=Host(`map-storage.workadventure.localhost`)"
+      - "traefik.http.routers.map-storage.rule=Host(`map-storage.${DOMAIN:-workadventure.localhost}`)"
       - "traefik.http.routers.map-storage.entryPoints=web"
       - "traefik.http.routers.map-storage.service=map-storage"
       - "traefik.http.services.map-storage.loadbalancer.server.port=3000"
-      - "traefik.http.routers.map-storage-ui.rule=Host(`map-storage.workadventure.localhost`) && PathPrefix(`/ui/`)"
+      - "traefik.http.routers.map-storage-ui.rule=Host(`map-storage.${DOMAIN:-workadventure.localhost}`) && PathPrefix(`/ui/`)"
       - "traefik.http.routers.map-storage-ui.entryPoints=web"
       - "traefik.http.routers.map-storage-ui.service=map-storage-ui"
       - "traefik.http.services.map-storage-ui.loadbalancer.server.port=8080"
@@ -326,7 +326,7 @@ services:
       - "9234:9229"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.uploader.rule=Host(`uploader.workadventure.localhost`)"
+      - "traefik.http.routers.uploader.rule=Host(`uploader.${DOMAIN:-workadventure.localhost}`)"
       - "traefik.http.routers.uploader.entryPoints=web"
       - "traefik.http.services.uploader.loadbalancer.server.port=8080"
 
@@ -350,7 +350,7 @@ services:
     image: redislabs/redisinsight:latest
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.redisinsight.rule=Host(`redis.workadventure.localhost`)"
+      - "traefik.http.routers.redisinsight.rule=Host(`redis.${DOMAIN:-workadventure.localhost}`)"
       - "traefik.http.routers.redisinsight.entryPoints=web"
       - "traefik.http.services.redisinsight.loadbalancer.server.port=8001"
 
@@ -358,7 +358,7 @@ services:
     image: matthiasluedtke/iconserver:v3.15.0
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.icon.rule=Host(`icon.workadventure.localhost`)"
+      - "traefik.http.routers.icon.rule=Host(`icon.${DOMAIN:-workadventure.localhost}`)"
       - "traefik.http.routers.icon.entryPoints=web"
       - "traefik.http.services.icon.loadbalancer.server.port=8080"
 
@@ -478,7 +478,7 @@ services:
       - ./contrib/oidc-server-mock:/tmp/config:ro
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.oidc.rule=Host(`oidc.workadventure.localhost`)"
+      - "traefik.http.routers.oidc.rule=Host(`oidc.${DOMAIN:-workadventure.localhost}`)"
       - "traefik.http.routers.oidc.entryPoints=web"
       - "traefik.http.services.oidc.loadbalancer.server.port=80"
     healthcheck:
@@ -491,7 +491,7 @@ services:
     entrypoint: /data/start.sh
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.matrix.rule=Host(`matrix.workadventure.localhost`)"
+      - "traefik.http.routers.matrix.rule=Host(`matrix.${DOMAIN:-workadventure.localhost}`)"
       - "traefik.http.routers.matrix.entryPoints=web"
       - "traefik.http.services.matrix.loadbalancer.server.port=8008"
       - "traefik.http.routers.matrix.service=matrix"

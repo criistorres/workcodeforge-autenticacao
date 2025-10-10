@@ -1,4 +1,11 @@
 version: "3.6"
+# ===========================================
+# DOCKER COMPOSE OVERRIDE (DEVELOPMENT)
+# ===========================================
+# Este arquivo é aplicado automaticamente em desenvolvimento
+# Carrega variáveis de .env.development
+# ===========================================
+
 services:
   # Desabilitar o OIDC mock server
   oidc-server-mock:
@@ -10,16 +17,18 @@ services:
     build:
       context: ./workadventure-auth/backend
       dockerfile: Dockerfile
+    env_file:
+      - .env.development
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
       - PORT=3000
-      - ISSUER_URL=http://auth.workadventure.localhost
-      - FRONTEND_URL=http://auth.workadventure.localhost
-      - WORKADVENTURE_CLIENT_ID=workadventure-local
-      - WORKADVENTURE_CLIENT_SECRET=my-super-secret-key-for-local-dev
-      - ALLOWED_REDIRECT_URIS=http://play.workadventure.localhost/login-callback,http://play.workadventure.localhost/oauth2/callback,http://play.workadventure.localhost/openid-callback,http://matrix.workadventure.localhost/_synapse/client/oidc/callback
-      - CORS_ORIGIN=http://play.workadventure.localhost
-      - DEFAULT_LOGOUT_REDIRECT=http://play.workadventure.localhost
+      - ISSUER_URL=http://auth.${DOMAIN:-workadventure.localhost}
+      - FRONTEND_URL=http://auth.${DOMAIN:-workadventure.localhost}
+      - WORKADVENTURE_CLIENT_ID=${OPENID_CLIENT_ID}
+      - WORKADVENTURE_CLIENT_SECRET=${OPENID_CLIENT_SECRET}
+      - ALLOWED_REDIRECT_URIS=http://play.${DOMAIN:-workadventure.localhost}/login-callback,http://play.${DOMAIN:-workadventure.localhost}/oauth2/callback,http://play.${DOMAIN:-workadventure.localhost}/openid-callback,http://matrix.${DOMAIN:-workadventure.localhost}/_synapse/client/oidc/callback
+      - CORS_ORIGIN=http://play.${DOMAIN:-workadventure.localhost}
+      - DEFAULT_LOGOUT_REDIRECT=http://play.${DOMAIN:-workadventure.localhost}
       - DATABASE_HOST=auth-postgres
       - DATABASE_PORT=5432
       - DATABASE_USER=auth_user
@@ -29,7 +38,7 @@ services:
       - ./workadventure-auth/backend/keys:/app/keys:ro
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.auth-api.rule=Host(`auth.workadventure.localhost`) && (PathPrefix(`/.well-known`) || PathPrefix(`/auth`) || PathPrefix(`/authorize`) || PathPrefix(`/token`) || PathPrefix(`/userinfo`) || PathPrefix(`/logout`) || PathPrefix(`/admin`) || PathPrefix(`/users`))"
+      - "traefik.http.routers.auth-api.rule=Host(`auth.${DOMAIN:-workadventure.localhost}`) && (PathPrefix(`/.well-known`) || PathPrefix(`/auth`) || PathPrefix(`/authorize`) || PathPrefix(`/token`) || PathPrefix(`/userinfo`) || PathPrefix(`/logout`) || PathPrefix(`/admin`) || PathPrefix(`/users`))"
       - "traefik.http.routers.auth-api.entryPoints=web"
       - "traefik.http.routers.auth-api.priority=500"
       - "traefik.http.services.auth-api.loadbalancer.server.port=3000"
@@ -49,17 +58,19 @@ services:
       - ./workadventure-auth/frontend/public:/app/public
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.auth-front.rule=Host(`auth.workadventure.localhost`)"
+      - "traefik.http.routers.auth-front.rule=Host(`auth.${DOMAIN:-workadventure.localhost}`)"
       - "traefik.http.routers.auth-front.entryPoints=web"
       - "traefik.http.routers.auth-front.priority=10"
       - "traefik.http.services.auth-front.loadbalancer.server.port=5173"
     networks:
       - default
 
-  # Adicionar extra_hosts ao container play para resolver auth.workadventure.localhost internamente
+  # Carregar variáveis de ambiente do .env.development
   play:
+    env_file:
+      - .env.development
     extra_hosts:
-      - "auth.workadventure.localhost:172.17.0.1"
+      - "auth.${DOMAIN:-workadventure.localhost}:172.17.0.1"
     environment:
       OPENID_CLIENT_ID: "${OPENID_CLIENT_ID}"
       OPENID_CLIENT_SECRET: "${OPENID_CLIENT_SECRET}"
@@ -69,10 +80,12 @@ services:
       OPENID_TAGS_CLAIM: "${OPENID_TAGS_CLAIM}"
       DISABLE_ANONYMOUS: "${DISABLE_ANONYMOUS}"
 
-  # Adicionar extra_hosts ao container synapse para resolver auth.workadventure.localhost internamente
+  # Adicionar extra_hosts ao container synapse para resolver auth internamente
   synapse:
+    env_file:
+      - .env.development
     extra_hosts:
-      - "auth.workadventure.localhost:172.17.0.1"
+      - "auth.${DOMAIN:-workadventure.localhost}:172.17.0.1"
 
   # PostgreSQL para persistência de dados do auth
   auth-postgres:
@@ -101,7 +114,7 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin123
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.pgadmin.rule=Host(`pgadmin.workadventure.localhost`)"
+      - "traefik.http.routers.pgadmin.rule=Host(`pgadmin.${DOMAIN:-workadventure.localhost}`)"
       - "traefik.http.routers.pgadmin.entryPoints=web"
       - "traefik.http.services.pgadmin.loadbalancer.server.port=80"
     networks:

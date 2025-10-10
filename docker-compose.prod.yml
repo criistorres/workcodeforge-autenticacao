@@ -1,0 +1,247 @@
+version: "3.6"
+# ===========================================
+# DOCKER COMPOSE - PRODUCTION
+# ===========================================
+# Este arquivo deve ser usado APENAS em produção
+# Uso: docker-compose -f docker-compose.yaml -f docker-compose.prod.yml up -d
+# Carrega variáveis de .env.production
+# ===========================================
+
+services:
+  # Traefik com Let's Encrypt para SSL/TLS
+  reverse-proxy:
+    command:
+      - --api.insecure=false
+      - --providers.docker
+      - --entryPoints.web.address=:80
+      - --entryPoints.websecure.address=:443
+      - --providers.docker.exposedbydefault=false
+      # Redirecionamento HTTP -> HTTPS
+      - --entrypoints.web.http.redirections.entryPoint.to=websecure
+      - --entrypoints.web.http.redirections.entryPoint.scheme=https
+      # Let's Encrypt
+      - --certificatesresolvers.myresolver.acme.tlschallenge=true
+      - --certificatesresolvers.myresolver.acme.email=${ACME_EMAIL}
+      - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
+    ports:
+      - "443:443"
+    volumes:
+      - letsencrypt:/letsencrypt
+    labels:
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.tls.certresolver=myresolver"
+
+  # Play service - Produção
+  play:
+    env_file:
+      - .env.production
+    restart: always
+    # Remover volumes de desenvolvimento (sem hot-reload)
+    volumes: []
+    environment:
+      NODE_ENV: production
+      ALLOWED_CORS_ORIGIN: "https://play.${DOMAIN}"
+      VITE_URL: "https://front.${DOMAIN}"
+      PUSHER_URL: https://play.${DOMAIN}
+      FRONT_URL: https://play.${DOMAIN}
+      UPLOADER_URL: https://uploader.${DOMAIN}
+      ICON_URL: https://icon.${DOMAIN}
+      PUBLIC_MAP_STORAGE_URL: "https://map-storage.${DOMAIN}"
+      PLAY_URL: https://play.${DOMAIN}
+      OPENID_CLIENT_ISSUER: https://auth.${DOMAIN}
+      OPENID_LOGOUT_REDIRECT_URL: https://play.${DOMAIN}
+    labels:
+      - "traefik.http.routers.front.entrypoints=websecure"
+      - "traefik.http.routers.front.tls.certresolver=myresolver"
+      - "traefik.http.routers.room-api.entrypoints=websecure"
+      - "traefik.http.routers.room-api.tls.certresolver=myresolver"
+      - "traefik.http.routers.play.entrypoints=websecure"
+      - "traefik.http.routers.play.tls.certresolver=myresolver"
+      - "traefik.http.routers.play-ws.entrypoints=websecure"
+      - "traefik.http.routers.play-ws.tls.certresolver=myresolver"
+    extra_hosts:
+      - "auth.${DOMAIN}:172.17.0.1"
+
+  # Maps - Produção
+  maps:
+    env_file:
+      - .env.production
+    restart: always
+    environment:
+      NODE_ENV: production
+      FRONT_URL: https://play.${DOMAIN}
+    labels:
+      - "traefik.http.routers.maps.entrypoints=websecure"
+      - "traefik.http.routers.maps.tls.certresolver=myresolver"
+
+  # Back service - Produção
+  back:
+    env_file:
+      - .env.production
+    restart: always
+    volumes: []
+    environment:
+      NODE_ENV: production
+      PLAY_URL: https://play.${DOMAIN}
+      PUBLIC_MAP_STORAGE_URL: "https://map-storage.${DOMAIN}"
+    labels:
+      - "traefik.http.routers.back.entrypoints=websecure"
+      - "traefik.http.routers.back.tls.certresolver=myresolver"
+
+  # Map Storage - Produção
+  map-storage:
+    env_file:
+      - .env.production
+    restart: always
+    volumes: []
+    environment:
+      NODE_ENV: production
+      PUSHER_URL: https://play.${DOMAIN}
+    labels:
+      - "traefik.http.routers.map-storage.entrypoints=websecure"
+      - "traefik.http.routers.map-storage.tls.certresolver=myresolver"
+      - "traefik.http.routers.map-storage-ui.entrypoints=websecure"
+      - "traefik.http.routers.map-storage-ui.tls.certresolver=myresolver"
+
+  # Uploader - Produção
+  uploader:
+    env_file:
+      - .env.production
+    restart: always
+    volumes: []
+    environment:
+      UPLOADER_URL: https://uploader.${DOMAIN}
+    labels:
+      - "traefik.http.routers.uploader.entrypoints=websecure"
+      - "traefik.http.routers.uploader.tls.certresolver=myresolver"
+
+  # Redis - Produção
+  redis:
+    restart: always
+    volumes:
+      - redis-data:/data
+
+  # RedisInsight - Produção (opcional, pode ser removido)
+  redisinsight:
+    restart: always
+    labels:
+      - "traefik.http.routers.redisinsight.entrypoints=websecure"
+      - "traefik.http.routers.redisinsight.tls.certresolver=myresolver"
+
+  # Icon server - Produção
+  icon:
+    restart: always
+    labels:
+      - "traefik.http.routers.icon.entrypoints=websecure"
+      - "traefik.http.routers.icon.tls.certresolver=myresolver"
+
+  # Desabilitar OIDC mock (só para dev)
+  oidc-server-mock:
+    deploy:
+      replicas: 0
+
+  # Synapse (Matrix) - Produção
+  synapse:
+    env_file:
+      - .env.production
+    restart: always
+    environment:
+      VIRTUAL_HOST: "matrix.${DOMAIN}"
+      SYNAPSE_SERVER_NAME: "matrix.${DOMAIN}"
+    extra_hosts:
+      - "auth.${DOMAIN}:172.17.0.1"
+    labels:
+      - "traefik.http.routers.matrix.entrypoints=websecure"
+      - "traefik.http.routers.matrix.tls.certresolver=myresolver"
+
+  # ===========================================
+  # CUSTOM AUTH SERVICE - PRODUCTION
+  # ===========================================
+
+  # Auth Backend - Produção
+  auth-backend:
+    build:
+      context: ./workadventure-auth/backend
+      dockerfile: Dockerfile
+    env_file:
+      - .env.production
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - ISSUER_URL=https://auth.${DOMAIN}
+      - FRONTEND_URL=https://auth.${DOMAIN}
+      - WORKADVENTURE_CLIENT_ID=${OPENID_CLIENT_ID}
+      - WORKADVENTURE_CLIENT_SECRET=${OPENID_CLIENT_SECRET}
+      - ALLOWED_REDIRECT_URIS=https://play.${DOMAIN}/login-callback,https://play.${DOMAIN}/oauth2/callback,https://play.${DOMAIN}/openid-callback,https://matrix.${DOMAIN}/_synapse/client/oidc/callback
+      - CORS_ORIGIN=https://play.${DOMAIN}
+      - DEFAULT_LOGOUT_REDIRECT=https://play.${DOMAIN}
+      - DATABASE_HOST=auth-postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USER=auth_user
+      - DATABASE_PASSWORD=${POSTGRES_PASSWORD}
+      - DATABASE_NAME=workadventure_auth
+    volumes:
+      - ./workadventure-auth/backend/keys:/app/keys:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.auth-api.rule=Host(`auth.${DOMAIN}`) && (PathPrefix(`/.well-known`) || PathPrefix(`/auth`) || PathPrefix(`/authorize`) || PathPrefix(`/token`) || PathPrefix(`/userinfo`) || PathPrefix(`/logout`) || PathPrefix(`/admin`) || PathPrefix(`/users`))"
+      - "traefik.http.routers.auth-api.entrypoints=websecure"
+      - "traefik.http.routers.auth-api.tls.certresolver=myresolver"
+      - "traefik.http.routers.auth-api.priority=500"
+      - "traefik.http.services.auth-api.loadbalancer.server.port=3000"
+    networks:
+      - default
+    depends_on:
+      auth-postgres:
+        condition: service_healthy
+
+  # Auth Frontend - Produção
+  auth-frontend:
+    build:
+      context: ./workadventure-auth/frontend
+      dockerfile: Dockerfile
+    restart: always
+    # Sem volumes em produção (usa build)
+    volumes: []
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.auth-front.rule=Host(`auth.${DOMAIN}`)"
+      - "traefik.http.routers.auth-front.entrypoints=websecure"
+      - "traefik.http.routers.auth-front.tls.certresolver=myresolver"
+      - "traefik.http.routers.auth-front.priority=10"
+      - "traefik.http.services.auth-front.loadbalancer.server.port=5173"
+    networks:
+      - default
+
+  # Auth PostgreSQL - Produção
+  auth-postgres:
+    image: postgres:15-alpine
+    restart: always
+    env_file:
+      - .env.production
+    environment:
+      POSTGRES_DB: workadventure_auth
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - auth-postgres-data:/var/lib/postgresql/data
+    # NÃO expor porta em produção (segurança)
+    ports: []
+    networks:
+      - default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auth_user -d workadventure_auth"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PgAdmin - REMOVER EM PRODUÇÃO (apenas dev)
+  auth-pgadmin:
+    deploy:
+      replicas: 0
+
+volumes:
+  letsencrypt:
+  redis-data:
+  auth-postgres-data:

@@ -407,15 +407,18 @@ export class AuthenticateController extends BaseHttpController {
 
             res.clearCookie("playUri");
             res.clearCookie("authToken");
-            const playUriUrl = new URL(req.cookies.playUri);
-            playUriUrl.searchParams.append("matrixLoginToken", query.loginToken);
+
+            // Redirecionar para raiz (/) ao invés de playUri
+            // O frontend decidirá qual mapa carregar baseado no defaultMap do token
+            const redirectUrl = new URL("/", FRONT_URL);
+            redirectUrl.searchParams.append("matrixLoginToken", query.loginToken);
 
             if (query.chatRoomId) {
-                playUriUrl.searchParams.append("chatRoomId", query.chatRoomId);
+                redirectUrl.searchParams.append("chatRoomId", query.chatRoomId);
             }
 
             const html = Mustache.render(this.redirectToPlayFile, {
-                playUri: playUriUrl.toString(),
+                playUri: redirectUrl.toString(),
             });
             res.type("html").send(html);
             return;

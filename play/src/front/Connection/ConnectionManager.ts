@@ -206,6 +206,10 @@ class ConnectionManager {
         this.connexionType = urlManager.getGameConnexionType();
         this._currentRoom = null;
 
+        console.log(`[ConnectionManager] ===== INIT GAME CONNEXION =====`);
+        console.log(`[ConnectionManager] connexionType: ${this.connexionType}`);
+        console.log(`[ConnectionManager] window.location.href: ${window.location.href}`);
+
         let nextScene: "selectCharacterScene" | "selectCompanionScene" | "gameScene" = "gameScene";
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -219,34 +223,6 @@ class ConnectionManager {
         if (token != undefined) {
             this.authToken = token;
             localUserStore.setAuthToken(token);
-
-            // Decodificar token JWT para verificar se há defaultMap
-            // JWT format: header.payload.signature
-            // O payload é Base64-encoded JSON
-            try {
-                const parts = token.split(".");
-                if (parts.length === 3) {
-                    // Decodificar o payload (segunda parte)
-                    const payload = JSON.parse(atob(parts[1]));
-                    console.log("[ConnectionManager] Token decodificado:", payload);
-
-                    if (payload.defaultMap) {
-                        console.log(`[ConnectionManager] defaultMap encontrado no token: ${payload.defaultMap}`);
-                        // Construir URL do mapa baseado no defaultMap
-                        const mapUrl = `/_/global/maps.workadventure.localhost/mapas/${payload.defaultMap}.json`;
-                        console.log(`[ConnectionManager] Redirecionando para: ${mapUrl}`);
-
-                        // Limpar token da URL antes de redirecionar
-                        urlParams.delete("token");
-
-                        // Redirecionar para o mapa padrão
-                        window.location.href = mapUrl;
-                        return; // Retornar para evitar continuar o fluxo
-                    }
-                }
-            } catch (error) {
-                console.warn("[ConnectionManager] Erro ao decodificar token:", error);
-            }
 
             //clean token of url
             urlParams.delete("token");
@@ -344,63 +320,79 @@ class ConnectionManager {
                     console.log(`[ConnectionManager] LOBBY_MAP_URL: ${LOBBY_MAP_URL}`);
                     console.log(`[ConnectionManager] MAIN_MAP_URL: ${MAIN_MAP_URL}`);
 
-                    // Verificar se usuário está autenticado via session cookie
-                    console.log("[ConnectionManager] Verificando autenticação para rotear mapa...");
-                    const sessionData = await SessionService.checkSession();
-                    const isAuthenticated = sessionData.authenticated;
-                    console.log(`[ConnectionManager] Usuário ${isAuthenticated ? "autenticado" : "não autenticado"}`);
-
-                    // Decidir qual mapa carregar baseado na autenticação
-                    if (isAuthenticated) {
-                        // Usuário autenticado: usar defaultMap do perfil ou fallback para MAIN_MAP_URL
-                        const defaultMap = sessionData.user?.defaultMap;
-
-                        if (defaultMap) {
-                            console.log(`[ConnectionManager] Usando defaultMap do usuário: ${defaultMap}`);
-                            // Construir URL do mapa baseado no defaultMap
-                            // Formato: http://maps.workadventure.localhost/mapas/filial1.json
-                            roomPath = `${window.location.protocol}//maps.workadventure.localhost/mapas/${defaultMap}.json`;
-                        } else if (MAIN_MAP_URL && MAIN_MAP_URL !== "undefined") {
-                            console.log(
-                                `[ConnectionManager] defaultMap não definido, usando MAIN_MAP_URL: ${MAIN_MAP_URL}`
-                            );
-                            // Converter para URL absoluta se for relativa
-                            if (MAIN_MAP_URL.startsWith("/")) {
-                                roomPath = `${window.location.protocol}//${window.location.host}${MAIN_MAP_URL}`;
-                            } else {
-                                roomPath = MAIN_MAP_URL;
-                            }
-                        } else {
-                            console.warn("[ConnectionManager] Nem defaultMap nem MAIN_MAP_URL definidos");
-                            roomPath = localUserStore.getLastRoomUrl();
-                        }
-                    } else if (!isAuthenticated && LOBBY_MAP_URL && LOBBY_MAP_URL !== "undefined") {
-                        console.log(`[ConnectionManager] Carregando mapa de lobby: ${LOBBY_MAP_URL}`);
-                        // Converter para URL absoluta se for relativa
-                        if (LOBBY_MAP_URL.startsWith("/")) {
-                            roomPath = `${window.location.protocol}//${window.location.host}${LOBBY_MAP_URL}`;
-                        } else {
-                            roomPath = LOBBY_MAP_URL;
-                        }
-                    } else {
-                        console.warn("[ConnectionManager] LOBBY/MAIN URLs não definidas, usando fallback");
-
-                        // Fallback para comportamento padrão
-                        roomPath = localUserStore.getLastRoomUrl();
+                    // Primeiro, verificar se temos authToken e extrair defaultMap dele
+                    let defaultMapFromToken: string | undefined;
+                    if (this.authToken) {
                         try {
-                            const lastRoomUrl = await localUserStore.getLastRoomUrlCacheApi();
-                            if (lastRoomUrl != undefined) {
-                                roomPath = lastRoomUrl;
+                            const parts = this.authToken.split(".");
+                            if (parts.length === 3) {
+                                const payload = JSON.parse(atob(parts[1]));
+                                defaultMapFromToken = payload.defaultMap;
+                                console.log(`[ConnectionManager] defaultMap extraído do token: ${defaultMapFromToken}`);
                             }
-                        } catch (err) {
-                            console.error(err);
-                            if (err instanceof Error) {
-                                console.error(err.stack);
+                        } catch (error) {
+                            console.warn("[ConnectionManager] Erro ao decodificar token:", error);
+                        }
+                    }
+
+                    // Se temos defaultMap do token e authToken, usar esse mapa
+                    if (this.authToken && defaultMapFromToken) {
+                        console.log(
+                            `[ConnectionManager] Usuário autenticado com token, carregando mapa: ${defaultMapFromToken}`
+                        );
+                        roomPath = `/_/global/maps.workadventure.localhost/mapas/${defaultMapFromToken}.json`;
+                    } else {
+                        // Verificar se usuário está autenticado via session cookie
+                        console.log("[ConnectionManager] Verificando autenticação para rotear mapa...");
+                        const sessionData = await SessionService.checkSession();
+                        const isAuthenticated = sessionData.authenticated;
+                        console.log(
+                            `[ConnectionManager] Usuário ${isAuthenticated ? "autenticado" : "não autenticado"}`
+                        );
+
+                        // Decidir qual mapa carregar baseado na autenticação
+                        if (isAuthenticated) {
+                            // Usuário autenticado: usar defaultMap do perfil ou fallback para MAIN_MAP_URL
+                            const defaultMap = sessionData.user?.defaultMap;
+
+                            if (defaultMap) {
+                                console.log(`[ConnectionManager] Usando defaultMap do usuário: ${defaultMap}`);
+                                // Construir URL do mapa baseado no defaultMap
+                                roomPath = `/_/global/maps.workadventure.localhost/mapas/${defaultMap}.json`;
+                            } else if (MAIN_MAP_URL && MAIN_MAP_URL !== "undefined") {
+                                console.log(
+                                    `[ConnectionManager] defaultMap não definido, usando MAIN_MAP_URL: ${MAIN_MAP_URL}`
+                                );
+                                roomPath = MAIN_MAP_URL;
+                            } else {
+                                console.warn("[ConnectionManager] Nem defaultMap nem MAIN_MAP_URL definidos");
+                                roomPath = localUserStore.getLastRoomUrl();
+                            }
+                        } else if (!isAuthenticated && LOBBY_MAP_URL && LOBBY_MAP_URL !== "undefined") {
+                            console.log(`[ConnectionManager] Carregando mapa de lobby: ${LOBBY_MAP_URL}`);
+                            roomPath = LOBBY_MAP_URL;
+                        } else {
+                            console.warn("[ConnectionManager] LOBBY/MAIN URLs não definidas, usando fallback");
+
+                            // Fallback para comportamento padrão
+                            roomPath = localUserStore.getLastRoomUrl();
+                            try {
+                                const lastRoomUrl = await localUserStore.getLastRoomUrlCacheApi();
+                                if (lastRoomUrl != undefined) {
+                                    roomPath = lastRoomUrl;
+                                }
+                            } catch (err) {
+                                console.error(err);
+                                if (err instanceof Error) {
+                                    console.error(err.stack);
+                                }
                             }
                         }
                     }
                 }
             } else {
+                // Usuário acessando URL direta de um mapa
+                console.log("[ConnectionManager] connexionType === room, construindo roomPath da URL atual");
                 const query = urlParams.toString();
                 roomPath =
                     window.location.protocol +
@@ -409,9 +401,44 @@ class ConnectionManager {
                     window.location.pathname +
                     (query ? "?" + query : "") + //use urlParams because the token param must be deleted
                     window.location.hash;
+
+                console.log(`[ConnectionManager] roomPath construído: ${roomPath}`);
+
+                // PROTEÇÃO: Verificar se o mapa acessado não é o lobby
+                // Se não for o lobby, usuário precisa estar autenticado
+                const isLobbyMap = LOBBY_MAP_URL && roomPath.includes(LOBBY_MAP_URL);
+
+                if (!isLobbyMap) {
+                    // Não é o lobby, verificar autenticação
+                    console.log("[ConnectionManager] Acesso direto a mapa protegido detectado");
+                    const sessionData = await SessionService.checkSession();
+
+                    if (!sessionData.authenticated) {
+                        console.log(
+                            "[ConnectionManager] Usuário não autenticado tentando acessar mapa protegido, redirecionando para lobby"
+                        );
+                        // Redirecionar para o lobby
+                        if (LOBBY_MAP_URL && LOBBY_MAP_URL !== "undefined") {
+                            const lobbyPath = LOBBY_MAP_URL.startsWith("/")
+                                ? `${window.location.protocol}//${window.location.host}${LOBBY_MAP_URL}`
+                                : LOBBY_MAP_URL;
+                            window.location.assign(lobbyPath);
+                            // Retornar para evitar continuar o fluxo
+                            return new Promise(() => {}); // Promise que nunca resolve (página está redirecionando)
+                        }
+                    } else {
+                        console.log("[ConnectionManager] Usuário autenticado, permitindo acesso ao mapa");
+                    }
+                }
             }
 
-            const roomPathUrl = new URL(roomPath);
+            // Converter roomPath para URL absoluta se for relativo
+            let roomPathUrl: URL;
+            if (roomPath.startsWith("/")) {
+                roomPathUrl = new URL(window.location.protocol + "//" + window.location.host + roomPath);
+            } else {
+                roomPathUrl = new URL(roomPath);
+            }
 
             //get detail map for anonymous login and set texture in local storage
             //before set token of user we must load room and all information. For example the mandatory authentication could be require on current room
@@ -423,6 +450,23 @@ class ConnectionManager {
 
             //todo: add here some kind of warning if authToken has expired.
             if (!this.authToken) {
+                // Verificar se usuário tem sessão ativa antes de fazer login anônimo
+                console.log("[ConnectionManager] authToken não encontrado no localStorage, verificando sessão...");
+                const sessionData = await SessionService.checkSession();
+
+                if (sessionData.authenticated) {
+                    console.log(
+                        "[ConnectionManager] Usuário tem sessão ativa, redirecionando para login OIDC para obter token"
+                    );
+                    // Usuário está autenticado via sessão, mas não tem authToken
+                    // Redirecionar para OIDC para obter o token
+                    const redirect = this.loadOpenIDScreen(false);
+                    if (redirect === null) {
+                        throw new Error("Unable to redirect on login page.");
+                    }
+                    return redirect;
+                }
+
                 // Verificar se estamos carregando o lobby (usuário não autenticado)
                 const isLoadingLobby = LOBBY_MAP_URL && roomPath.includes(LOBBY_MAP_URL);
 

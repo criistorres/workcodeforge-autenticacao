@@ -130,6 +130,9 @@ import type { AskPositionEvent } from "../../Api/Events/AskPositionEvent";
 import { chatVisibilityStore, forceRefreshChatStore } from "../../Stores/ChatStore";
 import type { HasPlayerMovedInterface } from "../../Api/Events/HasPlayerMovedInterface";
 import { extensionModuleStore, gameSceneIsLoadedStore, gameSceneStore } from "../../Stores/GameSceneStore";
+import { fetchAndSetLocationStatus } from "../../Stores/LocationStatusStore";
+// Debug utility - remove in production
+import "../../Debug/LocationStatusDebug";
 import { myCameraBlockedStore, myMicrophoneBlockedStore } from "../../Stores/MyMediaStore";
 import type { GameStateEvent } from "../../Api/Events/GameStateEvent";
 import { currentPlayerWokaStore } from "../../Stores/CurrentPlayerWokaStore";
@@ -183,6 +186,7 @@ import { ChatConnectionInterface } from "../../Chat/Connection/ChatConnection";
 import { selectedRoomStore } from "../../Chat/Stores/SelectRoomStore";
 import { raceTimeout } from "../../Utils/PromiseUtils";
 import { ConversationBubble } from "../Entity/ConversationBubble";
+import { LocationStatus } from "./LocationStatus";
 import { GameMapFrontWrapper } from "./GameMap/GameMapFrontWrapper";
 import { gameManager } from "./GameManager";
 import { EmoteManager } from "./EmoteManager";
@@ -3556,6 +3560,33 @@ ${escapedMessage}
             this.CurrentPlayer.on(requestEmoteEventName, (emoteKey: string) => {
                 this.connection?.emitEmoteEvent(emoteKey);
             });
+
+            // Set location status badge for current player
+            // Start with HOMEOFFICE default, then update when API responds
+            this.CurrentPlayer.setLocationStatus(LocationStatus.HOMEOFFICE, true);
+
+            const localUser = localUserStore.getLocalUser();
+            const currentPlayerEmail = localUser?.email;
+
+            console.log("=== LOCATION STATUS DEBUG ===");
+            console.log("LocalUser:", localUser);
+            console.log("Current player email:", currentPlayerEmail);
+
+            if (currentPlayerEmail) {
+                console.log(`🔄 Fetching location status for: ${currentPlayerEmail}`);
+                fetchAndSetLocationStatus(currentPlayerEmail)
+                    .then((status) => {
+                        // Update badge when API responds
+                        this.CurrentPlayer.setLocationStatus(status, false);
+                        console.log(`✅ Current player location status updated to: ${status}`);
+                    })
+                    .catch((error) => {
+                        console.error("❌ Failed to fetch location status for current player:", error);
+                    });
+            } else {
+                console.warn("⚠️ No email found for current player, cannot fetch location status");
+                console.log("💡 You can test manually with: window.debugLocationStatus.testCurrentUser()");
+            }
         } catch (error) {
             if (error instanceof CharacterTextureError) {
                 console.warn("Error while loading current player character texture", error.message);
@@ -3681,6 +3712,27 @@ ${escapedMessage}
         if (addPlayerData.availabilityStatus !== 0) {
             player.setAvailabilityStatus(addPlayerData.availabilityStatus, true);
         }
+
+        // Set location status badge - fetch from API using email
+        // Start with HOMEOFFICE default, then update when API responds
+        player.setLocationStatus(LocationStatus.HOMEOFFICE, true);
+
+        // Fetch location status from API if we have an email
+        // TODO: Backend should send email in addPlayerData
+        // For now, we can only get email for the current player
+        const playerEmail = addPlayerData.email ?? addPlayerData.name; // Fallback to name as temporary solution
+
+        if (playerEmail && playerEmail.includes("@")) {
+            fetchAndSetLocationStatus(playerEmail)
+                .then((status) => {
+                    // Update badge when API responds
+                    player.setLocationStatus(status, false);
+                })
+                .catch((error) => {
+                    console.warn(`Failed to fetch location status for player ${addPlayerData.userId}:`, error);
+                });
+        }
+
         this.MapPlayersByKey.set(player.userId, player);
         player.updatePosition(addPlayerData.position);
 

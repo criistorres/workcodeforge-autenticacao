@@ -12,6 +12,8 @@
     import { openDirectChatRoom } from "../../Utils";
     import { gameManager } from "../../../Phaser/Game/GameManager";
     import { analyticsClient } from "../../../Administration/AnalyticsClient";
+    import { createLocationStatusStore } from "../../../Stores/LocationStatusStore";
+    import { LocationStatus, getLocationStatusLabel } from "../../../Phaser/Game/LocationStatus";
     import UserActionButton from "./UserActionButton.svelte";
     import ImageWithFallback from "./ImageWithFallback.svelte";
     import { IconLoader, IconSend } from "@wa-icons";
@@ -27,6 +29,12 @@
     $: isMe = user.chatId === localUserStore.getChatId() || user.chatId === localUserStore.getLocalUser()?.uuid;
 
     $: userStatus = isMe ? availabilityStatusStore : availabilityStatus;
+
+    // Get location status for this user
+    // Try to get email from username (in our auth system, username is often the email)
+    $: userEmailOrId = user.username?.includes("@") ? user.username : user.uuid ?? user.spaceUserId ?? null;
+    $: userLocationStatusStore = createLocationStatusStore(userEmailOrId);
+    $: userLocationStatus = $userLocationStatusStore;
 
     $: chunks = highlightWords({
         text: username.match(/\[\d*]/) ? username.substring(0, username.search(/\[\d*]/)) : username,
@@ -133,6 +141,19 @@
                     {:else}
                         {$LL.chat.userList.disconnected()}
                     {/if}
+
+                    <!-- Location Status Badge -->
+                    <div class="flex items-center mt-1">
+                        <div
+                            class="px-2 py-0.5 rounded text-xxs font-semibold"
+                            style="background-color:{userLocationStatus === LocationStatus.PRESENTE
+                                ? '#68e97a'
+                                : '#4a90e2'}; color: white;"
+                            title={getLocationStatusLabel(userLocationStatus)}
+                        >
+                            {getLocationStatusLabel(userLocationStatus)}
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="flex flex-wrap justify-start items-start content-start">
