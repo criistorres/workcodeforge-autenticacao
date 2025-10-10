@@ -28,6 +28,7 @@ import {
     GOOGLE_SLIDES_ENABLED,
     INTERNAL_MAP_STORAGE_URL,
     KLAXOON_ENABLED,
+    LOBBY_MAP_URL,
     MAP_EDITOR_ALLOW_ALL_USERS,
     MAP_EDITOR_ALLOWED_USERS,
     OPID_WOKA_NAME_POLICY,
@@ -222,7 +223,51 @@ class LocalAdmin implements AdminInterface {
     ): Promise<MapDetailsData | RoomRedirect | ErrorApiData> {
         const roomUrl = new URL(playUri);
 
+        // Se for a rota raiz "/" e LOBBY_MAP_URL estiver configurado,
+        // retorna MapDetailsData SEM redirect, permitindo que o frontend decida
+        // entre lobby (anônimo) ou mapa autenticado baseado na sessão
         if (roomUrl.pathname === "/") {
+            if (LOBBY_MAP_URL) {
+                // Retorna MapDetailsData com authenticationMandatory: false
+                // para permitir acesso ao lobby mesmo com DISABLE_ANONYMOUS=true
+                const lobbyUrl = new URL(LOBBY_MAP_URL, roomUrl.origin);
+                const match = /\/_\/[^/]+\/(.+)/.exec(lobbyUrl.pathname);
+                const mapUrl = match ? lobbyUrl.protocol + "//" + match[1] : undefined;
+
+                const opidWokaNamePolicyCheck = OpidWokaNamePolicy.safeParse(OPID_WOKA_NAME_POLICY);
+                return Promise.resolve({
+                    mapUrl,
+                    wamUrl: undefined,
+                    canEdit: false,
+                    authenticationMandatory: false, // ← Permite acesso anônimo ao lobby
+                    contactPage: null,
+                    group: null,
+                    opidLogoutRedirectUrl: OPID_LOGOUT_REDIRECT_URL || null,
+                    opidUsernamePolicy: opidWokaNamePolicyCheck.success ? opidWokaNamePolicyCheck.data : null,
+                    loadingLogo: null,
+                    loginSceneLogo: null,
+                    errorSceneLogo: null,
+                    showPoweredBy: true,
+                    loadingCowebsiteLogo: null,
+                    enableChat: ENABLE_CHAT,
+                    enableChatUpload: ENABLE_CHAT_UPLOAD,
+                    enableChatOnlineList: ENABLE_CHAT_ONLINE_LIST,
+                    enableChatDisconnectedList: ENABLE_CHAT_DISCONNECTED_LIST,
+                    enableSay: ENABLE_SAY,
+                    enableMatrixChat: Boolean(
+                        MATRIX_PUBLIC_URI &&
+                            MATRIX_API_URI &&
+                            MATRIX_ADMIN_USER &&
+                            MATRIX_ADMIN_PASSWORD &&
+                            MATRIX_DOMAIN
+                    ),
+                    metatags: {
+                        ...MetaTagsDefaultValue,
+                    },
+                });
+            }
+
+            // Fallback: se LOBBY_MAP_URL não estiver configurado, usa comportamento antigo
             roomUrl.pathname = START_ROOM_URL;
             return Promise.resolve({
                 redirectUrl: roomUrl.toString(),

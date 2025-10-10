@@ -34,6 +34,9 @@ export class UserEntity {
   @Column({ nullable: true, length: 100 })
   departamento: string;
 
+  @Column({ nullable: true, length: 100 })
+  defaultMap: string;
+
   @Column({ default: true })
   isActive: boolean;
 

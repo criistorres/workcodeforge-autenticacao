@@ -19,6 +19,7 @@
     email: '',
     username: '',
     isActive: true,
+    defaultMap: 'main',
   };
 
   async function loadUser() {
@@ -30,6 +31,7 @@
         email: user.email,
         username: user.username,
         isActive: user.isActive,
+        defaultMap: user.defaultMap || 'main',
       };
       selectedRoles = user.roles ? user.roles.map(r => r.id) : [];
     } catch (err) {
@@ -182,6 +184,16 @@
               <input type="email" bind:value={formData.email} class="input" required />
             </div>
 
+            <div>
+              <label class="block text-sm font-medium text-dark-700 mb-2">Mapa Padrão</label>
+              <select bind:value={formData.defaultMap} class="input">
+                <option value="main">Principal (main)</option>
+                <option value="filial1">Filial 1</option>
+                <option value="filial2">Filial 2</option>
+                <option value="sede">Sede</option>
+              </select>
+            </div>
+
             <div class="flex items-center gap-2">
               <input type="checkbox" bind:checked={formData.isActive} class="w-4 h-4 text-primary-600" />
               <label class="text-sm font-medium text-dark-700">Conta Ativa</label>
@@ -233,6 +245,10 @@
             <div>
               <p class="text-xs text-dark-500 uppercase tracking-wide mb-1">Último Login</p>
               <p class="text-dark-900 text-sm">{user.lastLogin ? new Date(user.lastLogin).toLocaleDateString('pt-BR') : 'Nunca'}</p>
+            </div>
+            <div>
+              <p class="text-xs text-dark-500 uppercase tracking-wide mb-1">Mapa Padrão</p>
+              <p class="text-dark-900 font-medium">🗺️ {user.defaultMap || 'main'}</p>
             </div>
           </div>
 

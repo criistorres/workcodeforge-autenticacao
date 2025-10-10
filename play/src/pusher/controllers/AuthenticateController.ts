@@ -9,7 +9,13 @@ import { Application } from "express";
 import Debug from "debug";
 import { AuthTokenData, jwtTokenManager } from "../services/JWTTokenManager";
 import { openIDClient } from "../services/OpenIDClient";
-import { DISABLE_ANONYMOUS, FRONT_URL, MATRIX_PUBLIC_URI, PUSHER_URL } from "../enums/EnvironmentVariable";
+import {
+    DISABLE_ANONYMOUS,
+    FRONT_URL,
+    LOBBY_MAP_URL,
+    MATRIX_PUBLIC_URI,
+    PUSHER_URL,
+} from "../enums/EnvironmentVariable";
 import { adminService } from "../services/AdminService";
 import { validateQuery } from "../services/QueryValidator";
 import { VerifyDomainService } from "../services/verifyDomain/VerifyDomainService";
@@ -311,14 +317,24 @@ export class AuthenticateController extends BaseHttpController {
             if (!email) {
                 throw new Error("No email in the response");
             }
+
+            // DEBUG: Log defaultMap
+            console.log("[OPENID-CALLBACK] userInfo.defaultMap:", userInfo?.defaultMap);
+            console.log("[OPENID-CALLBACK] Creating authToken with defaultMap");
+
             const authToken = jwtTokenManager.createAuthToken(
                 email,
                 userInfo?.access_token,
                 userInfo?.username,
                 userInfo?.locale,
                 userInfo?.tags,
+                userInfo?.defaultMap,
                 email ? matrixProvider.getBareMatrixIdFromEmail(email) : undefined
             );
+
+            // DEBUG: Decode and log token to verify defaultMap is included
+            const decoded = jwtTokenManager.verifyJWTToken(authToken, true);
+            console.log("[OPENID-CALLBACK] Token created with defaultMap:", decoded.defaultMap);
 
             const matrixPublicUri = userInfo.matrix_url ?? MATRIX_PUBLIC_URI;
 
@@ -348,8 +364,11 @@ export class AuthenticateController extends BaseHttpController {
             }
 
             res.clearCookie("playUri");
-            // FIXME: possibly redirect to Admin instead.
-            res.redirect(playUri + "?token=" + encodeURIComponent(authToken));
+
+            // Redirecionar para raiz (/) ao invés de playUri
+            // O frontend decidirá qual mapa carregar baseado no defaultMap do token
+            console.log("[OPENID-CALLBACK] Redirecionando para raiz com token (frontend decidirá o mapa)");
+            res.redirect("/?token=" + encodeURIComponent(authToken));
             return;
         });
     }
@@ -519,18 +538,27 @@ export class AuthenticateController extends BaseHttpController {
     private anonymLogin(): void {
         this.app.post("/anonymLogin", (req, res) => {
             debug(`AuthenticateController => [${req.method}] ${req.originalUrl} — IP: ${req.ip} — Time: ${Date.now()}`);
-            if (DISABLE_ANONYMOUS) {
+
+            // Permitir login anônimo se:
+            // 1. DISABLE_ANONYMOUS = false (comportamento padrão)
+            // 2. OU estamos carregando o lobby (mesmo com DISABLE_ANONYMOUS = true)
+            const referer = req.get("Referer") || "";
+            const isLobbyAccess = LOBBY_MAP_URL && referer.includes("play.workadventure.localhost");
+
+            if (DISABLE_ANONYMOUS && !isLobbyAccess) {
+                console.log(`[anonymLogin] Acesso negado - DISABLE_ANONYMOUS=true e não é lobby`);
                 res.status(403).send("");
                 return;
-            } else {
-                const userUuid = v4();
-                const authToken = jwtTokenManager.createAuthToken(userUuid);
-                res.json({
-                    authToken,
-                    userUuid,
-                });
-                return;
             }
+
+            console.log(`[anonymLogin] Permitindo acesso anônimo ${isLobbyAccess ? "(lobby)" : ""}`);
+            const userUuid = v4();
+            const authToken = jwtTokenManager.createAuthToken(userUuid);
+            res.json({
+                authToken,
+                userUuid,
+            });
+            return;
         });
     }
 

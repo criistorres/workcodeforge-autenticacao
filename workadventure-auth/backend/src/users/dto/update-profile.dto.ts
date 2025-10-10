@@ -35,4 +35,9 @@ export class UpdateProfileDto {
   @IsString()
   @Length(0, 100)
   departamento?: string;
+
+  @IsOptional()
+  @IsString()
+  @Length(0, 100)
+  defaultMap?: string;
 }

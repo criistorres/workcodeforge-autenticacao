@@ -82,6 +82,7 @@ export const OPID_USERNAME_CLAIM = env.OPENID_USERNAME_CLAIM || env.OPID_USERNAM
 export const OPID_LOCALE_CLAIM = env.OPENID_LOCALE_CLAIM || env.OPID_LOCALE_CLAIM || "locale";
 export const OPID_WOKA_NAME_POLICY = env.OPENID_WOKA_NAME_POLICY || env.OPID_WOKA_NAME_POLICY || "user_input";
 export const OPID_TAGS_CLAIM = env.OPENID_TAGS_CLAIM || env.OPID_TAGS_CLAIM || "tags";
+export const OPID_DEFAULTMAP_CLAIM = env.OPENID_DEFAULTMAP_CLAIM || env.OPID_DEFAULTMAP_CLAIM || "defaultMap";
 export const DISABLE_ANONYMOUS: boolean = env.DISABLE_ANONYMOUS;
 export const PROMETHEUS_AUTHORIZATION_TOKEN = env.PROMETHEUS_AUTHORIZATION_TOKEN;
 export const PROMETHEUS_PORT = env.PROMETHEUS_PORT === env.PUSHER_HTTP_PORT ? 0 : env.PROMETHEUS_PORT;
@@ -96,6 +97,9 @@ export const ENABLE_OPENAPI_ENDPOINT = env.ENABLE_OPENAPI_ENDPOINT;
 
 // The URL to use if the user is visiting the first time and hitting the "/" route.
 export const START_ROOM_URL: string = env.START_ROOM_URL || "/_/global/maps.workadventu.re/starter/map.json";
+// Lobby and Main Map URLs for authentication routing
+export const LOBBY_MAP_URL: string = env.LOBBY_MAP_URL || "";
+export const MAIN_MAP_URL: string = env.MAIN_MAP_URL || "";
 export const FALLBACK_LOCALE: string | undefined = env.FALLBACK_LOCALE;
 
 // Logrocket id
@@ -212,5 +216,7 @@ export const FRONT_ENVIRONMENT_VARIABLES: FrontConfigurationInterface = {
     MATRIX_DOMAIN,
     ENABLE_SAY: env.ENABLE_SAY || true,
     GRPC_MAX_MESSAGE_SIZE: env.GRPC_MAX_MESSAGE_SIZE,
+    LOBBY_MAP_URL,
+    MAIN_MAP_URL,
 };
 export const GRPC_MAX_MESSAGE_SIZE = env.GRPC_MAX_MESSAGE_SIZE;

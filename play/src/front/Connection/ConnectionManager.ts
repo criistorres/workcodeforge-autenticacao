@@ -31,6 +31,8 @@ import {
     KLAXOON_CLIENT_ID,
     KLAXOON_ENABLED,
     YOUTUBE_ENABLED,
+    LOBBY_MAP_URL,
+    MAIN_MAP_URL,
 } from "../Enum/EnvironmentVariable";
 import { limitMapStore } from "../Stores/GameStore";
 import { showLimitRoomModalStore } from "../Stores/ModalStore";
@@ -43,6 +45,7 @@ import { openChatRoom } from "../Chat/Utils";
 import LL from "../../i18n/i18n-svelte";
 import waLogo from "../Components/images/logo.svg";
 import { errorScreenStore } from "../Stores/ErrorScreenStore";
+import { SessionService } from "../Services/SessionService";
 import { axiosToPusher, axiosWithRetry } from "./AxiosUtils";
 import { Room } from "./Room";
 import { LocalUser } from "./LocalUser";
@@ -217,6 +220,34 @@ class ConnectionManager {
             this.authToken = token;
             localUserStore.setAuthToken(token);
 
+            // Decodificar token JWT para verificar se há defaultMap
+            // JWT format: header.payload.signature
+            // O payload é Base64-encoded JSON
+            try {
+                const parts = token.split(".");
+                if (parts.length === 3) {
+                    // Decodificar o payload (segunda parte)
+                    const payload = JSON.parse(atob(parts[1]));
+                    console.log("[ConnectionManager] Token decodificado:", payload);
+
+                    if (payload.defaultMap) {
+                        console.log(`[ConnectionManager] defaultMap encontrado no token: ${payload.defaultMap}`);
+                        // Construir URL do mapa baseado no defaultMap
+                        const mapUrl = `/_/global/maps.workadventure.localhost/mapas/${payload.defaultMap}.json`;
+                        console.log(`[ConnectionManager] Redirecionando para: ${mapUrl}`);
+
+                        // Limpar token da URL antes de redirecionar
+                        urlParams.delete("token");
+
+                        // Redirecionar para o mapa padrão
+                        window.location.href = mapUrl;
+                        return; // Retornar para evitar continuar o fluxo
+                    }
+                }
+            } catch (error) {
+                console.warn("[ConnectionManager] Erro ao decodificar token:", error);
+            }
+
             //clean token of url
             urlParams.delete("token");
         }
@@ -287,17 +318,86 @@ class ConnectionManager {
 
             let roomPath: string;
             if (this.connexionType === GameConnexionTypes.empty) {
-                roomPath = localUserStore.getLastRoomUrl();
-                //get last room path from cache api
-                try {
-                    const lastRoomUrl = await localUserStore.getLastRoomUrlCacheApi();
-                    if (lastRoomUrl != undefined) {
-                        roomPath = lastRoomUrl;
+                // Proteção contra loops: verificar se já tentamos redirecionar
+                const skipAuthRouting = urlParams.get("skipAuthRouting");
+
+                if (skipAuthRouting === "true") {
+                    console.log("[ConnectionManager] Skip auth routing detectado, usando comportamento padrão");
+                    // Remover o parâmetro da URL
+                    urlParams.delete("skipAuthRouting");
+
+                    // Fallback para comportamento padrão
+                    roomPath = localUserStore.getLastRoomUrl();
+                    try {
+                        const lastRoomUrl = await localUserStore.getLastRoomUrlCacheApi();
+                        if (lastRoomUrl != undefined) {
+                            roomPath = lastRoomUrl;
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        if (err instanceof Error) {
+                            console.error(err.stack);
+                        }
                     }
-                } catch (err) {
-                    console.error(err);
-                    if (err instanceof Error) {
-                        console.error(err.stack);
+                } else {
+                    // Debug: verificar se as variáveis existem
+                    console.log(`[ConnectionManager] LOBBY_MAP_URL: ${LOBBY_MAP_URL}`);
+                    console.log(`[ConnectionManager] MAIN_MAP_URL: ${MAIN_MAP_URL}`);
+
+                    // Verificar se usuário está autenticado via session cookie
+                    console.log("[ConnectionManager] Verificando autenticação para rotear mapa...");
+                    const sessionData = await SessionService.checkSession();
+                    const isAuthenticated = sessionData.authenticated;
+                    console.log(`[ConnectionManager] Usuário ${isAuthenticated ? "autenticado" : "não autenticado"}`);
+
+                    // Decidir qual mapa carregar baseado na autenticação
+                    if (isAuthenticated) {
+                        // Usuário autenticado: usar defaultMap do perfil ou fallback para MAIN_MAP_URL
+                        const defaultMap = sessionData.user?.defaultMap;
+
+                        if (defaultMap) {
+                            console.log(`[ConnectionManager] Usando defaultMap do usuário: ${defaultMap}`);
+                            // Construir URL do mapa baseado no defaultMap
+                            // Formato: http://maps.workadventure.localhost/mapas/filial1.json
+                            roomPath = `${window.location.protocol}//maps.workadventure.localhost/mapas/${defaultMap}.json`;
+                        } else if (MAIN_MAP_URL && MAIN_MAP_URL !== "undefined") {
+                            console.log(
+                                `[ConnectionManager] defaultMap não definido, usando MAIN_MAP_URL: ${MAIN_MAP_URL}`
+                            );
+                            // Converter para URL absoluta se for relativa
+                            if (MAIN_MAP_URL.startsWith("/")) {
+                                roomPath = `${window.location.protocol}//${window.location.host}${MAIN_MAP_URL}`;
+                            } else {
+                                roomPath = MAIN_MAP_URL;
+                            }
+                        } else {
+                            console.warn("[ConnectionManager] Nem defaultMap nem MAIN_MAP_URL definidos");
+                            roomPath = localUserStore.getLastRoomUrl();
+                        }
+                    } else if (!isAuthenticated && LOBBY_MAP_URL && LOBBY_MAP_URL !== "undefined") {
+                        console.log(`[ConnectionManager] Carregando mapa de lobby: ${LOBBY_MAP_URL}`);
+                        // Converter para URL absoluta se for relativa
+                        if (LOBBY_MAP_URL.startsWith("/")) {
+                            roomPath = `${window.location.protocol}//${window.location.host}${LOBBY_MAP_URL}`;
+                        } else {
+                            roomPath = LOBBY_MAP_URL;
+                        }
+                    } else {
+                        console.warn("[ConnectionManager] LOBBY/MAIN URLs não definidas, usando fallback");
+
+                        // Fallback para comportamento padrão
+                        roomPath = localUserStore.getLastRoomUrl();
+                        try {
+                            const lastRoomUrl = await localUserStore.getLastRoomUrlCacheApi();
+                            if (lastRoomUrl != undefined) {
+                                roomPath = lastRoomUrl;
+                            }
+                        } catch (err) {
+                            console.error(err);
+                            if (err instanceof Error) {
+                                console.error(err.stack);
+                            }
+                        }
                     }
                 }
             } else {
@@ -323,7 +423,17 @@ class ConnectionManager {
 
             //todo: add here some kind of warning if authToken has expired.
             if (!this.authToken) {
-                if (!this._currentRoom.authenticationMandatory) {
+                // Verificar se estamos carregando o lobby (usuário não autenticado)
+                const isLoadingLobby = LOBBY_MAP_URL && roomPath.includes(LOBBY_MAP_URL);
+
+                if (!this._currentRoom.authenticationMandatory || isLoadingLobby) {
+                    console.log(
+                        `[ConnectionManager] ${
+                            isLoadingLobby
+                                ? "Lobby detectado, permitindo acesso anônimo"
+                                : "Autenticação não obrigatória, fazendo login anônimo"
+                        }`
+                    );
                     await this.anonymousLogin();
 
                     const characterTextures = localUserStore.getCharacterTextures();
@@ -331,6 +441,7 @@ class ConnectionManager {
                         nextScene = "selectCharacterScene";
                     }
                 } else {
+                    console.log(`[ConnectionManager] Autenticação obrigatória, redirecionando para login`);
                     const redirect = this.loadOpenIDScreen(false);
                     if (redirect === null) {
                         throw new Error("Unable to redirect on login page.");

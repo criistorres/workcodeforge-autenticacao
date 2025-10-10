@@ -69,4 +69,6 @@ export interface FrontConfigurationInterface {
     ENABLE_CHAT_DISCONNECTED_LIST: boolean | undefined;
     ENABLE_SAY: boolean | undefined;
     GRPC_MAX_MESSAGE_SIZE: number;
+    LOBBY_MAP_URL: string | undefined;
+    MAIN_MAP_URL: string | undefined;
 }

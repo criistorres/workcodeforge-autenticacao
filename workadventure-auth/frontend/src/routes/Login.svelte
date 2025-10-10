@@ -7,6 +7,7 @@
   let loading = false;
   let isRegister = false;
   let name = '';
+  let defaultMap = 'main';
 
   let clientId = '';
   let redirectUri = '';
@@ -220,7 +221,7 @@
       // Fazer login normal
       const endpoint = isRegister ? '/auth/register' : '/auth/login';
       const body = isRegister
-        ? { email, password, name }
+        ? { email, password, name, defaultMap }
         : { email, password };
 
       const response = await fetch(`${endpoint}`, {
@@ -334,6 +335,28 @@
                   disabled={loading}
                   class="w-full pl-12 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 />
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <label for="defaultMap" class="block text-sm font-semibold text-gray-300 uppercase tracking-wider">
+                Mapa Padrão
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <span class="text-gray-500 text-xl">🗺️</span>
+                </div>
+                <select
+                  id="defaultMap"
+                  bind:value={defaultMap}
+                  disabled={loading}
+                  class="w-full pl-12 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed appearance-none"
+                >
+                  <option value="main">Principal (main)</option>
+                  <option value="filial1">Filial 1</option>
+                  <option value="filial2">Filial 2</option>
+                  <option value="sede">Sede</option>
+                </select>
               </div>
             </div>
           {/if}

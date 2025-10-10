@@ -9,4 +9,5 @@ export class RegisterDto {
   name: string;
   username?: string;
   tags?: string[];
+  defaultMap?: string;
 }

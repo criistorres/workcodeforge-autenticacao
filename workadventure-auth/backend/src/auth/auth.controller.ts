@@ -1,4 +1,5 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import { Controller, Post, Body, Get, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto } from './dto/login.dto';
 import { UsersService } from '../users/users.service';
@@ -43,5 +44,23 @@ export class AuthController {
       tags: u.tags,
       createdAt: u.createdAt
     }));
+  }
+
+  @Get('check-session')
+  async checkSession(@Req() req: Request, @Res() res: Response) {
+    console.log('[CHECK-SESSION] Verificando sessão...');
+
+    // Buscar token no cookie ou header
+    const token = req.cookies?.auth_token || req.headers.authorization?.replace('Bearer ', '');
+
+    if (!token) {
+      console.log('[CHECK-SESSION] Nenhum token encontrado');
+      return res.json({ authenticated: false });
+    }
+
+    const result = await this.authService.checkSession(token);
+    console.log(`[CHECK-SESSION] Resultado: ${result.authenticated ? 'Autenticado' : 'Não autenticado'}`);
+
+    return res.json(result);
   }
 }

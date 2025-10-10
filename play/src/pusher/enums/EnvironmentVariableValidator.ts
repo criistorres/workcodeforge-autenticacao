@@ -198,6 +198,8 @@ export const EnvironmentVariables = z.object({
     //DEBUG_ERROR_MESSAGES: BoolAsString.optional().transform((val) => toBool(val, false)),
     ENABLE_OPENAPI_ENDPOINT: BoolAsString.optional().transform((val) => toBool(val, false)),
     START_ROOM_URL: z.string().optional(),
+    LOBBY_MAP_URL: z.string().optional(),
+    MAIN_MAP_URL: z.string().optional(),
 
     // Front related environment variables
     DEBUG_MODE: BoolAsString.optional().transform((val) => toBool(val, false)),

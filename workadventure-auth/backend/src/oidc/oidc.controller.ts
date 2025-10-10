@@ -25,7 +25,7 @@ export class OidcController {
       id_token_signing_alg_values_supported: ['RS256'],
       scopes_supported: ['openid', 'profile', 'email', 'tags-scope'],
       token_endpoint_auth_methods_supported: ['client_secret_post', 'client_secret_basic'],
-      claims_supported: ['sub', 'name', 'email', 'preferred_username', 'tags', 'email_verified']
+      claims_supported: ['sub', 'name', 'email', 'preferred_username', 'tags', 'email_verified', 'defaultMap']
     };
   }
 
@@ -76,7 +76,8 @@ export class OidcController {
     @Body('client_id') clientIdBody: string,
     @Body('client_secret') clientSecretBody: string,
     @Body('redirect_uri') redirectUri: string,
-    @Req() req: Request
+    @Req() req: Request,
+    @Res() res: Response
   ) {
     // Suporta tanto client_secret_basic (via Authorization header) quanto client_secret_post (via body)
     let clientId = clientIdBody;
@@ -108,13 +109,26 @@ export class OidcController {
 
     const tokens = await this.oidcService.generateTokens(authData);
 
-    return {
+    // Definir cookie cross-domain com o access_token
+    // Cookie válido para .workadventure.localhost (subdomínios)
+    res.cookie('auth_token', tokens.accessToken, {
+      httpOnly: true, // Previne acesso via JavaScript
+      secure: process.env.NODE_ENV === 'production', // HTTPS apenas em produção
+      sameSite: 'lax', // Permite cookies cross-domain em navegação
+      domain: '.workadventure.localhost', // Válido para todos subdomínios
+      maxAge: 3600000, // 1 hora (em milissegundos)
+      path: '/' // Válido para toda aplicação
+    });
+
+    console.log('[TOKEN] Cookie cross-domain criado para: .workadventure.localhost');
+
+    return res.json({
       access_token: tokens.accessToken,
       token_type: 'Bearer',
       expires_in: 3600,
       id_token: tokens.idToken,
       scope: authData.scope
-    };
+    });
   }
 
   @Get('userinfo')
@@ -142,7 +156,8 @@ export class OidcController {
       email_verified: true,
       name: user.name,
       preferred_username: user.username,
-      tags: user.tags
+      tags: user.tags,
+      defaultMap: user.defaultMap || 'main'
     };
   }
 
@@ -165,6 +180,13 @@ export class OidcController {
         console.error('[LOGOUT] Erro ao revogar sessão:', err.message);
       }
     }
+
+    // Limpar cookie de autenticação cross-domain
+    res.clearCookie('auth_token', {
+      domain: '.workadventure.localhost',
+      path: '/'
+    });
+    console.log('[LOGOUT] Cookie cross-domain removido');
 
     // Se não veio redirect_uri, usar o default (play.workadventure.localhost)
     const finalRedirectUri = redirectUri || process.env.DEFAULT_LOGOUT_REDIRECT || 'http://play.workadventure.localhost';

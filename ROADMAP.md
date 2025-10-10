@@ -65,7 +65,7 @@ Quando for implementar qualquer funcionalidade deste roadmap, siga estas regras:
 ## 🎯 PRIORIDADES
 
 ### 🔴 CRÍTICO (Bloqueia Comercialização)
-0. **Lobby e Login In-Game** ⚠️ FAZER PRIMEIRO
+0. **Lobby e Sistema de Mapa Padrão por Usuário** ⚠️ FAZER PRIMEIRO
 1. Password Reset
 2. Rate Limiting
 3. Sistema de Tags e Controle de Acesso
@@ -89,24 +89,85 @@ Quando for implementar qualquer funcionalidade deste roadmap, siga estas regras:
 
 ---
 
-## 🎮 FASE 0: LOBBY E LOGIN IN-GAME
-**Duração**: 3-4 dias
+## 🎮 FASE 0: LOBBY E SISTEMA DE MAPA PADRÃO POR USUÁRIO
+**Duração**: 5-6 dias
 **Prioridade**: 🔴 CRÍTICA - FAZER PRIMEIRO
 **[📖 Detalhes técnicos](docs/implementacoes/fase-0-lobby.md)**
 
 ### Objetivos
-- Usuários não logados veem mapa de lobby
-- Clica em botao de login, redireciona para auth
-- Após login, usuário é redirecionado ao mapa principal
+- Usuários não logados veem mapa de **lobby** (área pública de espera)
+- Após login, usuário é redirecionado ao **mapa padrão** configurado no cadastro
+- Cada usuário tem um `defaultMap` (ex: `filial1`, `filial2`, `sede`)
+- Usuário pode navegar livremente entre mapas, mesmo tendo um padrão
+- Admin pode configurar o `defaultMap` por usuário no Admin Panel
 - Sistema não quebra o fluxo atual que funciona
 
+### Arquitetura
+```
+┌──────────────────────────────────────────────────┐
+│ Fluxo de Acesso com Mapa Padrão                  │
+├──────────────────────────────────────────────────┤
+│                                                  │
+│ Não logado → Lobby (mapa público)               │
+│      ↓                                           │
+│ Clica em "Entrar/Login"                          │
+│      ↓                                           │
+│ Redireciona para auth.workadventure.localhost   │
+│      ↓                                           │
+│ Login/Registro                                   │
+│      ↓                                           │
+│ JWT com claims: {email, name, tags, defaultMap}  │
+│      ↓                                           │
+│ Redireciona para defaultMap do usuário           │
+│      ↓                                           │
+│ Exemplos:                                        │
+│   - user1 → filial1 (mapa padrão)                │
+│   - user2 → filial2 (mapa padrão)                │
+│   - admin → sede (mapa padrão)                   │
+│      ↓                                           │
+│ Usuário pode navegar para outros mapas          │
+│ (filial1 → filial2, filial2 → sede, etc)        │
+│                                                  │
+└──────────────────────────────────────────────────┘
+```
+
 ### Entregas
-- [ ] Mapa `lobby.json` criado e configurado
-- [ ] Endpoint `/auth/check-session` implementado
+
+#### Backend (workadventure-auth)
+- [x] Campo `defaultMap` em `UserEntity` (tipo: `string`, nullable)
+- [x] Migration para adicionar coluna `default_map` na tabela `users`
+- [x] DTO `UpdateUserDto` com campo `defaultMap` opcional
+- [x] Endpoint `/auth/check-session` retorna `defaultMap` do usuário
+- [x] Callback OIDC inclui `defaultMap` no `id_token` (claims JWT)
+- [x] Lógica: se `defaultMap` não definido, usar `'main'` como fallback
+
+#### Frontend Auth
+- [x] Campo select/input no formulário de registro para escolher `defaultMap` inicial
+- [x] Validação: lista de mapas disponíveis (hard-coded ou endpoint futuro)
+
+#### Admin Panel
+- [x] Campo select no `UserDetail` para editar `defaultMap`
+- [x] Opções: `filial1`, `filial2`, `sede`, `main`, etc (configurável)
+- [x] Atualização via PATCH `/users/:id`
+
+#### Play (WorkAdventure)
+- [ ] Mapa `lobby.json` criado e configurado (área pública)
 - [ ] Cookie cross-domain configurado (`.workadventure.localhost`)
-- [ ] Roteamento de mapas no frontend (lobby vs main)
+- [x] Pusher: `defaultMap` extraído do userinfo e incluído no JWT **✅ VALIDADO**
+- [ ] Frontend: ler `defaultMap` do JWT e redirecionar para o mapa configurado **⚠️ PENDENTE**
+- [ ] Frontend: roteamento de mapas (lobby vs authenticated maps)
 - [ ] Proteção contra loops de redirecionamento
-- [ ] Testes de fluxo completo
+- [x] Liberdade de navegação: usuário pode trocar de mapa manualmente (já existe)
+
+#### Testes
+- [x] Validar que `defaultMap` está no banco de dados
+- [x] Validar que OIDC claims incluem `defaultMap`
+- [x] Validar que JWT é criado com `defaultMap` **✅ Logs confirmam: `filial1`**
+- [ ] Fluxo completo: não logado → lobby → login → redirects para defaultMap
+- [ ] Testar com diferentes usuários e diferentes `defaultMap`
+- [ ] Testar navegação entre mapas após login
+- [ ] Testar fallback quando `defaultMap` é `null`
+- [ ] Testar admin editando `defaultMap` de usuário
 
 ---
 
@@ -367,13 +428,16 @@ TOTAL: 10-11 SEMANAS
 
 ## 🎯 MARCOS (MILESTONES)
 
-### Milestone 1: Lobby Funcional (Semana 1)
-✅ Sistema de lobby implementado
-✅ Login in-game funcionando
-✅ Redirecionamento correto entre mapas
-✅ Cookie cross-domain configurado
+### Milestone 1: Lobby e Mapa Padrão Funcional (Semana 1)
+- [ ] Sistema de lobby implementado
+- [ ] Campo `defaultMap` em User cadastrado e funcionando
+- [ ] Login in-game funcionando
+- [ ] Redirecionamento para mapa padrão do usuário após login
+- [ ] Navegação livre entre mapas
+- [ ] Admin pode editar `defaultMap` no UserDetail
+- [ ] Cookie cross-domain configurado
 
-**Critério**: Usuários não autenticados veem lobby, autenticados vão direto para o mapa principal
+**Critério**: Usuários não autenticados veem lobby, autenticados são redirecionados para o mapa padrão configurado no cadastro
 
 ---
 
@@ -474,8 +538,8 @@ TOTAL: 10-11 SEMANAS
 
 ---
 
-**Última Atualização**: 06/10/2025
-**Versão do Roadmap**: 2.0
+**Última Atualização**: 10/10/2025
+**Versão do Roadmap**: 2.1
 
 **Desenvolvedor**: Cristian Torres
 **Repositório**: https://github.com/cristiantorres/workcodeforge

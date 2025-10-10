@@ -73,4 +73,38 @@ export class AuthService {
 
     return { code };
   }
+
+  async checkSession(token: string) {
+    try {
+      // Validar o token JWT
+      const decoded = await this.oidcService.validateAccessToken(token);
+
+      if (!decoded) {
+        return { authenticated: false };
+      }
+
+      // Buscar o usuário
+      const user = await this.usersService.findById(decoded.sub);
+
+      if (!user) {
+        return { authenticated: false };
+      }
+
+      // Retornar informações do usuário
+      return {
+        authenticated: true,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          username: user.username,
+          tags: user.tags,
+          defaultMap: user.defaultMap || 'main'
+        }
+      };
+    } catch (error) {
+      console.error('[CHECK-SESSION] Erro ao validar token:', error.message);
+      return { authenticated: false };
+    }
+  }
 }

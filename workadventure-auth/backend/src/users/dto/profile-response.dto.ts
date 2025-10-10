@@ -6,6 +6,7 @@ export class ProfileResponseDto {
   telefone?: string;
   cpf?: string;
   departamento?: string;
+  defaultMap?: string;
   avatarUrl?: string;
   tags: string[];
   isActive: boolean;

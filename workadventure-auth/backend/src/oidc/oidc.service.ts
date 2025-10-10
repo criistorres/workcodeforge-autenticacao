@@ -85,7 +85,8 @@ export class OidcService {
       email_verified: true,
       name: user.name,
       preferred_username: user.username,
-      tags: user.tags
+      tags: user.tags,
+      defaultMap: user.defaultMap || 'main'
     };
 
     // Apenas adiciona nonce se ele existir e não for undefined ou 'undefined'

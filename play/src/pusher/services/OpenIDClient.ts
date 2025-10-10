@@ -14,6 +14,7 @@ import {
     OPID_PROMPT,
     SECRET_KEY,
     OPID_TAGS_CLAIM,
+    OPID_DEFAULTMAP_CLAIM,
 } from "../enums/EnvironmentVariable";
 
 custom.setHttpOptionsDefaults({
@@ -125,6 +126,7 @@ class OpenIDClient {
         access_token: string;
         username: string;
         locale: string;
+        defaultMap: string | undefined;
         matrix_url: string | undefined;
         matrix_identity_provider: string | undefined;
     }> {
@@ -168,6 +170,7 @@ class OpenIDClient {
                             username: res[OPID_USERNAME_CLAIM] as string,
                             locale: res[OPID_LOCALE_CLAIM] as string,
                             tags: res[OPID_TAGS_CLAIM] as string[],
+                            defaultMap: res[OPID_DEFAULTMAP_CLAIM] as string | undefined,
                             matrix_url: res.matrix_url as string | undefined,
                             matrix_identity_provider: res.matrix_identity_provider as string | undefined,
                         };
