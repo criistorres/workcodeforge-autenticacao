@@ -340,7 +340,7 @@ class ConnectionManager {
                         console.log(
                             `[ConnectionManager] Usuário autenticado com token, carregando mapa: ${defaultMapFromToken}`
                         );
-                        roomPath = `/_/global/maps.workadventure.localhost/mapas/${defaultMapFromToken}.json`;
+                        roomPath = `/~/${defaultMapFromToken}.wam`;
                     } else {
                         // Verificar se usuário está autenticado via session cookie
                         console.log("[ConnectionManager] Verificando autenticação para rotear mapa...");
@@ -358,7 +358,7 @@ class ConnectionManager {
                             if (defaultMap) {
                                 console.log(`[ConnectionManager] Usando defaultMap do usuário: ${defaultMap}`);
                                 // Construir URL do mapa baseado no defaultMap
-                                roomPath = `/_/global/maps.workadventure.localhost/mapas/${defaultMap}.json`;
+                                roomPath = `/~/${defaultMap}.wam`;
                             } else if (MAIN_MAP_URL && MAIN_MAP_URL !== "undefined") {
                                 console.log(
                                     `[ConnectionManager] defaultMap não definido, usando MAIN_MAP_URL: ${MAIN_MAP_URL}`
