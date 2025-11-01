@@ -25,3 +25,13 @@ synapse/homeserver.yaml
 synapse/media_store/*
 
 .vscode/settings.json
+
+# Environment-specific files (SECURITY)
+# Never commit these files - they contain secrets!
+.env
+.env.*
+!.env.template
+!.env.example
+
+# Local scripts that may contain sensitive data
+*.local.sh

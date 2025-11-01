@@ -213,7 +213,10 @@ export class UploadController {
                         promises.push(this.fileSystem.writeFile(zipEntry, key));
                         if (path.extname(key) === ".tmj") {
                             if (!wamFilesNames.includes(path.parse(zipEntry.path).name)) {
-                                promises.push(this.createWAMFileIfMissing(key, zipEntry, zipDirectory));
+                                promises.push(this.createOrUpdateWAMFile(key, zipEntry, zipDirectory));
+                            } else {
+                                // Sempre recompila WAM mesmo se já existe (para atualizar metadados)
+                                promises.push(this.createOrUpdateWAMFile(key, zipEntry, zipDirectory));
                             }
                         } else if (path.extname(key) === ".wam") {
                             const wamUrl = `${req.protocol}://${req.hostname}${directory}/${zipEntry.path}`;
@@ -466,6 +469,12 @@ export class UploadController {
 
                     await this.fileSystem.writeStringAsFile(virtualPath, patchedContentString);
 
+                    // Notify MapsManager about the change so it doesn't think the map hasn't been modified
+                    // This ensures the autosave interval continues and the changes are properly tracked
+                    const gameMap = await mapsManager.getOrLoadGameMap(virtualPath);
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+                    (gameMap as any).setWam(result.value);
+
                     uploadDetector.refresh(this.getFullUrlFromRequest(req)).catch((err) => {
                         console.error(`[${new Date().toISOString()}]`, err);
                         Sentry.captureException(err);
@@ -487,24 +496,23 @@ export class UploadController {
         });
     }
 
-    private async createWAMFileIfMissing(
+    private async createOrUpdateWAMFile(
         tmjKey: string,
         zipEntry: unzipper.File,
         zip: unzipper.CentralDirectory
     ): Promise<void> {
         const wamPath = tmjKey.slice().replace(".tmj", ".wam");
-        if (!(await this.fileSystem.exist(wamPath))) {
-            // Get the content of the file as a string
-            const buffer = await zipEntry.buffer();
-            const tmjString = buffer.toString("utf-8");
+        // Always create or update WAM file to ensure latest metadata is reflected
+        // Get the content of the file as a string
+        const buffer = await zipEntry.buffer();
+        const tmjString = buffer.toString("utf-8");
 
-            // Using "as" instead of Zod because the Zod check was already performed before.
-            const tmjContent = JSON.parse(tmjString) as ITiledMap;
-            await this.fileSystem.writeStringAsFile(
-                wamPath,
-                JSON.stringify(await this.getFreshWAMFileContent(`./${path.basename(tmjKey)}`, tmjContent), null, 4)
-            );
-        }
+        // Using "as" instead of Zod because the Zod check was already performed before.
+        const tmjContent = JSON.parse(tmjString) as ITiledMap;
+        await this.fileSystem.writeStringAsFile(
+            wamPath,
+            JSON.stringify(await this.getFreshWAMFileContent(`./${path.basename(tmjKey)}`, tmjContent), null, 4)
+        );
     }
 
     private async getFreshWAMFileContent(tmjFilePath: string, tmjContent: ITiledMap): Promise<WAMFileFormat> {
