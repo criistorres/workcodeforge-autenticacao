@@ -14,11 +14,11 @@ import { ADMIN_API_URL } from "../enums/EnvironmentVariable";
 import { adminService } from "./AdminService";
 
 export const MetaTagsDefaultValue: RequiredMetaTagsData = {
-    title: "WorkAdventure",
+    title: "WorkCodeForge",
     description:
-        "Organize your online event in WorkAdventure to recreate spontaneous social interactions. Connect, collaborate and have fun with your teammates and attendees.",
-    author: "WorkAdventure team",
-    provider: "WorkAdventure",
+        "Organize your online event in WorkCodeForge to recreate spontaneous social interactions. Connect, collaborate and have fun with your teammates and attendees.",
+    author: "WorkCodeForge team",
+    provider: "WorkCodeForge",
     favIcons: [
         {
             rel: "icon",

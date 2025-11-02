@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Generate WorkCodeForge Logos</title>
+</head>
+<body>
+    <canvas id="canvas-big" width="400" height="100"></canvas>
+    <canvas id="canvas-small" width="200" height="50"></canvas>
+    
+    <script>
+        // Big logo
+        const canvasBig = document.getElementById('canvas-big');
+        const ctxBig = canvasBig.getContext('2d');
+        
+        // Background gradient
+        const gradientBig = ctxBig.createLinearGradient(0, 0, 400, 100);
+        gradientBig.addColorStop(0, '#1e3a8a');
+        gradientBig.addColorStop(1, '#3b82f6');
+        ctxBig.fillStyle = gradientBig;
+        ctxBig.fillRect(0, 0, 400, 100);
+        
+        // Text
+        ctxBig.fillStyle = '#ffffff';
+        ctxBig.font = 'bold 20px Arial';
+        ctxBig.textAlign = 'center';
+        ctxBig.fillText('Powered by', 200, 35);
+        ctxBig.font = 'bold 32px Arial';
+        ctxBig.fillText('WorkCodeForge', 200, 75);
+        
+        // Small logo
+        const canvasSmall = document.getElementById('canvas-small');
+        const ctxSmall = canvasSmall.getContext('2d');
+        
+        // Background gradient
+        const gradientSmall = ctxSmall.createLinearGradient(0, 0, 200, 50);
+        gradientSmall.addColorStop(0, '#1e3a8a');
+        gradientSmall.addColorStop(1, '#3b82f6');
+        ctxSmall.fillStyle = gradientSmall;
+        ctxSmall.fillRect(0, 0, 200, 50);
+        
+        // Text
+        ctxSmall.fillStyle = '#ffffff';
+        ctxSmall.font = 'bold 10px Arial';
+        ctxSmall.textAlign = 'center';
+        ctxSmall.fillText('Powered by', 100, 18);
+        ctxSmall.font = 'bold 16px Arial';
+        ctxSmall.fillText('WorkCodeForge', 100, 38);
+        
+        // Download function
+        function downloadCanvas(canvas, filename) {
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+        
+        // Auto-download (commented out for manual control)
+        // setTimeout(() => {
+        //     downloadCanvas(canvasBig, 'Powered_By_WorkCodeForge_Big.png');
+        //     downloadCanvas(canvasSmall, 'Powered_By_WorkCodeForge_Small.png');
+        // }, 100);
+        
+        console.log('Right-click on canvas and save as PNG to save logos');
+    </script>
+</body>
+</html>

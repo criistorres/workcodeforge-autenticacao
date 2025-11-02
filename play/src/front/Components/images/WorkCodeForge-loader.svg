@@ -1,0 +1,33 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="80" fill="none" stroke="#1e3a8a" stroke-width="4" opacity="0.3"/>
+
+  <!-- Animated rotating circle -->
+  <circle cx="100" cy="100" r="80" fill="none" stroke="#3b82f6" stroke-width="4" stroke-dasharray="251" stroke-dashoffset="0" stroke-linecap="round">
+    <animateTransform
+      attributeName="transform"
+      type="rotate"
+      from="0 100 100"
+      to="360 100 100"
+      dur="2s"
+      repeatCount="indefinite"/>
+    <animate
+      attributeName="stroke-dashoffset"
+      values="0;-251"
+      dur="2s"
+      repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Code brackets icon -->
+  <g transform="translate(75, 75)">
+    <path d="M 10 5 L 0 25 L 10 45" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <path d="M 40 5 L 50 25 L 40 45" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <circle cx="25" cy="25" r="3" fill="white" opacity="0.7">
+      <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Text -->
+  <text x="100" y="170" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">WorkCodeForge</text>
+  <text x="100" y="190" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle" opacity="0.8">Loading...</text>
+</svg>

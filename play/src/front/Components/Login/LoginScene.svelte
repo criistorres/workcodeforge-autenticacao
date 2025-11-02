@@ -4,8 +4,9 @@
     import { LoginSceneName } from "../../Phaser/Login/LoginScene";
     import { MAX_USERNAME_LENGTH } from "../../Enum/EnvironmentVariable";
     import logoImg from "../images/logo.svg";
-    import poweredByWorkAdventureImg from "../images/Powered_By_WorkAdventure_Big.png";
     import bgMap from "../images/map-exemple.png";
+
+    const poweredByWorkAdventureImg = "/static/images/Powered_By_WorkCodeForge_Big.svg";
     import { gameManager } from "../../Phaser/Game/GameManager";
     import { LL, locale } from "../../../i18n/i18n-svelte";
     import { NameNotValidError, NameTooLongError } from "../../Exception/NameError";
@@ -154,7 +155,7 @@
     </div>
     {#if logo !== logoImg && gameManager.currentStartedRoom.showPoweredBy !== false}
         <section class="text-right flex powered-by justify-center items-end">
-            <img draggable="false" src={poweredByWorkAdventureImg} alt="Powered by WorkAdventure" class="h-14" />
+            <img draggable="false" src={poweredByWorkAdventureImg} alt="Powered by WorkCodeForge" class="h-14" />
         </section>
     {/if}
 </form>

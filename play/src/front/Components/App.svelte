@@ -115,7 +115,7 @@
 
         const config: Phaser.Types.Core.GameConfig = {
             type: mode,
-            title: "WorkAdventure",
+            title: "WorkCodeForge",
             scale: {
                 parent: gameDiv,
                 width: gameSize.width,
