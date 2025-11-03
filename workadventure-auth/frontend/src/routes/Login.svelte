@@ -320,154 +320,125 @@
     body {
       margin: 0;
       padding: 0;
-      background: #1B1B29;
       min-height: 100vh;
       overflow: hidden;
-    }
-
-    :global(html) {
-      --contrast: 43, 39, 59;
-      --secondary: 86, 234, 255;
-    }
-
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes bobbing {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-15px); }
-    }
-
-    .character {
-      animation: bobbing 3s ease-in-out infinite;
-    }
-
-    .modal-content {
-      animation: slideUp 0.4s ease-out;
     }
   </style>
 </svelte:head>
 
-<!-- Main backdrop -->
-<div class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-  <!-- Subtle background pattern -->
-  <div class="absolute inset-0 opacity-10">
-    <svg class="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-          <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(86, 234, 255, 0.3)" stroke-width="0.5"/>
-        </pattern>
-      </defs>
-      <rect width="100" height="100" fill="url(#grid)" />
-    </svg>
-  </div>
+<!-- Admin access button - Pixel style (positioned outside flex container) -->
+<a
+  href="#/admin/login"
+  class="fixed top-6 right-6 z-50 px-4 py-3 pixel-button bg-[#0f3460] hover:bg-[#16213e] text-[#5ce1e6] transition-all duration-100"
+  title="Acessar painel administrativo"
+  style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px; position: fixed !important;"
+>
+  ⚡ ADMIN
+</a>
 
-  <!-- Admin access button -->
-  <a
-    href="#/admin/login"
-    class="absolute top-4 right-4 z-20 p-3 bg-contrast/60 hover:bg-contrast/80 border border-secondary/30 rounded-md text-secondary transition-all duration-200 md:top-8 md:right-8"
-    title="Acessar painel administrativo"
-  >
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-    </svg>
-  </a>
+<!-- Main backdrop with pixel grid -->
+<div class="fixed inset-0 flex items-center justify-center p-4 pixel-grid pixel-theme">
+  <!-- Scanline effect -->
+  <div class="pixel-scanline"></div>
 
   <!-- Character - WorkAdventure pixel art -->
-  <div class="character absolute bottom-10 right-10 md:right-20 md:bottom-20 pointer-events-none z-5">
+  <div class="pixel-bounce absolute bottom-10 right-10 md:right-20 md:bottom-20 pointer-events-none z-5" style="filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.5));">
     <img
       src="/yoda-avatar.png"
       alt="Guia do jogo"
-      class="w-24 h-24 md:w-32 md:h-32"
-      style="filter: drop-shadow(0 8px 20px rgba(86, 234, 255, 0.35)); image-rendering: pixelated;"
+      class="w-32 h-32 md:w-40 md:h-40"
+      style="image-rendering: pixelated; filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.5));"
     />
-    <!-- Speech bubble -->
-    <div class="absolute -top-14 right-0 bg-contrast/90 border border-secondary/60 rounded-md px-3 py-1.5 text-xs text-white backdrop-blur-md pointer-events-auto whitespace-nowrap shadow-lg" style="background: rgba(43, 39, 59, 0.9); border-color: rgba(86, 234, 255, 0.6);">
-      Bem-vindo!
-      <div class="absolute top-full right-4 w-2 h-2 bg-contrast" style="clip-path: polygon(50% 0%, 0% 100%, 100% 100%); background: rgba(43, 39, 59, 0.9);"></div>
+    <!-- Speech bubble - Pixel style -->
+    <div class="absolute -top-16 right-0 px-4 py-2 pointer-events-auto whitespace-nowrap" style="background: #16213e; border: 4px solid #0f3460; box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3); font-size: 8px; color: #5ce1e6;">
+      BEM-VINDO!
+      <div class="absolute top-full right-8 w-0 h-0" style="border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid #0f3460;"></div>
     </div>
   </div>
 
-  <!-- Login card -->
-  <div class="relative w-full max-w-sm z-10">
-    <div class="modal-content bg-contrast/80 rounded-lg border border-secondary/25 p-8 backdrop-blur-lg shadow-2xl" style="background-color: rgba(43, 39, 59, 0.8); border-color: rgba(86, 234, 255, 0.25);">
-      <!-- Header -->
-      <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-white mb-1">
-          {isRegister ? 'Criar Conta' : 'Entrar'}
+  <!-- Login card - Pixel style terminal -->
+  <div class="relative w-full max-w-md z-10">
+    <!-- Glow effect -->
+    <div class="absolute inset-0 pixel-pulse" style="z-index: -1; border: 4px solid var(--pixel-border);"></div>
+
+    <div class="pixel-slide-in pixel-card p-8">
+      <!-- Header - Terminal style -->
+      <div class="text-center mb-8 pb-6" style="border-bottom: 3px dashed #0f3460;">
+        <div class="mb-4 text-[#5ce1e6]" style="font-size: 8px; letter-spacing: 2px;">
+          ▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼
+        </div>
+        <h1 class="text-white mb-3" style="font-size: 20px; text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.5), 0 0 20px rgba(92, 225, 230, 0.5);">
+          {isRegister ? 'CRIAR CONTA' : 'LOGIN'}
         </h1>
-        <p class="text-secondary text-xs font-semibold uppercase tracking-wider">WorkCodeForge</p>
+        <p class="text-[#53a8b6]" style="font-size: 8px; letter-spacing: 3px;">
+          ★ WORKCODEFORGE ★
+        </p>
       </div>
 
-      <!-- Error message -->
+      <!-- Error message - Pixel style -->
       {#if error}
-        <div class="mb-6 p-3 bg-red-500/10 border border-red-500/30 rounded-md text-red-300 text-sm">
-          {error}
+        <div class="mb-6 p-4" style="background: #2d1b1b; border: 3px solid #8b3a3a; box-shadow: inset 0 4px 0 rgba(0, 0, 0, 0.3); font-size: 8px; color: #ff6b6b;">
+          ⚠ {error.toUpperCase()}
         </div>
       {/if}
 
-      <!-- Form -->
+      <!-- Form - Pixel style -->
       <form on:submit|preventDefault={handleSubmit} class="space-y-5">
         {#if isRegister}
           <div>
-            <label for="name" class="block text-xs font-semibold text-white/60 mb-2 uppercase tracking-wider">
-              Nome
+            <label for="name" class="block mb-2 text-[#53a8b6]" style="font-size: 8px; letter-spacing: 1px;">
+              ► NOME
             </label>
             <input
               id="name"
               type="text"
               bind:value={name}
-              placeholder="Seu nome completo"
+              placeholder="SEU NOME"
               required
               disabled={loading}
-              class="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-md text-white placeholder-white/40 text-sm focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 transition-all duration-200 disabled:opacity-50"
+              class="w-full px-4 py-3 pixel-input text-white placeholder-[#0f3460] disabled:opacity-50"
+              style="background: #0a0e1a; color: #5ce1e6;"
             />
           </div>
 
           <div>
-            <label for="defaultMap" class="block text-xs font-semibold text-white/60 mb-2 uppercase tracking-wider">
-              Mapa Padrão
+            <label for="defaultMap" class="block mb-2 text-[#53a8b6]" style="font-size: 8px; letter-spacing: 1px;">
+              ► MAPA PADRÃO
             </label>
             <select
               id="defaultMap"
               bind:value={defaultMap}
               disabled={loading}
-              class="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-md text-white text-sm focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 transition-all duration-200 disabled:opacity-50 appearance-none cursor-pointer"
+              class="w-full px-4 py-3 pixel-input text-white disabled:opacity-50 cursor-pointer appearance-none"
+              style="background: #0a0e1a; color: #5ce1e6;"
             >
-              <option value="main">Principal (main)</option>
-              <option value="filial1">Filial 1</option>
-              <option value="filial2">Filial 2</option>
-              <option value="sede">Sede</option>
+              <option value="main">PRINCIPAL (MAIN)</option>
+              <option value="filial1">FILIAL 1</option>
+              <option value="filial2">FILIAL 2</option>
+              <option value="sede">SEDE</option>
             </select>
           </div>
         {/if}
 
         <div>
-          <label for="email" class="block text-xs font-semibold text-white/60 mb-2 uppercase tracking-wider">
-            Email
+          <label for="email" class="block mb-2 text-[#53a8b6]" style="font-size: 8px; letter-spacing: 1px;">
+            ► EMAIL
           </label>
           <input
             id="email"
             type="email"
             bind:value={email}
-            placeholder="seu@email.com"
+            placeholder="SEU@EMAIL.COM"
             required
             disabled={loading}
-            class="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-md text-white placeholder-white/40 text-sm focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 transition-all duration-200 disabled:opacity-50"
+            class="w-full px-4 py-3 pixel-input text-white placeholder-[#0f3460] disabled:opacity-50"
+            style="background: #0a0e1a; color: #5ce1e6;"
           />
         </div>
 
         <div>
-          <label for="password" class="block text-xs font-semibold text-white/60 mb-2 uppercase tracking-wider">
-            Senha
+          <label for="password" class="block mb-2 text-[#53a8b6]" style="font-size: 8px; letter-spacing: 1px;">
+            ► SENHA
           </label>
           <input
             id="password"
@@ -476,77 +447,84 @@
             placeholder="••••••••"
             required
             disabled={loading}
-            class="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-md text-white placeholder-white/40 text-sm focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 transition-all duration-200 disabled:opacity-50"
+            class="w-full px-4 py-3 pixel-input text-white placeholder-[#0f3460] disabled:opacity-50"
+            style="background: #0a0e1a; color: #5ce1e6;"
           />
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          class="w-full py-2.5 px-4 bg-secondary text-contrast font-bold rounded-md hover:bg-secondary/90 focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all duration-200 disabled:opacity-50 mt-6"
+          class="w-full py-4 px-4 pixel-button text-[#1a1a2e] font-bold disabled:opacity-50 mt-6"
+          style="background: #5ce1e6; font-size: 12px; letter-spacing: 2px;"
         >
           {#if loading}
-            <span class="flex items-center justify-center gap-2 text-sm">
-              <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Processando...
+            <span class="flex items-center justify-center gap-2">
+              ⏳ PROCESSANDO...
             </span>
           {:else}
-            {isRegister ? 'Criar Conta' : 'Entrar'}
+            ▶ {isRegister ? 'CRIAR CONTA' : 'ENTRAR'} ◀
           {/if}
         </button>
       </form>
 
-      <!-- Toggle -->
-      <div class="mt-6 text-center">
+      <!-- Toggle - Pixel style -->
+      <div class="mt-6 text-center pt-4" style="border-top: 2px dashed #0f3460;">
         <button
           type="button"
           on:click={() => isRegister = !isRegister}
           disabled={loading}
-          class="text-secondary hover:text-secondary/80 text-sm font-semibold transition-colors duration-200 disabled:opacity-50"
+          class="text-[#5ce1e6] hover:text-[#53a8b6] disabled:opacity-50 transition-colors duration-100"
+          style="font-size: 8px; letter-spacing: 1px;"
         >
-          {isRegister ? 'Já tem conta? Entrar' : 'Não tem conta? Registrar'}
+          {isRegister ? '◄ JÁ TEM CONTA? ENTRAR' : '► NÃO TEM CONTA? REGISTRAR'}
         </button>
       </div>
 
-      <!-- Test users section -->
-      <div class="mt-8 pt-6 border-t border-white/10">
-        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">
-          Usuários de Teste
+      <!-- Test users section - Pixel style -->
+      <div class="mt-8 pt-6" style="border-top: 3px dashed #0f3460;">
+        <h3 class="text-[#5ce1e6] mb-4 text-center" style="font-size: 8px; letter-spacing: 2px;">
+          ═══ USUÁRIOS DE TESTE ═══
         </h3>
-        <div class="space-y-2">
+        <div class="space-y-3">
           <button
             type="button"
             on:click={() => fillLoginForm('admin@example.com', 'pwd')}
             disabled={loading}
-            class="w-full text-left px-3 py-2 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 rounded-md transition-all duration-200 disabled:opacity-50 text-xs"
+            class="w-full text-left px-4 py-3 pixel-button disabled:opacity-50"
+            style="background: #1a2332; border-color: #2d5a8a; font-size: 8px;"
           >
-            <p class="text-blue-300 font-semibold">admin@example.com</p>
-            <p class="text-white/60 text-xs">👑 admin, moderator</p>
+            <p class="text-[#5ce1e6] mb-1" style="letter-spacing: 1px;">ADMIN@EXAMPLE.COM</p>
+            <p class="text-[#53a8b6]">👑 ADMIN, MODERATOR</p>
           </button>
 
           <button
             type="button"
             on:click={() => fillLoginForm('user1@example.com', 'pwd')}
             disabled={loading}
-            class="w-full text-left px-3 py-2 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 rounded-md transition-all duration-200 disabled:opacity-50 text-xs"
+            class="w-full text-left px-4 py-3 pixel-button disabled:opacity-50"
+            style="background: #2a1a32; border-color: #5a2d8a; font-size: 8px;"
           >
-            <p class="text-purple-300 font-semibold">user1@example.com</p>
-            <p class="text-white/60 text-xs">👤 admin, moderator</p>
+            <p class="text-[#d8a7ff] mb-1" style="letter-spacing: 1px;">USER1@EXAMPLE.COM</p>
+            <p class="text-[#9d7ab8]">👤 ADMIN, MODERATOR</p>
           </button>
 
           <button
             type="button"
             on:click={() => fillLoginForm('user2@example.com', 'pwd')}
             disabled={loading}
-            class="w-full text-left px-3 py-2 bg-green-500/10 hover:bg-green-500/20 border border-green-500/20 rounded-md transition-all duration-200 disabled:opacity-50 text-xs"
+            class="w-full text-left px-4 py-3 pixel-button disabled:opacity-50"
+            style="background: #1a321a; border-color: #2d8a2d; font-size: 8px;"
           >
-            <p class="text-green-300 font-semibold">user2@example.com</p>
-            <p class="text-white/60 text-xs">👥 member</p>
+            <p class="text-[#7bff7b] mb-1" style="letter-spacing: 1px;">USER2@EXAMPLE.COM</p>
+            <p class="text-[#5ab85a]">👥 MEMBER</p>
           </button>
         </div>
+      </div>
+
+      <!-- Footer decoration -->
+      <div class="mt-6 text-center text-[#0f3460]" style="font-size: 6px; letter-spacing: 2px;">
+        ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
       </div>
     </div>
   </div>

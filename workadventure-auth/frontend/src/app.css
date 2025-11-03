@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -144,4 +145,172 @@
 
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-cyan-500;
+}
+
+/* ========================================
+   PIXEL ART THEME - Reutilizável
+   ======================================== */
+
+/* Variáveis CSS do tema pixel */
+:root {
+  --pixel-bg: #1a1a2e;
+  --pixel-card: #16213e;
+  --pixel-border: #0f3460;
+  --pixel-accent: #53a8b6;
+  --pixel-highlight: #5ce1e6;
+  --pixel-text: #ffffff;
+  --pixel-text-dim: #a0a0a0;
+}
+
+/* Classe para aplicar tema pixel em uma página */
+.pixel-theme {
+  font-family: 'Press Start 2P', cursive;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  background: var(--pixel-bg);
+  color: var(--pixel-text);
+}
+
+/* Grid de fundo pixel */
+.pixel-grid {
+  background-image:
+    linear-gradient(rgba(92, 225, 230, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(92, 225, 230, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Botão estilo pixel art */
+.pixel-button {
+  position: relative;
+  border: 4px solid var(--pixel-border);
+  box-shadow:
+    inset -4px -4px 0 rgba(0, 0, 0, 0.3),
+    inset 4px 4px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.1s;
+  font-family: 'Press Start 2P', cursive;
+  image-rendering: pixelated;
+}
+
+.pixel-button:hover:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow:
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.1);
+}
+
+.pixel-button:active:not(:disabled) {
+  transform: translate(4px, 4px);
+  box-shadow: inset 0 0 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Input estilo pixel art */
+.pixel-input {
+  border: 3px solid var(--pixel-border);
+  box-shadow: inset 0 4px 0 rgba(0, 0, 0, 0.3);
+  font-family: 'Press Start 2P', cursive;
+  font-size: 10px;
+  background: #0a0e1a;
+  color: var(--pixel-highlight);
+}
+
+.pixel-input::placeholder {
+  color: var(--pixel-border);
+}
+
+.pixel-input:focus {
+  border-color: var(--pixel-highlight);
+  box-shadow:
+    inset 0 4px 0 rgba(0, 0, 0, 0.3),
+    0 0 0 3px rgba(92, 225, 230, 0.3);
+  outline: none;
+}
+
+/* Card estilo pixel art */
+.pixel-card {
+  background: var(--pixel-card);
+  border: 6px solid var(--pixel-border);
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(92, 225, 230, 0.1);
+  font-family: 'Press Start 2P', cursive;
+}
+
+/* Animações pixel */
+@keyframes pixelPulse {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(92, 225, 230, 0.5),
+                0 0 20px rgba(92, 225, 230, 0.3),
+                0 0 30px rgba(92, 225, 230, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(92, 225, 230, 0.7),
+                0 0 30px rgba(92, 225, 230, 0.5),
+                0 0 45px rgba(92, 225, 230, 0.3);
+  }
+}
+
+@keyframes pixelBounce {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pixelSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+/* Classes de animação */
+.pixel-pulse {
+  animation: pixelPulse 3s ease-in-out infinite;
+}
+
+.pixel-bounce {
+  animation: pixelBounce 2s ease-in-out infinite;
+}
+
+.pixel-slide-in {
+  animation: pixelSlideIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Scanline effect */
+.pixel-scanline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(transparent, rgba(92, 225, 230, 0.1));
+  animation: scanline 8s linear infinite;
+  pointer-events: none;
+}
+
+/* Texto pixel com cores do tema */
+.pixel-text-primary {
+  color: var(--pixel-highlight);
+  font-family: 'Press Start 2P', cursive;
+}
+
+.pixel-text-secondary {
+  color: var(--pixel-accent);
+  font-family: 'Press Start 2P', cursive;
+}
+
+.pixel-text-dim {
+  color: var(--pixel-text-dim);
+  font-family: 'Press Start 2P', cursive;
+}
+
+/* Efeito de sombra de texto pixel */
+.pixel-text-shadow {
+  text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.5), 0 0 20px rgba(92, 225, 230, 0.5);
 }
