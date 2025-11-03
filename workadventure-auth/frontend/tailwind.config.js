@@ -7,6 +7,13 @@ export default {
   theme: {
     extend: {
       colors: {
+        // WorkCodeForge brand colors
+        "dark-purple": "#1B1B29",
+        "medium-purple": "#38384A",
+        "light-blue": "#56EAFF",
+        "secondary": "#56EAFF",
+        "contrast": "#2A2A3A",
+
         primary: {
           50: '#f5f3ff',
           100: '#ede9fe',

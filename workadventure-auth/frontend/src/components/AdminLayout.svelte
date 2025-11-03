@@ -21,7 +21,7 @@
   .admin-layout {
     display: flex;
     min-height: 100vh;
-    background: #f5f7fa;
+    background: #1B1B29;
   }
 
   .content {
@@ -32,15 +32,16 @@
   }
 
   header {
-    background: white;
+    background: rgba(43, 39, 59, 0.6);
     padding: 1.5rem 2rem;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid rgba(86, 234, 255, 0.15);
+    backdrop-filter: blur(10px);
   }
 
   header h1 {
     margin: 0;
     font-size: 1.5rem;
-    color: #1f2937;
+    color: #ffffff;
   }
 
   .page-content {

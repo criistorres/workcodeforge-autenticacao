@@ -35,3 +35,4 @@ synapse/media_store/*
 
 # Local scripts that may contain sensitive data
 *.local.sh
+/.playwright-mcp

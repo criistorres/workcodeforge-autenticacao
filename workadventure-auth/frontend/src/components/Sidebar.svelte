@@ -6,118 +6,99 @@
 </script>
 
 <aside class="relative h-screen transition-all duration-300 {isOpen ? 'w-64' : 'w-20'}">
-  <!-- Background com gradiente gamer -->
-  <div class="absolute inset-0 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900"></div>
+  <!-- Background -->
+  <div class="absolute inset-0 bg-contrast" style="background-color: rgba(43, 39, 59, 0.9);"></div>
 
-  <!-- Efeito de brilho lateral -->
-  <div class="absolute inset-y-0 right-0 w-px bg-gradient-to-b from-cyan-500/50 via-purple-500/50 to-pink-500/50"></div>
+  <!-- Border right -->
+  <div class="absolute inset-y-0 right-0 w-px bg-secondary/20" style="background-color: rgba(86, 234, 255, 0.2);"></div>
 
-  <!-- Conteúdo -->
+  <!-- Content -->
   <div class="relative h-full flex flex-col">
     <!-- Logo -->
-    <div class="p-6 border-b border-gray-700">
+    <div class="p-6 border-b" style="border-color: rgba(86, 234, 255, 0.1);">
       <div class="flex items-center gap-3">
-        <div class="text-3xl">⚡</div>
+        <div class="text-2xl">⚡</div>
         {#if isOpen}
           <div class="flex-1">
-            <h2 class="text-xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+            <h2 class="text-lg font-bold text-white">
               WorkCodeForge
             </h2>
-            <p class="text-xs text-gray-400 font-semibold mt-1">Admin Panel</p>
+            <p class="text-xs text-white/50 font-semibold mt-1">Admin Panel</p>
           </div>
         {/if}
       </div>
     </div>
 
-    <!-- Navegação -->
-    <nav class="flex-1 py-4">
-      <a href="/admin" use:link use:active
-         class="group relative flex items-center gap-4 px-6 py-3 text-gray-300 hover:text-white transition-all duration-300">
-        <!-- Barra lateral de indicação ativa -->
-        <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-cyan-500 to-blue-500 opacity-0 group-[.active]:opacity-100 transition-opacity"></div>
-
-        <!-- Ícone -->
-        <div class="text-2xl group-hover:scale-110 transition-transform duration-300">📊</div>
-
+    <!-- Navigation -->
+    <nav class="flex-1 py-4 space-y-1 px-3">
+      <a href="#/admin" use:link use:active
+         class="group relative flex items-center gap-4 px-4 py-3 text-white/70 hover:text-white transition-all duration-300 rounded-md"
+         style="border-color: rgba(86, 234, 255, 0.3);">
+        <div class="text-lg">📊</div>
         {#if isOpen}
-          <span class="font-semibold">Dashboard</span>
+          <span class="font-medium text-sm">Dashboard</span>
         {/if}
-
-        <!-- Glow effect no hover -->
-        <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 group-[.active]:opacity-100 transition-opacity rounded-lg"></div>
+        <div class="absolute inset-0 rounded-md bg-secondary/10 opacity-0 group-hover:opacity-100 group-[.active]:opacity-100 transition-opacity pointer-events-none" style="background-color: rgba(86, 234, 255, 0.1);"></div>
       </a>
 
-      <a href="/admin/users" use:link use:active
-         class="group relative flex items-center gap-4 px-6 py-3 text-gray-300 hover:text-white transition-all duration-300">
-        <!-- Barra lateral de indicação ativa -->
-        <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-cyan-500 to-blue-500 opacity-0 group-[.active]:opacity-100 transition-opacity"></div>
-
-        <!-- Ícone -->
-        <div class="text-2xl group-hover:scale-110 transition-transform duration-300">👥</div>
-
+      <a href="#/admin/users" use:link use:active
+         class="group relative flex items-center gap-4 px-4 py-3 text-white/70 hover:text-white transition-all duration-300 rounded-md"
+         style="border-color: rgba(86, 234, 255, 0.3);">
+        <div class="text-lg">👥</div>
         {#if isOpen}
-          <span class="font-semibold">Usuários</span>
+          <span class="font-medium text-sm">Usuários</span>
         {/if}
-
-        <!-- Glow effect no hover -->
-        <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 group-[.active]:opacity-100 transition-opacity rounded-lg"></div>
+        <div class="absolute inset-0 rounded-md bg-secondary/10 opacity-0 group-hover:opacity-100 group-[.active]:opacity-100 transition-opacity pointer-events-none" style="background-color: rgba(86, 234, 255, 0.1);"></div>
       </a>
 
-      <a href="/admin/roles" use:link use:active
-         class="group relative flex items-center gap-4 px-6 py-3 text-gray-300 hover:text-white transition-all duration-300">
-        <!-- Barra lateral de indicação ativa -->
-        <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-purple-500 to-pink-500 opacity-0 group-[.active]:opacity-100 transition-opacity"></div>
-
-        <!-- Ícone -->
-        <div class="text-2xl group-hover:scale-110 transition-transform duration-300">🎭</div>
-
+      <a href="#/admin/roles" use:link use:active
+         class="group relative flex items-center gap-4 px-4 py-3 text-white/70 hover:text-white transition-all duration-300 rounded-md"
+         style="border-color: rgba(86, 234, 255, 0.3);">
+        <div class="text-lg">🎭</div>
         {#if isOpen}
-          <span class="font-semibold">Roles</span>
+          <span class="font-medium text-sm">Roles</span>
         {/if}
-
-        <!-- Glow effect no hover -->
-        <div class="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 group-[.active]:opacity-100 transition-opacity rounded-lg"></div>
+        <div class="absolute inset-0 rounded-md bg-secondary/10 opacity-0 group-hover:opacity-100 group-[.active]:opacity-100 transition-opacity pointer-events-none" style="background-color: rgba(86, 234, 255, 0.1);"></div>
       </a>
 
-      <a href="/admin/logs" use:link use:active
-         class="group relative flex items-center gap-4 px-6 py-3 text-gray-300 hover:text-white transition-all duration-300">
-        <!-- Barra lateral de indicação ativa -->
-        <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-green-500 to-emerald-500 opacity-0 group-[.active]:opacity-100 transition-opacity"></div>
-
-        <!-- Ícone -->
-        <div class="text-2xl group-hover:scale-110 transition-transform duration-300">📜</div>
-
+      <a href="#/admin/logs" use:link use:active
+         class="group relative flex items-center gap-4 px-4 py-3 text-white/70 hover:text-white transition-all duration-300 rounded-md"
+         style="border-color: rgba(86, 234, 255, 0.3);">
+        <div class="text-lg">📜</div>
         {#if isOpen}
-          <span class="font-semibold">Auditoria</span>
+          <span class="font-medium text-sm">Auditoria</span>
         {/if}
-
-        <!-- Glow effect no hover -->
-        <div class="absolute inset-0 bg-gradient-to-r from-green-500/10 to-transparent opacity-0 group-hover:opacity-100 group-[.active]:opacity-100 transition-opacity rounded-lg"></div>
+        <div class="absolute inset-0 rounded-md bg-secondary/10 opacity-0 group-hover:opacity-100 group-[.active]:opacity-100 transition-opacity pointer-events-none" style="background-color: rgba(86, 234, 255, 0.1);"></div>
       </a>
     </nav>
 
     <!-- Footer -->
-    <div class="border-t border-gray-700 p-4">
-      <a href="/" use:link
-         class="group relative flex items-center gap-4 px-4 py-3 text-gray-400 hover:text-gray-200 transition-all duration-300 rounded-lg hover:bg-gray-800/50">
-        <!-- Ícone -->
-        <div class="text-2xl group-hover:scale-110 transition-transform duration-300">🚪</div>
-
+    <div class="border-t" style="border-color: rgba(86, 234, 255, 0.1); padding: 1rem;">
+      <a href="#/" use:link
+         class="group relative flex items-center gap-4 px-4 py-3 text-white/60 hover:text-white/90 transition-all duration-300 rounded-md hover:bg-white/5">
+        <div class="text-lg">🚪</div>
         {#if isOpen}
-          <span class="font-semibold text-sm">Voltar ao Login</span>
+          <span class="font-medium text-sm">Voltar</span>
         {/if}
       </a>
 
-      <!-- Informações do sistema -->
+      <!-- System info -->
       {#if isOpen}
-        <div class="mt-4 px-4 py-3 bg-gradient-to-r from-gray-800 to-gray-900 rounded-lg border border-gray-700">
+        <div class="mt-4 px-4 py-3 rounded-md border" style="background-color: rgba(86, 234, 255, 0.05); border-color: rgba(86, 234, 255, 0.15);">
           <div class="flex items-center gap-2 mb-2">
-            <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span class="text-xs font-semibold text-green-400">Sistema Online</span>
+            <div class="w-2 h-2 rounded-full animate-pulse" style="background-color: rgba(86, 234, 255, 0.6);"></div>
+            <span class="text-xs font-semibold text-secondary" style="color: rgba(86, 234, 255, 0.7);">Sistema Online</span>
           </div>
-          <p class="text-xs text-gray-500">v2.0.0 - Gamer Edition</p>
+          <p class="text-xs text-white/40">v2.0.0</p>
         </div>
       {/if}
     </div>
   </div>
 </aside>
+
+<style>
+  :global(.active) {
+    background-color: rgba(86, 234, 255, 0.15) !important;
+    color: #56EAFF !important;
+  }
+</style>

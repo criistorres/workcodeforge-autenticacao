@@ -16,33 +16,20 @@
   let scope = '';
 
   // OAuth Redirect URI configuration from environment
-  // These should be set in .env file and passed to frontend
-  // Example:
-  //   PLAY_REDIRECT_URI=http://play.workadventure.localhost/openid-callback
-  //   MATRIX_REDIRECT_URI=http://matrix.workadventure.localhost/_synapse/client/oidc/callback
   const REDIRECT_URI_CONFIG = {
     play: import.meta.env.VITE_PLAY_REDIRECT_URI || '',
     matrix: import.meta.env.VITE_MATRIX_REDIRECT_URI || '',
   };
 
-  /**
-   * Identify which service (play, matrix, etc) is requesting OAuth based on redirect_uri
-   * This is used to track multiple OAuth states simultaneously for SSO support
-   *
-   * @param {string} uri - The redirect_uri from the OAuth request
-   * @returns {string} - The service name (play, matrix, unknown)
-   */
   function getServiceFromRedirectUri(uri) {
     if (!uri) return 'unknown';
 
-    // Check against configured redirect URIs
     for (const [service, configuredUri] of Object.entries(REDIRECT_URI_CONFIG)) {
       if (configuredUri && uri === configuredUri) {
         return service;
       }
     }
 
-    // Fallback: try to identify by path patterns
     try {
       const url = new URL(uri);
       const path = url.pathname;
@@ -60,10 +47,6 @@
     return 'unknown';
   }
 
-  /**
-   * Get all tracked OAuth states from localStorage
-   * @returns {Object} - Object mapping service names to their states
-   */
   function getOAuthStates() {
     try {
       const stored = localStorage.getItem('oauthStates');
@@ -74,10 +57,6 @@
     }
   }
 
-  /**
-   * Save OAuth states to localStorage
-   * @param {Object} states - Object mapping service names to their states
-   */
   function setOAuthStates(states) {
     try {
       localStorage.setItem('oauthStates', JSON.stringify(states));
@@ -86,7 +65,6 @@
     }
   }
 
-  // Função para atualizar os parâmetros da URL
   function updateParamsFromUrl() {
     const params = new URLSearchParams(window.location.search);
     clientId = params.get('client_id') || '';
@@ -95,22 +73,19 @@
     nonce = params.get('nonce') || undefined;
     scope = params.get('scope') || '';
 
-    // Verificar se é um logout
     const isLogout = params.get('logout') === 'true' || params.get('post_logout_redirect_uri');
     if (isLogout) {
       console.log('[LOGIN] Logout detectado, limpando sessão...');
       localStorage.removeItem('userId');
       localStorage.removeItem('sessionEmail');
       localStorage.removeItem('userEmail');
-      localStorage.removeItem('lastOAuthState'); // Legacy, keep for backwards compatibility
-      localStorage.removeItem('oauthStates'); // Clear all service states for SSO
+      localStorage.removeItem('lastOAuthState');
+      localStorage.removeItem('oauthStates');
 
-      // Marcar que acabou de fazer logout (válido por 2 minutos)
       const logoutTimestamp = Date.now();
       localStorage.setItem('justLoggedOut', logoutTimestamp.toString());
       console.log('[LOGIN] Flag de logout recente marcada:', logoutTimestamp);
 
-      // Se tem redirect de logout, redirecionar
       const postLogoutRedirect = params.get('post_logout_redirect_uri');
       if (postLogoutRedirect) {
         console.log('[LOGIN] Redirecionando após logout para:', postLogoutRedirect);
@@ -123,7 +98,6 @@
   }
 
   async function checkAndAutoAuthorize() {
-    // Verificar se é um logout - se for, NÃO fazer auto-authorize
     const params = new URLSearchParams(window.location.search);
     const isLogout = params.get('logout') === 'true' || params.get('post_logout_redirect_uri');
 
@@ -132,7 +106,6 @@
       return false;
     }
 
-    // Verificar se acabou de fazer logout recentemente (últimos 2 minutos)
     const justLoggedOut = localStorage.getItem('justLoggedOut');
     if (justLoggedOut) {
       const logoutTime = parseInt(justLoggedOut);
@@ -140,10 +113,9 @@
       const twoMinutes = 2 * 60 * 1000;
 
       if (now - logoutTime < twoMinutes) {
-        console.log('[LOGIN] ⚠️ Logout recente detectado (há', Math.round((now - logoutTime) / 1000), 'segundos) - NÃO fazer auto-authorize');
+        console.log('[LOGIN] ⚠️ Logout recente detectado');
         return false;
       } else {
-        // Passou de 2 minutos, limpar o flag
         console.log('[LOGIN] Flag de logout expirado, limpando...');
         localStorage.removeItem('justLoggedOut');
       }
@@ -153,7 +125,6 @@
     const sessionEmail = localStorage.getItem('sessionEmail');
     const oauthStates = getOAuthStates();
 
-    // Identify which service is requesting OAuth
     const currentService = getServiceFromRedirectUri(redirectUri);
     const previousStateForService = oauthStates[currentService];
 
@@ -168,10 +139,8 @@
       allStates: oauthStates
     });
 
-    // ✅ FIX: Only clear session if the SAME service is changing its state
-    // This allows multiple services to authenticate simultaneously for SSO
     if (state && previousStateForService && state !== previousStateForService) {
-      console.log(`[LOGIN] ⚠️ State mudou para ${currentService}! NOVO fluxo OAuth do mesmo serviço - LIMPANDO SESSÃO`);
+      console.log(`[LOGIN] ⚠️ State mudou para ${currentService}!`);
       localStorage.removeItem('userId');
       localStorage.removeItem('sessionEmail');
       localStorage.removeItem('userEmail');
@@ -180,14 +149,12 @@
       return false;
     }
 
-    // ✅ NEW: Save state for this service (allows tracking multiple services)
     if (state && currentService !== 'unknown') {
       console.log(`[LOGIN] Salvando state para serviço '${currentService}'`);
       oauthStates[currentService] = state;
       setOAuthStates(oauthStates);
     }
 
-    // Se já está autenticado e temos os parâmetros OAuth, fazer auto-authorize
     if (existingUserId && sessionEmail && clientId && redirectUri) {
       console.log('[LOGIN] Sessão válida encontrada, fazendo auto-authorize...');
 
@@ -228,8 +195,6 @@
 
     updateParamsFromUrl();
 
-    // Se não tem parâmetros OAuth (client_id vazio), assumir que é um acesso direto
-    // (provavelmente após logout) e limpar a sessão
     if (!clientId && !redirectUri) {
       console.log('[LOGIN] ⚠️ Acesso direto sem parâmetros OAuth - LIMPANDO SESSÃO');
       localStorage.removeItem('userId');
@@ -243,12 +208,10 @@
       console.log('[LOGIN] ✓ Parâmetros OAuth presentes:', { clientId, redirectUri });
     }
 
-    // Aguardar um pouco para os parâmetros serem definidos
     setTimeout(async () => {
       await checkAndAutoAuthorize();
     }, 100);
 
-    // Atualizar parâmetros quando a URL mudar (popstate/pushstate)
     const handleUrlChange = async () => {
       updateParamsFromUrl();
       setTimeout(async () => {
@@ -273,7 +236,6 @@
     error = '';
 
     try {
-      // Verificar se já temos uma sessão ativa
       const existingUserId = localStorage.getItem('userId');
       const sessionEmail = localStorage.getItem('sessionEmail');
 
@@ -281,7 +243,6 @@
       console.log('[LOGIN] Sessão existente:', { existingUserId, sessionEmail });
       console.log('[LOGIN] Parâmetros OAuth:', { clientId, redirectUri, state, scope });
 
-      // Se já está autenticado com o mesmo email, pular login e ir direto para authorize
       if (existingUserId && sessionEmail === email) {
         console.log('[LOGIN] Sessão válida encontrada, pulando login...');
 
@@ -306,7 +267,6 @@
         }
       }
 
-      // Fazer login normal
       const endpoint = isRegister ? '/auth/register' : '/auth/login';
       const body = isRegister
         ? { email, password, name, defaultMap }
@@ -325,10 +285,8 @@
 
       const { userId } = await response.json();
 
-      // Salvar userId e email na sessão
       localStorage.setItem('userId', userId);
       localStorage.setItem('sessionEmail', email);
-      // Remover flag de logout recente após login bem-sucedido
       localStorage.removeItem('justLoggedOut');
       console.log('[LOGIN] Login bem-sucedido, userId:', userId);
 
@@ -362,251 +320,232 @@
     body {
       margin: 0;
       padding: 0;
-      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+      background: #1B1B29;
       min-height: 100vh;
+      overflow: hidden;
+    }
+
+    :global(html) {
+      --contrast: 43, 39, 59;
+      --secondary: 86, 234, 255;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes bobbing {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+    }
+
+    .character {
+      animation: bobbing 3s ease-in-out infinite;
+    }
+
+    .modal-content {
+      animation: slideUp 0.4s ease-out;
     }
   </style>
 </svelte:head>
 
-<div class="flex items-center justify-center min-h-screen p-8">
-  <!-- Efeitos de fundo -->
-  <div class="fixed inset-0 overflow-hidden pointer-events-none">
-    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"></div>
-    <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl"></div>
+<!-- Main backdrop -->
+<div class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+  <!-- Subtle background pattern -->
+  <div class="absolute inset-0 opacity-10">
+    <svg class="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+          <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(86, 234, 255, 0.3)" stroke-width="0.5"/>
+        </pattern>
+      </defs>
+      <rect width="100" height="100" fill="url(#grid)" />
+    </svg>
   </div>
 
-  <div class="relative w-full max-w-md">
-    <!-- Container principal - Estilo Gamer -->
-    <div class="group relative">
-      <!-- Glow effect -->
-      <div class="absolute inset-0 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-300"></div>
+  <!-- Admin access button -->
+  <a
+    href="#/admin/login"
+    class="absolute top-4 right-4 z-20 p-3 bg-contrast/60 hover:bg-contrast/80 border border-secondary/30 rounded-md text-secondary transition-all duration-200 md:top-8 md:right-8"
+    title="Acessar painel administrativo"
+  >
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+    </svg>
+  </a>
 
-      <!-- Card principal -->
-      <div class="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl border border-cyan-500/50 shadow-2xl p-8">
-        <!-- Header -->
-        <div class="text-center mb-8">
-          <h1 class="text-4xl font-bold mb-2 bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-            {isRegister ? '📝 Registrar' : '🔐 Entrar'}
-          </h1>
-          <p class="text-gray-400">WorkCodeForge Authentication</p>
+  <!-- Character - WorkAdventure pixel art -->
+  <div class="character absolute bottom-10 right-10 md:right-20 md:bottom-20 pointer-events-none z-5">
+    <img
+      src="/yoda-avatar.png"
+      alt="Guia do jogo"
+      class="w-24 h-24 md:w-32 md:h-32"
+      style="filter: drop-shadow(0 8px 20px rgba(86, 234, 255, 0.35)); image-rendering: pixelated;"
+    />
+    <!-- Speech bubble -->
+    <div class="absolute -top-14 right-0 bg-contrast/90 border border-secondary/60 rounded-md px-3 py-1.5 text-xs text-white backdrop-blur-md pointer-events-auto whitespace-nowrap shadow-lg" style="background: rgba(43, 39, 59, 0.9); border-color: rgba(86, 234, 255, 0.6);">
+      Bem-vindo!
+      <div class="absolute top-full right-4 w-2 h-2 bg-contrast" style="clip-path: polygon(50% 0%, 0% 100%, 100% 100%); background: rgba(43, 39, 59, 0.9);"></div>
+    </div>
+  </div>
+
+  <!-- Login card -->
+  <div class="relative w-full max-w-sm z-10">
+    <div class="modal-content bg-contrast/80 rounded-lg border border-secondary/25 p-8 backdrop-blur-lg shadow-2xl" style="background-color: rgba(43, 39, 59, 0.8); border-color: rgba(86, 234, 255, 0.25);">
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-white mb-1">
+          {isRegister ? 'Criar Conta' : 'Entrar'}
+        </h1>
+        <p class="text-secondary text-xs font-semibold uppercase tracking-wider">WorkCodeForge</p>
+      </div>
+
+      <!-- Error message -->
+      {#if error}
+        <div class="mb-6 p-3 bg-red-500/10 border border-red-500/30 rounded-md text-red-300 text-sm">
+          {error}
         </div>
+      {/if}
 
-        <!-- Error message -->
-        {#if error}
-          <div class="mb-6 bg-gradient-to-r from-red-900/50 to-red-800/50 border border-red-500/50 rounded-xl p-4 text-red-200">
-            <div class="flex items-center gap-3">
-              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              <span class="font-semibold text-sm">{error}</span>
-            </div>
+      <!-- Form -->
+      <form on:submit|preventDefault={handleSubmit} class="space-y-5">
+        {#if isRegister}
+          <div>
+            <label for="name" class="block text-xs font-semibold text-white/60 mb-2 uppercase tracking-wider">
+              Nome
+            </label>
+            <input
+              id="name"
+              type="text"
+              bind:value={name}
+              placeholder="Seu nome completo"
+              required
+              disabled={loading}
+              class="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-md text-white placeholder-white/40 text-sm focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 transition-all duration-200 disabled:opacity-50"
+            />
+          </div>
+
+          <div>
+            <label for="defaultMap" class="block text-xs font-semibold text-white/60 mb-2 uppercase tracking-wider">
+              Mapa Padrão
+            </label>
+            <select
+              id="defaultMap"
+              bind:value={defaultMap}
+              disabled={loading}
+              class="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-md text-white text-sm focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 transition-all duration-200 disabled:opacity-50 appearance-none cursor-pointer"
+            >
+              <option value="main">Principal (main)</option>
+              <option value="filial1">Filial 1</option>
+              <option value="filial2">Filial 2</option>
+              <option value="sede">Sede</option>
+            </select>
           </div>
         {/if}
 
-        <!-- Form -->
-        <form on:submit|preventDefault={handleSubmit} class="space-y-6">
-          {#if isRegister}
-            <div class="space-y-2">
-              <label for="name" class="block text-sm font-semibold text-gray-300 uppercase tracking-wider">
-                Nome
-              </label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span class="text-gray-500 text-xl">👤</span>
-                </div>
-                <input
-                  id="name"
-                  type="text"
-                  bind:value={name}
-                  placeholder="Seu nome completo"
-                  required
-                  disabled={loading}
-                  class="w-full pl-12 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                />
-              </div>
-            </div>
-
-            <div class="space-y-2">
-              <label for="defaultMap" class="block text-sm font-semibold text-gray-300 uppercase tracking-wider">
-                Mapa Padrão
-              </label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span class="text-gray-500 text-xl">🗺️</span>
-                </div>
-                <select
-                  id="defaultMap"
-                  bind:value={defaultMap}
-                  disabled={loading}
-                  class="w-full pl-12 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed appearance-none"
-                >
-                  <option value="main">Principal (main)</option>
-                  <option value="filial1">Filial 1</option>
-                  <option value="filial2">Filial 2</option>
-                  <option value="sede">Sede</option>
-                </select>
-              </div>
-            </div>
-          {/if}
-
-          <div class="space-y-2">
-            <label for="email" class="block text-sm font-semibold text-gray-300 uppercase tracking-wider">
-              Email
-            </label>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <span class="text-gray-500 text-xl">📧</span>
-              </div>
-              <input
-                id="email"
-                type="email"
-                bind:value={email}
-                placeholder="[email protected]"
-                required
-                disabled={loading}
-                class="w-full pl-12 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              />
-            </div>
-          </div>
-
-          <div class="space-y-2">
-            <label for="password" class="block text-sm font-semibold text-gray-300 uppercase tracking-wider">
-              Senha
-            </label>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <span class="text-gray-500 text-xl">🔑</span>
-              </div>
-              <input
-                id="password"
-                type="password"
-                bind:value={password}
-                placeholder="••••••••"
-                required
-                disabled={loading}
-                class="w-full pl-12 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              />
-            </div>
-          </div>
-
-          <button
-            type="submit"
+        <div>
+          <label for="email" class="block text-xs font-semibold text-white/60 mb-2 uppercase tracking-wider">
+            Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            bind:value={email}
+            placeholder="seu@email.com"
+            required
             disabled={loading}
-            class="w-full py-3 px-4 bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold rounded-xl hover:from-cyan-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transform hover:scale-105 active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-cyan-500/50"
-          >
-            {#if loading}
-              <span class="flex items-center justify-center gap-2">
-                <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Processando...
-              </span>
-            {:else}
-              {isRegister ? '📝 Criar Conta' : '🔐 Entrar'}
-            {/if}
-          </button>
-        </form>
-
-        <!-- Toggle -->
-        <div class="mt-6 text-center">
-          <button
-            type="button"
-            on:click={() => isRegister = !isRegister}
-            disabled={loading}
-            class="text-cyan-400 hover:text-cyan-300 font-semibold text-sm transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isRegister ? '← Já tem conta? Entrar' : 'Não tem conta? Registrar →'}
-          </button>
+            class="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-md text-white placeholder-white/40 text-sm focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 transition-all duration-200 disabled:opacity-50"
+          />
         </div>
 
-        <!-- Info box - Usuários de teste -->
-        <div class="mt-8 bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-xl p-6">
-          <h3 class="text-sm font-bold text-purple-300 uppercase tracking-wider mb-4 flex items-center gap-2">
-            <span class="text-xl">👤</span>
-            Usuários de Teste
-          </h3>
-          <div class="space-y-3 text-xs">
-            <div class="bg-gray-900/50 rounded-lg p-3 border border-gray-700/50">
-              <div class="flex items-start justify-between gap-3">
-                <div class="flex-1">
-                  <p class="text-gray-300 mb-1">
-                    <span class="text-cyan-400 font-semibold">Email:</span> admin@example.com
-                  </p>
-                  <p class="text-gray-300 mb-1">
-                    <span class="text-purple-400 font-semibold">Senha:</span> pwd
-                  </p>
-                  <p class="text-gray-400">
-                    <span class="text-green-400 font-semibold">Tags:</span> admin, moderator
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  on:click={() => fillLoginForm('admin@example.com', 'pwd')}
-                  disabled={loading}
-                  class="px-3 py-1.5 bg-gradient-to-r from-cyan-600 to-purple-600 text-white text-xs font-semibold rounded-lg hover:from-cyan-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
-                >
-                  Usar
-                </button>
-              </div>
-            </div>
-            <div class="bg-gray-900/50 rounded-lg p-3 border border-gray-700/50">
-              <div class="flex items-start justify-between gap-3">
-                <div class="flex-1">
-                  <p class="text-gray-300 mb-1">
-                    <span class="text-cyan-400 font-semibold">Email:</span> user1@example.com
-                  </p>
-                  <p class="text-gray-300 mb-1">
-                    <span class="text-purple-400 font-semibold">Senha:</span> pwd
-                  </p>
-                  <p class="text-gray-400">
-                    <span class="text-green-400 font-semibold">Tags:</span> admin, moderator
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  on:click={() => fillLoginForm('user1@example.com', 'pwd')}
-                  disabled={loading}
-                  class="px-3 py-1.5 bg-gradient-to-r from-cyan-600 to-purple-600 text-white text-xs font-semibold rounded-lg hover:from-cyan-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
-                >
-                  Usar
-                </button>
-              </div>
-            </div>
-            <div class="bg-gray-900/50 rounded-lg p-3 border border-gray-700/50">
-              <div class="flex items-start justify-between gap-3">
-                <div class="flex-1">
-                  <p class="text-gray-300 mb-1">
-                    <span class="text-cyan-400 font-semibold">Email:</span> user2@example.com
-                  </p>
-                  <p class="text-gray-300 mb-1">
-                    <span class="text-purple-400 font-semibold">Senha:</span> pwd
-                  </p>
-                  <p class="text-gray-400">
-                    <span class="text-green-400 font-semibold">Tags:</span> member
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  on:click={() => fillLoginForm('user2@example.com', 'pwd')}
-                  disabled={loading}
-                  class="px-3 py-1.5 bg-gradient-to-r from-cyan-600 to-purple-600 text-white text-xs font-semibold rounded-lg hover:from-cyan-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
-                >
-                  Usar
-                </button>
-              </div>
-            </div>
-          </div>
-          <div class="mt-4 pt-4 border-t border-gray-700">
-            <p class="text-gray-400 text-xs flex items-start gap-2">
-              <span class="text-base">💡</span>
-              <span>Clique em "Usar" para preencher automaticamente o formulário</span>
-            </p>
-            <p class="text-red-300 text-xs flex items-start gap-2 mt-2">
-              <span class="text-base">⚠️</span>
-              <span>A senha é <code class="px-1.5 py-0.5 bg-gray-900 rounded text-red-400">pwd</code> (tudo minúscula!)</span>
-            </p>
-          </div>
+        <div>
+          <label for="password" class="block text-xs font-semibold text-white/60 mb-2 uppercase tracking-wider">
+            Senha
+          </label>
+          <input
+            id="password"
+            type="password"
+            bind:value={password}
+            placeholder="••••••••"
+            required
+            disabled={loading}
+            class="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-md text-white placeholder-white/40 text-sm focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 transition-all duration-200 disabled:opacity-50"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          class="w-full py-2.5 px-4 bg-secondary text-contrast font-bold rounded-md hover:bg-secondary/90 focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all duration-200 disabled:opacity-50 mt-6"
+        >
+          {#if loading}
+            <span class="flex items-center justify-center gap-2 text-sm">
+              <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Processando...
+            </span>
+          {:else}
+            {isRegister ? 'Criar Conta' : 'Entrar'}
+          {/if}
+        </button>
+      </form>
+
+      <!-- Toggle -->
+      <div class="mt-6 text-center">
+        <button
+          type="button"
+          on:click={() => isRegister = !isRegister}
+          disabled={loading}
+          class="text-secondary hover:text-secondary/80 text-sm font-semibold transition-colors duration-200 disabled:opacity-50"
+        >
+          {isRegister ? 'Já tem conta? Entrar' : 'Não tem conta? Registrar'}
+        </button>
+      </div>
+
+      <!-- Test users section -->
+      <div class="mt-8 pt-6 border-t border-white/10">
+        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">
+          Usuários de Teste
+        </h3>
+        <div class="space-y-2">
+          <button
+            type="button"
+            on:click={() => fillLoginForm('admin@example.com', 'pwd')}
+            disabled={loading}
+            class="w-full text-left px-3 py-2 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 rounded-md transition-all duration-200 disabled:opacity-50 text-xs"
+          >
+            <p class="text-blue-300 font-semibold">admin@example.com</p>
+            <p class="text-white/60 text-xs">👑 admin, moderator</p>
+          </button>
+
+          <button
+            type="button"
+            on:click={() => fillLoginForm('user1@example.com', 'pwd')}
+            disabled={loading}
+            class="w-full text-left px-3 py-2 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 rounded-md transition-all duration-200 disabled:opacity-50 text-xs"
+          >
+            <p class="text-purple-300 font-semibold">user1@example.com</p>
+            <p class="text-white/60 text-xs">👤 admin, moderator</p>
+          </button>
+
+          <button
+            type="button"
+            on:click={() => fillLoginForm('user2@example.com', 'pwd')}
+            disabled={loading}
+            class="w-full text-left px-3 py-2 bg-green-500/10 hover:bg-green-500/20 border border-green-500/20 rounded-md transition-all duration-200 disabled:opacity-50 text-xs"
+          >
+            <p class="text-green-300 font-semibold">user2@example.com</p>
+            <p class="text-white/60 text-xs">👥 member</p>
+          </button>
         </div>
       </div>
     </div>
