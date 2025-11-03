@@ -15,6 +15,77 @@
   let nonce = '';
   let scope = '';
 
+  // OAuth Redirect URI configuration from environment
+  // These should be set in .env file and passed to frontend
+  // Example:
+  //   PLAY_REDIRECT_URI=http://play.workadventure.localhost/openid-callback
+  //   MATRIX_REDIRECT_URI=http://matrix.workadventure.localhost/_synapse/client/oidc/callback
+  const REDIRECT_URI_CONFIG = {
+    play: import.meta.env.VITE_PLAY_REDIRECT_URI || '',
+    matrix: import.meta.env.VITE_MATRIX_REDIRECT_URI || '',
+  };
+
+  /**
+   * Identify which service (play, matrix, etc) is requesting OAuth based on redirect_uri
+   * This is used to track multiple OAuth states simultaneously for SSO support
+   *
+   * @param {string} uri - The redirect_uri from the OAuth request
+   * @returns {string} - The service name (play, matrix, unknown)
+   */
+  function getServiceFromRedirectUri(uri) {
+    if (!uri) return 'unknown';
+
+    // Check against configured redirect URIs
+    for (const [service, configuredUri] of Object.entries(REDIRECT_URI_CONFIG)) {
+      if (configuredUri && uri === configuredUri) {
+        return service;
+      }
+    }
+
+    // Fallback: try to identify by path patterns
+    try {
+      const url = new URL(uri);
+      const path = url.pathname;
+
+      if (path === '/openid-callback' || path.startsWith('/app')) {
+        return 'play';
+      }
+      if (path.includes('/_synapse/client/oidc/callback')) {
+        return 'matrix';
+      }
+    } catch (e) {
+      console.warn('[LOGIN] Could not parse redirect_uri:', uri);
+    }
+
+    return 'unknown';
+  }
+
+  /**
+   * Get all tracked OAuth states from localStorage
+   * @returns {Object} - Object mapping service names to their states
+   */
+  function getOAuthStates() {
+    try {
+      const stored = localStorage.getItem('oauthStates');
+      return stored ? JSON.parse(stored) : {};
+    } catch (e) {
+      console.warn('[LOGIN] Error parsing OAuth states:', e);
+      return {};
+    }
+  }
+
+  /**
+   * Save OAuth states to localStorage
+   * @param {Object} states - Object mapping service names to their states
+   */
+  function setOAuthStates(states) {
+    try {
+      localStorage.setItem('oauthStates', JSON.stringify(states));
+    } catch (e) {
+      console.error('[LOGIN] Error saving OAuth states:', e);
+    }
+  }
+
   // Função para atualizar os parâmetros da URL
   function updateParamsFromUrl() {
     const params = new URLSearchParams(window.location.search);
@@ -31,7 +102,8 @@
       localStorage.removeItem('userId');
       localStorage.removeItem('sessionEmail');
       localStorage.removeItem('userEmail');
-      localStorage.removeItem('lastOAuthState');
+      localStorage.removeItem('lastOAuthState'); // Legacy, keep for backwards compatibility
+      localStorage.removeItem('oauthStates'); // Clear all service states for SSO
 
       // Marcar que acabou de fazer logout (válido por 2 minutos)
       const logoutTimestamp = Date.now();
@@ -79,24 +151,40 @@
 
     const existingUserId = localStorage.getItem('userId');
     const sessionEmail = localStorage.getItem('sessionEmail');
-    const lastState = localStorage.getItem('lastOAuthState');
+    const oauthStates = getOAuthStates();
 
-    console.log('[LOGIN] Auto-check sessão:', { existingUserId, sessionEmail, clientId, redirectUri, state, lastState });
+    // Identify which service is requesting OAuth
+    const currentService = getServiceFromRedirectUri(redirectUri);
+    const previousStateForService = oauthStates[currentService];
 
-    // Se o state mudou, significa que é um NOVO fluxo OAuth (possivelmente após logout)
-    // Então vamos LIMPAR a sessão e forçar novo login
-    if (state && lastState && state !== lastState) {
-      console.log('[LOGIN] ⚠️ State diferente detectado! Novo fluxo OAuth - LIMPANDO SESSÃO');
+    console.log('[LOGIN] Auto-check sessão:', {
+      existingUserId,
+      sessionEmail,
+      clientId,
+      redirectUri,
+      state,
+      currentService,
+      previousStateForService,
+      allStates: oauthStates
+    });
+
+    // ✅ FIX: Only clear session if the SAME service is changing its state
+    // This allows multiple services to authenticate simultaneously for SSO
+    if (state && previousStateForService && state !== previousStateForService) {
+      console.log(`[LOGIN] ⚠️ State mudou para ${currentService}! NOVO fluxo OAuth do mesmo serviço - LIMPANDO SESSÃO`);
       localStorage.removeItem('userId');
       localStorage.removeItem('sessionEmail');
       localStorage.removeItem('userEmail');
-      localStorage.setItem('lastOAuthState', state);
+      localStorage.removeItem('oauthStates');
+      localStorage.setItem('oauthStates', JSON.stringify({ [currentService]: state }));
       return false;
     }
 
-    // Salvar o state atual
-    if (state) {
-      localStorage.setItem('lastOAuthState', state);
+    // ✅ NEW: Save state for this service (allows tracking multiple services)
+    if (state && currentService !== 'unknown') {
+      console.log(`[LOGIN] Salvando state para serviço '${currentService}'`);
+      oauthStates[currentService] = state;
+      setOAuthStates(oauthStates);
     }
 
     // Se já está autenticado e temos os parâmetros OAuth, fazer auto-authorize

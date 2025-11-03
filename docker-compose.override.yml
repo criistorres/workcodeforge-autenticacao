@@ -53,6 +53,12 @@ services:
     build:
       context: ./workadventure-auth/frontend
       dockerfile: Dockerfile
+    env_file:
+      - .env.development
+    environment:
+      # Pass OAuth redirect URIs as Vite environment variables (VITE_ prefix)
+      - VITE_PLAY_REDIRECT_URI=http://play.${DOMAIN:-workadventure.localhost}/openid-callback
+      - VITE_MATRIX_REDIRECT_URI=http://matrix.${DOMAIN:-workadventure.localhost}/_synapse/client/oidc/callback
     volumes:
       - ./workadventure-auth/frontend/src:/app/src
       - ./workadventure-auth/frontend/public:/app/public
