@@ -7,6 +7,7 @@ import { UserRoleEntity } from '../users/entities/user-role.entity';
 import { AuditLogEntity } from '../users/entities/audit-log.entity';
 import { SessionEntity } from '../users/entities/session.entity';
 import { AdminActionEntity } from '../users/entities/admin-action.entity';
+import { MapEntity } from '../users/entities/map.entity';
 
 @Injectable()
 export class AdminService {
@@ -23,6 +24,8 @@ export class AdminService {
     private sessionsRepository: Repository<SessionEntity>,
     @InjectRepository(AdminActionEntity)
     private adminActionsRepository: Repository<AdminActionEntity>,
+    @InjectRepository(MapEntity)
+    private mapsRepository: Repository<MapEntity>,
   ) {}
 
   // ============ USERS ============
@@ -110,7 +113,20 @@ export class AdminService {
     };
   }
 
-  async updateUser(userId: string, data: { name?: string; email?: string; isActive?: boolean }) {
+  async updateUser(
+    userId: string,
+    data: {
+      name?: string;
+      email?: string;
+      username?: string;
+      avatarUrl?: string;
+      telefone?: string;
+      cpf?: string;
+      departamento?: string;
+      isActive?: boolean;
+      defaultMap?: string;
+    },
+  ) {
     await this.usersRepository.update(userId, data);
     return this.usersRepository.findOne({ where: { id: userId } });
   }
@@ -295,6 +311,34 @@ export class AdminService {
         active: activeSessions,
       },
     };
+  }
+
+  // ============ MAPS ============
+
+  async getMaps() {
+    return this.mapsRepository.find({
+      order: { displayName: 'ASC' },
+    });
+  }
+
+  async createMap(data: {
+    name: string;
+    displayName: string;
+    description?: string;
+    mapUrl?: string;
+    isActive?: boolean;
+  }) {
+    return this.mapsRepository.save(data);
+  }
+
+  async updateMap(mapId: string, data: Partial<MapEntity>) {
+    await this.mapsRepository.update(mapId, data);
+    return this.mapsRepository.findOne({ where: { id: mapId } });
+  }
+
+  async deleteMap(mapId: string) {
+    await this.mapsRepository.delete(mapId);
+    return { success: true };
   }
 
   // ============ HELPERS ============

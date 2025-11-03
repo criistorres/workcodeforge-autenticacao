@@ -115,6 +115,16 @@
         {/if}
       </a>
 
+      <!-- Mapas -->
+      <a href="#/admin/maps" use:link use:active
+         class="nav-item group relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200"
+         style="font-size: 14px; font-weight: 500;">
+        <Icon name="map" size="w-5 h-5" className="flex-shrink-0 text-white/70 group-hover:text-[#5ce1e6] transition-colors" />
+        {#if isOpen}
+          <span class="text-white/80 group-hover:text-white transition-colors">Mapas</span>
+        {/if}
+      </a>
+
       <!-- Auditoria - Com subitens -->
       <div>
         <button

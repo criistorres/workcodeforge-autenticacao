@@ -10,6 +10,7 @@ import { UserRoleEntity } from '../users/entities/user-role.entity';
 import { AuditLogEntity } from '../users/entities/audit-log.entity';
 import { SessionEntity } from '../users/entities/session.entity';
 import { AdminActionEntity } from '../users/entities/admin-action.entity';
+import { MapEntity } from '../users/entities/map.entity';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AdminActionEntity } from '../users/entities/admin-action.entity';
       AuditLogEntity,
       SessionEntity,
       AdminActionEntity,
+      MapEntity,
     ]),
   ],
   controllers: [AdminController],

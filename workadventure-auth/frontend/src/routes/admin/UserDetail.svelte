@@ -9,6 +9,7 @@
 
   let user = null;
   let allRoles = [];
+  let allMaps = [];
   let loading = true;
   let error = '';
   let editing = false;
@@ -22,6 +23,10 @@
     name: '',
     email: '',
     username: '',
+    avatarUrl: '',
+    telefone: '',
+    cpf: '',
+    departamento: '',
     isActive: true,
     defaultMap: 'main',
   };
@@ -34,6 +39,10 @@
         name: user.name,
         email: user.email,
         username: user.username,
+        avatarUrl: user.avatarUrl || '',
+        telefone: user.telefone || '',
+        cpf: user.cpf || '',
+        departamento: user.departamento || '',
         isActive: user.isActive,
         defaultMap: user.defaultMap || 'main',
       };
@@ -50,6 +59,14 @@
       allRoles = await adminAPI.getRoles();
     } catch (err) {
       console.error('Error loading roles:', err);
+    }
+  }
+
+  async function loadMaps() {
+    try {
+      allMaps = await adminAPI.getMaps();
+    } catch (err) {
+      console.error('Error loading maps:', err);
     }
   }
 
@@ -115,6 +132,7 @@
   onMount(() => {
     loadUser();
     loadRoles();
+    loadMaps();
   });
 </script>
 
@@ -226,17 +244,68 @@
                   style="background: rgba(26, 31, 53, 0.6); border: 1px solid rgba(92, 225, 230, 0.15);" />
               </div>
 
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-white/70 text-sm font-semibold mb-2">Telefone</label>
+                  <input
+                    type="tel"
+                    bind:value={formData.telefone}
+                    placeholder="(00) 00000-0000"
+                    maxlength="20"
+                    class="w-full px-4 py-3 rounded-lg text-white text-sm focus:outline-none transition-all duration-200"
+                    style="background: rgba(26, 31, 53, 0.6); border: 1px solid rgba(92, 225, 230, 0.15);" />
+                </div>
+
+                <div>
+                  <label class="block text-white/70 text-sm font-semibold mb-2">CPF</label>
+                  <input
+                    type="text"
+                    bind:value={formData.cpf}
+                    placeholder="000.000.000-00"
+                    maxlength="14"
+                    class="w-full px-4 py-3 rounded-lg text-white text-sm focus:outline-none transition-all duration-200"
+                    style="background: rgba(26, 31, 53, 0.6); border: 1px solid rgba(92, 225, 230, 0.15);" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-white/70 text-sm font-semibold mb-2">Departamento</label>
+                  <input
+                    type="text"
+                    bind:value={formData.departamento}
+                    placeholder="Ex: TI, RH, Financeiro"
+                    maxlength="100"
+                    class="w-full px-4 py-3 rounded-lg text-white text-sm focus:outline-none transition-all duration-200"
+                    style="background: rgba(26, 31, 53, 0.6); border: 1px solid rgba(92, 225, 230, 0.15);" />
+                </div>
+
+                <div>
+                  <label class="block text-white/70 text-sm font-semibold mb-2">Avatar URL</label>
+                  <input
+                    type="url"
+                    bind:value={formData.avatarUrl}
+                    placeholder="https://exemplo.com/avatar.png"
+                    maxlength="500"
+                    class="w-full px-4 py-3 rounded-lg text-white text-sm focus:outline-none transition-all duration-200"
+                    style="background: rgba(26, 31, 53, 0.6); border: 1px solid rgba(92, 225, 230, 0.15);" />
+                </div>
+              </div>
+
               <div>
                 <label class="block text-white/70 text-sm font-semibold mb-2">Mapa Padrão</label>
                 <select
                   bind:value={formData.defaultMap}
                   class="w-full px-4 py-3 rounded-lg text-white text-sm focus:outline-none transition-all duration-200"
                   style="background: rgba(26, 31, 53, 0.6); border: 1px solid rgba(92, 225, 230, 0.15);">
-                  <option value="main">Principal (main)</option>
-                  <option value="filial1">Filial 1</option>
-                  <option value="filial2">Filial 2</option>
-                  <option value="sede">Sede</option>
+                  <option value="">Selecione um mapa</option>
+                  {#each allMaps.filter(m => m.isActive) as map}
+                    <option value={map.name}>{map.displayName}</option>
+                  {/each}
                 </select>
+                {#if allMaps.length === 0}
+                  <p class="text-yellow-300 text-xs mt-1">⚠️ Nenhum mapa cadastrado. Crie mapas na seção de gerenciamento.</p>
+                {/if}
               </div>
 
               <div class="flex items-center gap-3">
@@ -257,7 +326,7 @@
                 </button>
                 <button
                   type="button"
-                  on:click={() => { editing = false; formData = { name: user.name, email: user.email, username: user.username, isActive: user.isActive, defaultMap: user.defaultMap || 'main' }; }}
+                  on:click={() => { editing = false; formData = { name: user.name, email: user.email, username: user.username, avatarUrl: user.avatarUrl || '', telefone: user.telefone || '', cpf: user.cpf || '', departamento: user.departamento || '', isActive: user.isActive, defaultMap: user.defaultMap || 'main' }; }}
                   class="flex-1 py-3 rounded-lg font-semibold text-sm transition-all duration-200 hover:-translate-y-0.5"
                   style="background: rgba(92, 225, 230, 0.1); color: #5ce1e6; border: 1px solid rgba(92, 225, 230, 0.2);">
                   Cancelar
@@ -284,6 +353,21 @@
               <div>
                 <p class="text-white/50 text-xs font-semibold uppercase tracking-wider mb-2">Username</p>
                 <p class="text-[#5ce1e6] font-medium">@{user.username}</p>
+              </div>
+
+              <div>
+                <p class="text-white/50 text-xs font-semibold uppercase tracking-wider mb-2">Telefone</p>
+                <p class="text-white">{user.telefone || '-'}</p>
+              </div>
+
+              <div>
+                <p class="text-white/50 text-xs font-semibold uppercase tracking-wider mb-2">CPF</p>
+                <p class="text-white font-mono">{user.cpf || '-'}</p>
+              </div>
+
+              <div>
+                <p class="text-white/50 text-xs font-semibold uppercase tracking-wider mb-2">Departamento</p>
+                <p class="text-white">{user.departamento || '-'}</p>
               </div>
 
               <div>
@@ -324,6 +408,16 @@
                 <p class="text-white/50 text-xs font-semibold uppercase tracking-wider mb-2">Mapa Padrão</p>
                 <p class="text-white font-medium">{user.defaultMap || 'main'}</p>
               </div>
+
+              {#if user.avatarUrl}
+                <div class="md:col-span-2 lg:col-span-3">
+                  <p class="text-white/50 text-xs font-semibold uppercase tracking-wider mb-2">Avatar</p>
+                  <div class="flex items-center gap-3">
+                    <img src={user.avatarUrl} alt="Avatar" class="w-16 h-16 rounded-full object-cover" style="border: 2px solid rgba(92, 225, 230, 0.3);" />
+                    <a href={user.avatarUrl} target="_blank" rel="noopener noreferrer" class="text-[#5ce1e6] text-sm hover:underline truncate max-w-md">{user.avatarUrl}</a>
+                  </div>
+                </div>
+              {/if}
             </div>
 
             {#if user.blockedReason}

@@ -42,7 +42,17 @@ export class AdminController {
   @Permissions('users.edit')
   async updateUser(
     @Param('id') id: string,
-    @Body() data: { name?: string; email?: string; isActive?: boolean },
+    @Body() data: {
+      name?: string;
+      email?: string;
+      username?: string;
+      avatarUrl?: string;
+      telefone?: string;
+      cpf?: string;
+      departamento?: string;
+      isActive?: boolean;
+      defaultMap?: string;
+    },
   ) {
     return this.adminService.updateUser(id, data);
   }
@@ -139,5 +149,48 @@ export class AdminController {
   @Permissions('users.view')
   async getStats() {
     return this.adminService.getStats();
+  }
+
+  // ============ MAPS ============
+
+  @Get('maps')
+  @Permissions('users.view')
+  async getMaps() {
+    return this.adminService.getMaps();
+  }
+
+  @Post('maps')
+  @Permissions('users.edit')
+  async createMap(
+    @Body() data: {
+      name: string;
+      displayName: string;
+      description?: string;
+      mapUrl?: string;
+      isActive?: boolean;
+    },
+  ) {
+    return this.adminService.createMap(data);
+  }
+
+  @Put('maps/:id')
+  @Permissions('users.edit')
+  async updateMap(
+    @Param('id') id: string,
+    @Body() data: {
+      name?: string;
+      displayName?: string;
+      description?: string;
+      mapUrl?: string;
+      isActive?: boolean;
+    },
+  ) {
+    return this.adminService.updateMap(id, data);
+  }
+
+  @Delete('maps/:id')
+  @Permissions('users.delete')
+  async deleteMap(@Param('id') id: string) {
+    return this.adminService.deleteMap(id);
   }
 }

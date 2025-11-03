@@ -99,4 +99,29 @@ export const adminAPI = {
   getStats: () => {
     return apiRequest('/admin/stats');
   },
+
+  // Maps
+  getMaps: () => {
+    return apiRequest('/admin/maps');
+  },
+
+  createMap: (data) => {
+    return apiRequest('/admin/maps', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  updateMap: (mapId, data) => {
+    return apiRequest(`/admin/maps/${mapId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  deleteMap: (mapId) => {
+    return apiRequest(`/admin/maps/${mapId}`, {
+      method: 'DELETE',
+    });
+  },
 };

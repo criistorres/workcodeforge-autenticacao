@@ -5,6 +5,7 @@
   import Dashboard from './routes/admin/Dashboard.svelte';
   import UserList from './routes/admin/UserList.svelte';
   import UserDetail from './routes/admin/UserDetail.svelte';
+  import MapList from './routes/admin/MapList.svelte';
 
   const routes = {
     '/': Login,
@@ -12,6 +13,7 @@
     '/admin': Dashboard,
     '/admin/users': UserList,
     '/admin/users/:id': UserDetail,
+    '/admin/maps': MapList,
   };
 </script>
 
