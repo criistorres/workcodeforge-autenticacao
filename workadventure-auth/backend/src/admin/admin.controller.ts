@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Req, BadRequestException } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { AdminGuard } from './guards/admin.guard';
 import { PermissionsGuard, Permissions } from './guards/permissions.guard';
@@ -9,6 +9,37 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   // ============ USERS ============
+
+  @Get('me')
+  async getCurrentUser(@Req() req: any) {
+    const userId = req.user.id;
+    return this.adminService.getUserDetails(userId);
+  }
+
+  @Put('me')
+  async updateCurrentUser(
+    @Req() req: any,
+    @Body() data: {
+      name?: string;
+      email?: string;
+      username?: string;
+      avatarUrl?: string;
+      telefone?: string;
+      departamento?: string;
+      password?: string;
+    },
+  ) {
+    const userId = req.user.id;
+    return this.adminService.updateUser(userId, data);
+  }
+
+  @Post('logout')
+  async logout(@Req() req: any) {
+    const userId = req.user.id;
+    // Criar log de auditoria para logout
+    await this.adminService.createAuditLog(userId, 'logout');
+    return { success: true, message: 'Logout realizado com sucesso' };
+  }
 
   @Get('users')
   @Permissions('users.view')
@@ -38,6 +69,32 @@ export class AdminController {
     return this.adminService.getUserDetails(id);
   }
 
+  @Post('users')
+  @Permissions('users.create')
+  async createUser(
+    @Body() data: {
+      name: string;
+      email: string;
+      username: string;
+      password: string;
+      avatarUrl?: string;
+      telefone?: string;
+      cpf?: string;
+      departamento?: string;
+      isActive?: boolean;
+      defaultMap?: string;
+      roleIds: string[];
+    },
+    @Req() req: any,
+  ) {
+    try {
+      const adminId = req.user.id;
+      return await this.adminService.createUser(data, adminId);
+    } catch (error) {
+      throw new BadRequestException(error.message || 'Erro ao criar usuário');
+    }
+  }
+
   @Put('users/:id')
   @Permissions('users.edit')
   async updateUser(
@@ -54,7 +111,11 @@ export class AdminController {
       defaultMap?: string;
     },
   ) {
-    return this.adminService.updateUser(id, data);
+    try {
+      return await this.adminService.updateUser(id, data);
+    } catch (error) {
+      throw new BadRequestException(error.message || 'Erro ao atualizar usuário');
+    }
   }
 
   @Put('users/:id/roles')

@@ -4,6 +4,7 @@
   import AdminLayout from '../../components/AdminLayout.svelte';
   import Icon from '../../components/Icon.svelte';
   import { adminAPI } from '../../utils/api.js';
+  import { toasts } from '../../stores/toast.js';
 
   export let params = {};
 
@@ -71,22 +72,30 @@
   }
 
   async function handleSave() {
+    error = ''; // Limpar erro anterior
     try {
       await adminAPI.updateUser(params.id, formData);
       editing = false;
       await loadUser();
+      toasts.success('Usuário atualizado com sucesso!');
     } catch (err) {
       error = err.message;
+      toasts.error(err.message || 'Erro ao atualizar usuário');
+      console.error('Erro ao atualizar usuário:', err);
     }
   }
 
   async function handleSaveRoles() {
+    error = ''; // Limpar erro anterior
     try {
       await adminAPI.assignRoles(params.id, selectedRoles);
       editingRoles = false;
       await loadUser();
+      toasts.success('Roles atualizadas com sucesso!');
     } catch (err) {
       error = err.message;
+      toasts.error(err.message || 'Erro ao atribuir roles');
+      console.error('Erro ao atribuir roles:', err);
     }
   }
 
@@ -98,8 +107,10 @@
       showBlockModal = false;
       blockReason = '';
       await loadUser();
+      toasts.warning('Usuário bloqueado com sucesso');
     } catch (err) {
       error = err.message;
+      toasts.error(err.message || 'Erro ao bloquear usuário');
     }
   }
 
@@ -107,17 +118,21 @@
     try {
       await adminAPI.blockUser(params.id, false);
       await loadUser();
+      toasts.success('Usuário desbloqueado com sucesso!');
     } catch (err) {
       error = err.message;
+      toasts.error(err.message || 'Erro ao desbloquear usuário');
     }
   }
 
   async function handleDelete() {
     try {
       await adminAPI.deleteUser(params.id);
-      push('/admin/users');
+      toasts.success('Usuário deletado com sucesso');
+      setTimeout(() => push('/admin/users'), 1000);
     } catch (err) {
       error = err.message;
+      toasts.error(err.message || 'Erro ao deletar usuário');
     }
   }
 

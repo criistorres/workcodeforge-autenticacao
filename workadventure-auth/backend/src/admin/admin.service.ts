@@ -8,6 +8,7 @@ import { AuditLogEntity } from '../users/entities/audit-log.entity';
 import { SessionEntity } from '../users/entities/session.entity';
 import { AdminActionEntity } from '../users/entities/admin-action.entity';
 import { MapEntity } from '../users/entities/map.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AdminService {
@@ -113,6 +114,108 @@ export class AdminService {
     };
   }
 
+  async createUser(
+    data: {
+      name: string;
+      email: string;
+      username: string;
+      password: string;
+      avatarUrl?: string;
+      telefone?: string;
+      cpf?: string;
+      departamento?: string;
+      isActive?: boolean;
+      defaultMap?: string;
+      roleIds: string[];
+    },
+    adminId: string,
+  ) {
+    // Verificar se email já existe
+    const existingEmail = await this.usersRepository.findOne({
+      where: { email: data.email },
+    });
+    if (existingEmail) {
+      throw new Error('Email já está em uso');
+    }
+
+    // Verificar se username já existe
+    const existingUsername = await this.usersRepository.findOne({
+      where: { username: data.username },
+    });
+    if (existingUsername) {
+      throw new Error('Username já está em uso');
+    }
+
+    // Verificar se CPF já existe (se fornecido)
+    if (data.cpf && data.cpf.trim() !== '') {
+      const existingCpf = await this.usersRepository.findOne({
+        where: { cpf: data.cpf },
+      });
+      if (existingCpf) {
+        throw new Error('CPF já está em uso');
+      }
+    }
+
+    // Hash da senha
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+
+    // Buscar nomes das roles
+    const roles = await this.rolesRepository.find({
+      where: { id: In(data.roleIds) },
+    });
+    const tags = roles.map((role) => role.name);
+
+    // Converter strings vazias em null
+    const cleanedData: any = {
+      name: data.name,
+      email: data.email,
+      username: data.username,
+      password: hashedPassword,
+      tags,
+      isActive: data.isActive ?? true,
+      isEmailVerified: false,
+    };
+
+    if (data.avatarUrl && data.avatarUrl.trim() !== '') {
+      cleanedData.avatarUrl = data.avatarUrl;
+    }
+    if (data.telefone && data.telefone.trim() !== '') {
+      cleanedData.telefone = data.telefone;
+    }
+    if (data.cpf && data.cpf.trim() !== '') {
+      cleanedData.cpf = data.cpf;
+    }
+    if (data.departamento && data.departamento.trim() !== '') {
+      cleanedData.departamento = data.departamento;
+    }
+    if (data.defaultMap && data.defaultMap.trim() !== '') {
+      cleanedData.defaultMap = data.defaultMap;
+    }
+
+    // Criar usuário
+    const user = await this.usersRepository.save(cleanedData);
+
+    // Atribuir roles
+    if (data.roleIds && data.roleIds.length > 0) {
+      const userRoles = data.roleIds.map((roleId) => ({
+        userId: user.id,
+        roleId,
+        assignedBy: adminId,
+      }));
+      await this.userRolesRepository.save(userRoles);
+    }
+
+    // Log admin action
+    await this.logAdminAction({
+      adminId,
+      actionType: 'user.create',
+      targetUserId: user.id,
+      metadata: { roleIds: data.roleIds, tags },
+    });
+
+    return this.getUserDetails(user.id);
+  }
+
   async updateUser(
     userId: string,
     data: {
@@ -127,7 +230,52 @@ export class AdminService {
       defaultMap?: string;
     },
   ) {
-    await this.usersRepository.update(userId, data);
+    // Verificar se email já existe em outro usuário
+    if (data.email) {
+      const existingEmail = await this.usersRepository.findOne({
+        where: { email: data.email },
+      });
+      if (existingEmail && existingEmail.id !== userId) {
+        throw new Error('Email já está em uso');
+      }
+    }
+
+    // Verificar se username já existe em outro usuário
+    if (data.username) {
+      const existingUsername = await this.usersRepository.findOne({
+        where: { username: data.username },
+      });
+      if (existingUsername && existingUsername.id !== userId) {
+        throw new Error('Username já está em uso');
+      }
+    }
+
+    // Verificar se CPF já existe em outro usuário (se não for vazio)
+    if (data.cpf && data.cpf.trim() !== '') {
+      const existingCpf = await this.usersRepository.findOne({
+        where: { cpf: data.cpf },
+      });
+      if (existingCpf && existingCpf.id !== userId) {
+        throw new Error('CPF já está em uso');
+      }
+    }
+
+    // Converter strings vazias em null para campos nullable com constraint única
+    const cleanedData = { ...data };
+    if (cleanedData.cpf === '' || cleanedData.cpf?.trim() === '') {
+      cleanedData.cpf = null;
+    }
+    if (cleanedData.telefone === '' || cleanedData.telefone?.trim() === '') {
+      cleanedData.telefone = null;
+    }
+    if (cleanedData.departamento === '' || cleanedData.departamento?.trim() === '') {
+      cleanedData.departamento = null;
+    }
+    if (cleanedData.avatarUrl === '' || cleanedData.avatarUrl?.trim() === '') {
+      cleanedData.avatarUrl = null;
+    }
+
+    await this.usersRepository.update(userId, cleanedData);
     return this.usersRepository.findOne({ where: { id: userId } });
   }
 
@@ -342,6 +490,22 @@ export class AdminService {
   }
 
   // ============ HELPERS ============
+
+  async createAuditLog(
+    userId: string,
+    action: string,
+    targetId?: string,
+    metadata?: any,
+  ) {
+    const auditLog = this.auditLogRepository.create({
+      userId,
+      action,
+      targetId,
+      metadata,
+    });
+
+    return this.auditLogRepository.save(auditLog);
+  }
 
   private async logAdminAction(data: {
     adminId: string;

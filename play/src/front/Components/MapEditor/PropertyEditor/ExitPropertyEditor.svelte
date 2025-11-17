@@ -6,6 +6,7 @@
     import { LL } from "../../../../i18n/i18n-svelte";
     import { gameManager } from "../../../Phaser/Game/GameManager";
     import Select from "../../Input/Select.svelte";
+    import Input from "../../Input/Input.svelte";
     import PropertyEditorBase from "./PropertyEditorBase.svelte";
 
     export let property: ExitPropertyData;
@@ -23,8 +24,18 @@
         }
     >();
     let startAreas: string[] = [];
+    let useCustomUrl = false;
+    let customUrl = property.url || "";
+
     function onValueChange() {
         dispatch("change");
+    }
+
+    function onCustomUrlChange() {
+        if (useCustomUrl) {
+            property.url = customUrl;
+            onValueChange();
+        }
     }
 
     const connection = gameManager.getCurrentGameScene().connection;
@@ -86,22 +97,55 @@
         {$LL.mapEditor.properties.exitProperties.label()}
     </span>
     <span slot="content">
-        <div>
-            <Select
-                id="exitMapSelector"
-                label={$LL.mapEditor.properties.exitProperties.exitMap()}
-                bind:value={property.url}
-                onChange={() => {
-                    onValueChange();
-                    fetchStartAreasName().catch((e) => console.error(e));
-                }}
-            >
-                {#each [...mapsUrl.entries()] as map (map[0])}
-                    <option value={map[0]}>{map[1].name}</option>
-                {/each}
-            </Select>
+        <div class="mb-3">
+            <label class="flex items-center cursor-pointer">
+                <input
+                    type="checkbox"
+                    bind:checked={useCustomUrl}
+                    on:change={() => {
+                        if (!useCustomUrl) {
+                            customUrl = property.url || "";
+                        }
+                    }}
+                    class="mr-2"
+                />
+                <span>Usar URL personalizada</span>
+            </label>
         </div>
-        {#if property.url}
+
+        {#if useCustomUrl}
+            <div class="mb-3">
+                <Input
+                    id="customExitUrl"
+                    label="URL de Saída"
+                    type="text"
+                    placeholder="/~/filial2.wam ou ~/nomearquivo.wam"
+                    bind:value={customUrl}
+                    onChange={onCustomUrlChange}
+                />
+                <p class="text-xs text-gray-400 mt-1">
+                    Exemplos: /~/filial2.wam, ~/mapa.wam, http://play.workadventure.localhost/~/mapa.wam
+                </p>
+            </div>
+        {:else}
+            <div>
+                <Select
+                    id="exitMapSelector"
+                    label={$LL.mapEditor.properties.exitProperties.exitMap()}
+                    bind:value={property.url}
+                    onChange={() => {
+                        onValueChange();
+                        fetchStartAreasName().catch((e) => console.error(e));
+                    }}
+                >
+                    {#each [...mapsUrl.entries()] as map (map[0])}
+                        <option value={map[0]}>{map[1].name}</option>
+                    {/each}
+                </Select>
+            </div>
+        {/if}
+
+        {#if property.url && !useCustomUrl}
             <div>
                 <Select
                     id="startAreaNameSelector"

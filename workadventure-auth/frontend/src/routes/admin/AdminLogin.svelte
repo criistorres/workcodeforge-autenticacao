@@ -1,5 +1,6 @@
 <script>
   import { push } from 'svelte-spa-router';
+  import { userStore } from '../../stores/userStore';
 
   let email = '';
   let password = '';
@@ -22,12 +23,12 @@
         throw new Error(data.message || 'Erro na autenticação');
       }
 
-      const { userId } = await response.json();
+      const userData = await response.json();
 
-      localStorage.setItem('userId', userId);
-      localStorage.setItem('userEmail', email);
-      localStorage.setItem('isAdmin', 'true');
+      // Armazenar dados do usuário no userStore
+      userStore.setUser(userData);
 
+      // Redirecionar para o dashboard
       push('/admin');
 
     } catch (err) {

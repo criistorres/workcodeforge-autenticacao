@@ -27,6 +27,24 @@ export async function apiRequest(endpoint, options = {}) {
 
 // Admin API calls
 export const adminAPI = {
+  // Current User
+  getCurrentUser: () => {
+    return apiRequest('/admin/me');
+  },
+
+  updateCurrentUser: (data) => {
+    return apiRequest('/admin/me', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  logout: () => {
+    return apiRequest('/admin/logout', {
+      method: 'POST',
+    });
+  },
+
   // Users
   getUsers: (params = {}) => {
     const query = new URLSearchParams(params).toString();
@@ -35,6 +53,13 @@ export const adminAPI = {
 
   getUserDetails: (userId) => {
     return apiRequest(`/admin/users/${userId}`);
+  },
+
+  createUser: (data) => {
+    return apiRequest('/admin/users', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
   },
 
   updateUser: (userId, data) => {

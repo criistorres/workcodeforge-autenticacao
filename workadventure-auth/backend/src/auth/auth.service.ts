@@ -1,13 +1,18 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { OidcService } from '../oidc/oidc.service';
 import { LoginDto, RegisterDto } from './dto/login.dto';
+import { UserRoleEntity } from '../users/entities/user-role.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
-    private oidcService: OidcService
+    private oidcService: OidcService,
+    @InjectRepository(UserRoleEntity)
+    private userRolesRepository: Repository<UserRoleEntity>,
   ) {}
 
   async login(loginDto: LoginDto) {
@@ -37,11 +42,24 @@ export class AuthService {
       timestamp: new Date(),
     });
 
+    // Buscar roles do usuário
+    const userRoles = await this.userRolesRepository.find({
+      where: { userId: user.id },
+      relations: ['role'],
+    });
+
     return {
       userId: user.id,
       email: user.email,
       name: user.name,
-      tags: user.tags
+      username: user.username,
+      tags: user.tags,
+      avatarUrl: user.avatarUrl,
+      telefone: user.telefone,
+      departamento: user.departamento,
+      defaultMap: user.defaultMap,
+      roles: userRoles.map((ur) => ur.role),
+      isAdmin: user.tags?.includes('admin') || user.tags?.includes('super_admin') || false,
     };
   }
 
