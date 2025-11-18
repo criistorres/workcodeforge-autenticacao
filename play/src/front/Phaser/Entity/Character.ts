@@ -212,6 +212,7 @@ export abstract class Character extends Container implements OutlineableInterfac
         this.talkIcon = new TalkIcon(scene, 0, -45);
         this.speakerIcon = new SpeakerIcon(scene, 0, -45);
         this.locationBadge = new LocationBadge(scene, 0, -35, LocationStatus.UNKNOWN);
+        this.locationBadge.setVisible(false); // Ocultar badge de localização
         this.add([this.talkIcon, this.speakerIcon, this.statusDot, this.megaphoneIcon, this.locationBadge]);
 
         if (isClickable) {
