@@ -133,22 +133,35 @@ export class OidcController {
 
   @Get('userinfo')
   async getUserInfo(@Req() req: Request) {
+    console.log('[USERINFO] Requisição recebida');
+    console.log('[USERINFO] Headers:', JSON.stringify(req.headers, null, 2));
+
     const authHeader = req.headers['authorization'];
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.log('[USERINFO] Erro: Authorization header ausente ou inválido');
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
 
     const accessToken = authHeader.substring(7);
+    console.log('[USERINFO] Access token:', accessToken.substring(0, 50) + '...');
+
     const decoded = await this.oidcService.validateAccessToken(accessToken);
 
     if (!decoded) {
+      console.log('[USERINFO] Erro: Token inválido ou expirado');
       throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
     }
 
+    console.log('[USERINFO] Token validado. User ID:', decoded.sub);
+
     const user = await this.usersService.findById(decoded.sub);
     if (!user) {
+      console.log('[USERINFO] Erro: Usuário não encontrado. ID:', decoded.sub);
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
+
+    console.log('[USERINFO] Usuário encontrado:', user.email);
+    console.log('[USERINFO] defaultMap do usuário:', user.defaultMap);
 
     return {
       sub: user.id,

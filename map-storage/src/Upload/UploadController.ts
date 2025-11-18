@@ -194,12 +194,8 @@ export class UploadController {
                         return;
                     }
 
-                    const filesPathsFromZip = zipEntries
-                        .filter((zipEntry) => zipEntry.path.includes(".wam") || zipEntry.path.includes(".tmj"))
-                        .map((zipEntry) => zipEntry.path);
-
-                    // Delete all files in the given filesystem (disk or s3) with the exception of some .wam files
-                    await this.fileSystem.deleteFilesExceptWAM(mapPath(directory, req), filesPathsFromZip);
+                    // Delete ALL files in the directory to ensure clean upload (overwrite everything)
+                    await this.fileSystem.deleteFiles(mapPath(directory, req));
 
                     const promises: Promise<void>[] = [];
                     const wamToPurge: string[] = [];
