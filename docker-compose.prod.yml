@@ -34,6 +34,8 @@ services:
     restart: always
     # Remover volumes de desenvolvimento (sem hot-reload)
     volumes: []
+    # Usar WORKDIR do Dockerfile (não o de desenvolvimento)
+    working_dir: /usr/src/play
     # Usar command de produção
     command: npm run start
     environment:
