@@ -1,47 +1,45 @@
-version: "3.6"
 # ===========================================
 # DOCKER COMPOSE - PRODUCTION
 # ===========================================
 # Este arquivo deve ser usado APENAS em produção
 # Uso: docker-compose -f docker-compose.yaml -f docker-compose.prod.yml up -d
 # Carrega variáveis de .env.production
+#
+# NOTA: Este arquivo usa o Traefik externo da rede n8nhub_traefik_network
 # ===========================================
 
+networks:
+  traefik_network:
+    external: true
+    name: n8nhub_traefik_network
+
 services:
-  # Traefik com Let's Encrypt para SSL/TLS
+  # Desabilitar o reverse-proxy local (usar Traefik externo)
   reverse-proxy:
-    command:
-      - --api.insecure=false
-      - --providers.docker
-      - --entryPoints.web.address=:80
-      - --entryPoints.websecure.address=:443
-      - --providers.docker.exposedbydefault=false
-      # Redirecionamento HTTP -> HTTPS
-      - --entrypoints.web.http.redirections.entryPoint.to=websecure
-      - --entrypoints.web.http.redirections.entryPoint.scheme=https
-      # Let's Encrypt
-      - --certificatesresolvers.myresolver.acme.tlschallenge=true
-      - --certificatesresolvers.myresolver.acme.email=${ACME_EMAIL}
-      - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
-    ports:
-      - "443:443"
-    volumes:
-      - letsencrypt:/letsencrypt
-    labels:
-      - "traefik.http.routers.traefik.entrypoints=websecure"
-      - "traefik.http.routers.traefik.tls.certresolver=myresolver"
+    deploy:
+      replicas: 0
 
   # Play service - Produção
   play:
+    image: workcodeforge/play:latest
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: play/Dockerfile
+      args:
+        NODE_OPTIONS: "--max-old-space-size=8192"
+        FAST_BUILD: "true"
     env_file:
       - .env.production
     restart: always
     # Remover volumes de desenvolvimento (sem hot-reload)
     volumes: []
+    # Usar command de produção
+    command: npm run start
     environment:
       NODE_ENV: production
       ALLOWED_CORS_ORIGIN: "https://play.${DOMAIN}"
-      VITE_URL: "https://front.${DOMAIN}"
+      VITE_URL: "https://play.${DOMAIN}"
       PUSHER_URL: https://play.${DOMAIN}
       FRONT_URL: https://play.${DOMAIN}
       UPLOADER_URL: https://uploader.${DOMAIN}
@@ -49,21 +47,48 @@ services:
       PUBLIC_MAP_STORAGE_URL: "https://map-storage.${DOMAIN}"
       PLAY_URL: https://play.${DOMAIN}
       OPENID_CLIENT_ISSUER: https://auth.${DOMAIN}
+      OPENID_CLIENT_ID: ${OPENID_CLIENT_ID}
+      OPENID_CLIENT_SECRET: ${OPENID_CLIENT_SECRET}
+      OPENID_SCOPE: ${OPENID_SCOPE}
+      OPENID_USERNAME_CLAIM: ${OPENID_USERNAME_CLAIM}
+      OPENID_TAGS_CLAIM: ${OPENID_TAGS_CLAIM}
+      DISABLE_ANONYMOUS: ${DISABLE_ANONYMOUS}
       OPENID_LOGOUT_REDIRECT_URL: https://play.${DOMAIN}
     labels:
-      - "traefik.http.routers.front.entrypoints=websecure"
-      - "traefik.http.routers.front.tls.certresolver=myresolver"
-      - "traefik.http.routers.room-api.entrypoints=websecure"
-      - "traefik.http.routers.room-api.tls.certresolver=myresolver"
+      - "traefik.enable=true"
+      # Main play router
+      - "traefik.http.routers.play.rule=Host(`play.${DOMAIN}`)"
       - "traefik.http.routers.play.entrypoints=websecure"
       - "traefik.http.routers.play.tls.certresolver=myresolver"
+      - "traefik.http.routers.play.priority=1"
+      - "traefik.http.services.play.loadbalancer.server.port=3000"
+      # WebSocket router
+      - "traefik.http.routers.play-ws.rule=Host(`play.${DOMAIN}`) && PathPrefix(`/ws/`)"
       - "traefik.http.routers.play-ws.entrypoints=websecure"
       - "traefik.http.routers.play-ws.tls.certresolver=myresolver"
+      - "traefik.http.routers.play-ws.priority=10"
+      - "traefik.http.services.play-ws.loadbalancer.server.port=3000"
+      # Room API router
+      - "traefik.http.routers.room-api.rule=Host(`play.${DOMAIN}`) && PathPrefix(`/room/api`)"
+      - "traefik.http.routers.room-api.entrypoints=websecure"
+      - "traefik.http.routers.room-api.tls.certresolver=myresolver"
+      - "traefik.http.routers.room-api.priority=20"
+      - "traefik.http.services.room-api.loadbalancer.server.port=50051"
+      - "traefik.http.services.room-api.loadbalancer.server.scheme=h2c"
+      - "traefik.docker.network=n8nhub_traefik_network"
+    networks:
+      - default
+      - traefik_network
     extra_hosts:
-      - "auth.${DOMAIN}:172.17.0.1"
+      - "auth.${DOMAIN}:172.20.0.1"
 
   # Maps - Produção
   maps:
+    image: workcodeforge/maps:latest
+    platform: linux/amd64
+    build:
+      context: ./maps
+      dockerfile: Dockerfile
     env_file:
       - .env.production
     restart: always
@@ -71,11 +96,23 @@ services:
       NODE_ENV: production
       FRONT_URL: https://play.${DOMAIN}
     labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.maps.rule=Host(`maps.${DOMAIN}`)"
       - "traefik.http.routers.maps.entrypoints=websecure"
       - "traefik.http.routers.maps.tls.certresolver=myresolver"
+      - "traefik.http.services.maps.loadbalancer.server.port=80"
+      - "traefik.docker.network=n8nhub_traefik_network"
+    networks:
+      - default
+      - traefik_network
 
   # Back service - Produção
   back:
+    image: workcodeforge/back:latest
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: back/Dockerfile
     env_file:
       - .env.production
     restart: always
@@ -85,26 +122,55 @@ services:
       PLAY_URL: https://play.${DOMAIN}
       PUBLIC_MAP_STORAGE_URL: "https://map-storage.${DOMAIN}"
     labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.back.rule=Host(`api.${DOMAIN}`)"
       - "traefik.http.routers.back.entrypoints=websecure"
       - "traefik.http.routers.back.tls.certresolver=myresolver"
+      - "traefik.http.services.back.loadbalancer.server.port=8080"
+      - "traefik.docker.network=n8nhub_traefik_network"
+    networks:
+      - default
+      - traefik_network
 
   # Map Storage - Produção
   map-storage:
+    image: workcodeforge/map-storage:latest
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: map-storage/Dockerfile
     env_file:
       - .env.production
     restart: always
     volumes: []
+    command: npm run start
     environment:
       NODE_ENV: production
       PUSHER_URL: https://play.${DOMAIN}
     labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.map-storage.rule=Host(`map-storage.${DOMAIN}`)"
       - "traefik.http.routers.map-storage.entrypoints=websecure"
       - "traefik.http.routers.map-storage.tls.certresolver=myresolver"
+      - "traefik.http.routers.map-storage.service=map-storage"
+      - "traefik.http.services.map-storage.loadbalancer.server.port=3000"
+      - "traefik.http.routers.map-storage-ui.rule=Host(`map-storage.${DOMAIN}`) && PathPrefix(`/ui/`)"
       - "traefik.http.routers.map-storage-ui.entrypoints=websecure"
       - "traefik.http.routers.map-storage-ui.tls.certresolver=myresolver"
+      - "traefik.http.routers.map-storage-ui.service=map-storage-ui"
+      - "traefik.http.services.map-storage-ui.loadbalancer.server.port=3000"
+      - "traefik.docker.network=n8nhub_traefik_network"
+    networks:
+      - default
+      - traefik_network
 
   # Uploader - Produção
   uploader:
+    image: workcodeforge/uploader:latest
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: uploader/Dockerfile
     env_file:
       - .env.production
     restart: always
@@ -112,8 +178,15 @@ services:
     environment:
       UPLOADER_URL: https://uploader.${DOMAIN}
     labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.uploader.rule=Host(`uploader.${DOMAIN}`)"
       - "traefik.http.routers.uploader.entrypoints=websecure"
       - "traefik.http.routers.uploader.tls.certresolver=myresolver"
+      - "traefik.http.services.uploader.loadbalancer.server.port=8080"
+      - "traefik.docker.network=n8nhub_traefik_network"
+    networks:
+      - default
+      - traefik_network
 
   # Redis - Produção
   redis:
@@ -121,19 +194,24 @@ services:
     volumes:
       - redis-data:/data
 
-  # RedisInsight - Produção (opcional, pode ser removido)
+  # RedisInsight - Desabilitado em produção
   redisinsight:
-    restart: always
-    labels:
-      - "traefik.http.routers.redisinsight.entrypoints=websecure"
-      - "traefik.http.routers.redisinsight.tls.certresolver=myresolver"
+    deploy:
+      replicas: 0
 
   # Icon server - Produção
   icon:
     restart: always
     labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.icon.rule=Host(`icon.${DOMAIN}`)"
       - "traefik.http.routers.icon.entrypoints=websecure"
       - "traefik.http.routers.icon.tls.certresolver=myresolver"
+      - "traefik.http.services.icon.loadbalancer.server.port=8080"
+      - "traefik.docker.network=n8nhub_traefik_network"
+    networks:
+      - default
+      - traefik_network
 
   # Desabilitar OIDC mock (só para dev)
   oidc-server-mock:
@@ -148,11 +226,32 @@ services:
     environment:
       VIRTUAL_HOST: "matrix.${DOMAIN}"
       SYNAPSE_SERVER_NAME: "matrix.${DOMAIN}"
+      SYNAPSE_PUBLIC_BASEURL: "https://matrix.${DOMAIN}/"
+      SYNAPSE_REGISTRATION_SECRET: "${ROOM_API_SECRET_KEY}"
+      SYNAPSE_MACAROON_SECRET: "${ADMIN_API_TOKEN}"
+      SYNAPSE_FORM_SECRET: "${PROMETHEUS_AUTHORIZATION_TOKEN}"
+      JWT_SECRET: "${SECRET_KEY}"
+      MATRIX_ADMIN_USER: admin
+      MATRIX_ADMIN_PASSWORD: "${POSTGRES_PASSWORD}"
+      # OIDC config for production
+      OIDC_ISSUER_URL: "https://auth.${DOMAIN}"
+      OIDC_CLIENT_ID: "${OPENID_CLIENT_ID}"
+      OIDC_CLIENT_SECRET: "${OPENID_CLIENT_SECRET}"
+      # SSO whitelist
+      SSO_CLIENT_PUSHER: "https://play.${DOMAIN}/"
+      SSO_CLIENT_PLAY: "https://play.${DOMAIN}/"
     extra_hosts:
-      - "auth.${DOMAIN}:172.17.0.1"
+      - "auth.${DOMAIN}:172.20.0.1"
     labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.matrix.rule=Host(`matrix.${DOMAIN}`)"
       - "traefik.http.routers.matrix.entrypoints=websecure"
       - "traefik.http.routers.matrix.tls.certresolver=myresolver"
+      - "traefik.http.services.matrix.loadbalancer.server.port=8008"
+      - "traefik.docker.network=n8nhub_traefik_network"
+    networks:
+      - default
+      - traefik_network
 
   # ===========================================
   # CUSTOM AUTH SERVICE - PRODUCTION
@@ -160,6 +259,8 @@ services:
 
   # Auth Backend - Produção
   auth-backend:
+    image: workcodeforge/auth-backend:latest
+    platform: linux/amd64
     build:
       context: ./workadventure-auth/backend
       dockerfile: Dockerfile
@@ -176,6 +277,7 @@ services:
       - ALLOWED_REDIRECT_URIS=https://play.${DOMAIN}/login-callback,https://play.${DOMAIN}/oauth2/callback,https://play.${DOMAIN}/openid-callback,https://matrix.${DOMAIN}/_synapse/client/oidc/callback
       - CORS_ORIGIN=https://play.${DOMAIN}
       - DEFAULT_LOGOUT_REDIRECT=https://play.${DOMAIN}
+      - COOKIE_DOMAIN=.${DOMAIN}
       - DATABASE_HOST=auth-postgres
       - DATABASE_PORT=5432
       - DATABASE_USER=auth_user
@@ -190,20 +292,27 @@ services:
       - "traefik.http.routers.auth-api.tls.certresolver=myresolver"
       - "traefik.http.routers.auth-api.priority=500"
       - "traefik.http.services.auth-api.loadbalancer.server.port=3000"
+      - "traefik.docker.network=n8nhub_traefik_network"
     networks:
       - default
+      - traefik_network
     depends_on:
       auth-postgres:
         condition: service_healthy
 
   # Auth Frontend - Produção
   auth-frontend:
+    image: workcodeforge/auth-frontend:latest
+    platform: linux/amd64
     build:
       context: ./workadventure-auth/frontend
       dockerfile: Dockerfile
     restart: always
     # Sem volumes em produção (usa build)
     volumes: []
+    environment:
+      - VITE_PLAY_REDIRECT_URI=https://play.${DOMAIN}/openid-callback
+      - VITE_MATRIX_REDIRECT_URI=https://matrix.${DOMAIN}/_synapse/client/oidc/callback
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.auth-front.rule=Host(`auth.${DOMAIN}`)"
@@ -211,8 +320,10 @@ services:
       - "traefik.http.routers.auth-front.tls.certresolver=myresolver"
       - "traefik.http.routers.auth-front.priority=10"
       - "traefik.http.services.auth-front.loadbalancer.server.port=5173"
+      - "traefik.docker.network=n8nhub_traefik_network"
     networks:
       - default
+      - traefik_network
 
   # Auth PostgreSQL - Produção
   auth-postgres:
@@ -236,12 +347,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # PgAdmin - REMOVER EM PRODUÇÃO (apenas dev)
-  auth-pgadmin:
-    deploy:
-      replicas: 0
-
 volumes:
-  letsencrypt:
   redis-data:
   auth-postgres-data:

@@ -1,0 +1,243 @@
+networks:
+  traefik_network:
+    driver: bridge
+  codeforge_network:
+    driver: bridge
+
+services:
+  traefik:
+    image: traefik:v2.11
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.myresolver.acme.httpchallenge=true
+      - --certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web
+      - --certificatesresolvers.myresolver.acme.email=comercial@codeforgeit.com.br
+      - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
+      # Redirecionamento automático HTTP -> HTTPS
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --api.dashboard=true
+      - --api.insecure=true
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"  # Dashboard do Traefik
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
+    networks:
+      - traefik_network
+      - codeforge_network
+    restart: always
+    
+ # ===========================================
+  # AFFINE - WORKSPACE
+  # ===========================================
+  affine_db:
+    image: postgres:16
+    container_name: affine_db
+    environment:
+      POSTGRES_USER: affine
+      POSTGRES_PASSWORD: affine_password_2024
+      POSTGRES_DB: affine
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - affine_postgres_data:/var/lib/postgresql/data
+    networks:
+      - traefik_network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U affine']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+    ports:
+      - "5435:5432"
+
+  affine_migration:
+    image: ghcr.io/toeverything/affine:stable
+    container_name: affine_migration_job
+    volumes:
+      - affine_storage:/root/.affine/storage
+      - affine_config:/root/.affine/config
+    command: ['sh', '-c', 'node ./scripts/self-host-predeploy.js']
+    environment:
+      - REDIS_SERVER_HOST=redis
+      - DATABASE_URL=postgresql://affine:affine_password_2024@affine_db:5432/affine
+    depends_on:
+      affine_db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - traefik_network
+    restart: "no"
+
+  affine:
+    image: ghcr.io/toeverything/affine:stable
+    container_name: affine_server
+    environment:
+      - AFFINE_CONFIG_PATH=/root/.affine/config
+      - DATABASE_URL=postgresql://affine:affine_password_2024@affine_db:5432/affine
+      - REDIS_SERVER_HOST=redis
+      - REDIS_SERVER_PORT=6379
+      - REDIS_SERVER_PASSWORD=default
+      - TELEMETRY_ENABLE=false
+    volumes:
+      - affine_storage:/root/.affine/storage
+      - affine_config:/root/.affine/config
+    depends_on:
+      affine_db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      affine_migration:
+        condition: service_completed_successfully
+    networks:
+      - traefik_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.affine.rule=Host(`docs.codeforgeit.com.br`)"
+      - "traefik.http.routers.affine.entrypoints=websecure"
+      - "traefik.http.routers.affine.tls.certresolver=myresolver"
+      - "traefik.http.services.affine.loadbalancer.server.port=3010"
+    restart: always
+
+  # ===========================================
+  # SITE INSTITUCIONAL CODEFORGE
+  # ===========================================
+  codeforge_db:
+    image: postgres:15
+    container_name: codeforge_db
+    environment:
+      POSTGRES_DB: codeforge_db
+      POSTGRES_USER: codeforge_user
+      POSTGRES_PASSWORD: codeforge_password
+    volumes:
+      - codeforge_postgres_data:/var/lib/postgresql/data
+    networks:
+      - codeforge_network
+    restart: always
+    ports:
+      - "5433:5432"  # Porta diferente para evitar conflito
+
+  codeforge_web:
+    build: /root/CodeForgeSystems-Institucional
+    container_name: codeforge_web
+    environment:
+      DB_NAME: codeforge_db
+      DB_USER: codeforge_user
+      DB_PASSWORD: codeforge_password
+      DB_HOST: codeforge_db
+      DB_PORT: 5432
+      DEBUG: "False"
+      SECRET_KEY: "django-insecure-mude-em-producao-codeforgeit-2024"
+      ALLOWED_HOSTS: "site.codeforgeit.com.br,codeforgeit.com.br,localhost"
+    volumes:
+      - /root/CodeForgeSystems-Institucional:/app
+      - codeforge_media_volume:/app/media
+      - codeforge_static_volume:/app/staticfiles
+    depends_on:
+      - codeforge_db
+    networks:
+      - codeforge_network
+      - traefik_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.codeforge-site.rule=Host(`site.codeforgeit.com.br`)"
+      - "traefik.http.routers.codeforge-site.entrypoints=websecure"
+      - "traefik.http.routers.codeforge-site.tls.certresolver=myresolver"
+      - "traefik.http.services.codeforge-site.loadbalancer.server.port=8000"
+      - "traefik.docker.network=n8nhub_traefik_network"
+    restart: always
+
+  # ===========================================
+  # N8N E SERVIÇOS RELACIONADOS
+  # ===========================================
+  redis:
+    image: redis:latest
+    command: redis-server --requirepass default
+    ports:
+      - "6379:6379"
+    networks:
+      - traefik_network
+    restart: always
+
+  postgres:
+    image: postgres:latest
+    container_name: n8n_postgres
+    environment:
+      POSTGRES_USER: default
+      POSTGRES_PASSWORD: default
+      POSTGRES_DB: default
+    volumes:
+      - n8n_pgdata:/var/lib/postgresql/data
+    networks:
+      - traefik_network
+    restart: always
+    ports:
+      - "5434:5432"  # Porta diferente para evitar conflito
+
+  waha:
+    image: devlikeapro/waha:latest
+    environment:
+      WHATSAPP_HOOK_URL: https://hub.codeforgeit.com.br/webhook/webhook
+      WHATSAPP_DEFAULT_ENGINE: GOWS
+      WHATSAPP_HOOK_EVENTS: message
+    volumes:
+      - waha_sessions:/app/.sessions
+      - waha_media:/app/.media
+    depends_on:
+      - n8n
+    networks:
+      - traefik_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.waha.rule=Host(`waha.codeforgeit.com.br`)"
+      - "traefik.http.routers.waha.entrypoints=websecure"
+      - "traefik.http.routers.waha.tls.certresolver=myresolver"
+      - "traefik.http.services.waha.loadbalancer.server.port=3000"
+    restart: always
+
+  n8n:
+    image: n8nio/n8n:latest
+    environment:
+      N8N_PROTOCOL: https
+      N8N_PORT: 5678
+      N8N_HOST: hub.codeforgeit.com.br
+      WEBHOOK_URL: https://hub.codeforgeit.com.br
+      GENERIC_TIMEZONE: America/Sao_Paulo
+      N8N_LOG_LEVEL: debug
+      N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE: true
+    volumes:
+      - n8n_data:/home/node/.n8n
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - traefik_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.n8n.rule=Host(`hub.codeforgeit.com.br`)"
+      - "traefik.http.routers.n8n.entrypoints=websecure"
+      - "traefik.http.routers.n8n.tls.certresolver=myresolver"
+      - "traefik.http.services.n8n.loadbalancer.server.port=5678"
+    restart: always
+
+volumes:
+  # N8N volumes
+  n8n_pgdata:
+  waha_sessions:
+  waha_media:
+  n8n_data:
+  # CodeForge volumes  
+  codeforge_postgres_data:
+  codeforge_media_volume:
+  codeforge_static_volume:
+  # AFFINE volumes
+  affine_postgres_data:
+  affine_storage:
+  affine_config:

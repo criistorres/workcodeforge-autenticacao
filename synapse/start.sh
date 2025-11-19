@@ -23,8 +23,9 @@ envsubst < /data/homeserver.template.yaml > /data/homeserver.yaml
 # Wait for the auth server to be up, exit with an error after 2 minutes
 timeout=120
 elapsed=0
-echo "Waiting for auth server to be up..."
-while ! wget -q http://auth.workadventure.localhost/.well-known/openid-configuration; do
+AUTH_URL="${OIDC_ISSUER_URL:-http://auth.workadventure.localhost}"
+echo "Waiting for auth server to be up at ${AUTH_URL}..."
+while ! wget -q --no-check-certificate "${AUTH_URL}/.well-known/openid-configuration"; do
     if [ $elapsed -ge $timeout ]; then
         echo "Error: Auth server did not start within 2 minutes."
         exit 1

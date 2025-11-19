@@ -110,17 +110,17 @@ export class OidcController {
     const tokens = await this.oidcService.generateTokens(authData);
 
     // Definir cookie cross-domain com o access_token
-    // Cookie válido para .workadventure.localhost (subdomínios)
+    const cookieDomain = process.env.COOKIE_DOMAIN || '.workadventure.localhost';
     res.cookie('auth_token', tokens.accessToken, {
       httpOnly: true, // Previne acesso via JavaScript
       secure: process.env.NODE_ENV === 'production', // HTTPS apenas em produção
       sameSite: 'lax', // Permite cookies cross-domain em navegação
-      domain: '.workadventure.localhost', // Válido para todos subdomínios
+      domain: cookieDomain, // Válido para todos subdomínios
       maxAge: 3600000, // 1 hora (em milissegundos)
       path: '/' // Válido para toda aplicação
     });
 
-    console.log('[TOKEN] Cookie cross-domain criado para: .workadventure.localhost');
+    console.log(`[TOKEN] Cookie cross-domain criado para: ${cookieDomain}`);
 
     return res.json({
       access_token: tokens.accessToken,
@@ -195,13 +195,14 @@ export class OidcController {
     }
 
     // Limpar cookie de autenticação cross-domain
+    const cookieDomain = process.env.COOKIE_DOMAIN || '.workadventure.localhost';
     res.clearCookie('auth_token', {
-      domain: '.workadventure.localhost',
+      domain: cookieDomain,
       path: '/'
     });
-    console.log('[LOGOUT] Cookie cross-domain removido');
+    console.log(`[LOGOUT] Cookie cross-domain removido para: ${cookieDomain}`);
 
-    // Se não veio redirect_uri, usar o default (play.workadventure.localhost)
+    // Se não veio redirect_uri, usar o default
     const finalRedirectUri = redirectUri || process.env.DEFAULT_LOGOUT_REDIRECT || 'http://play.workadventure.localhost';
 
     // Redirecionar para o frontend com parâmetro de logout para limpar localStorage

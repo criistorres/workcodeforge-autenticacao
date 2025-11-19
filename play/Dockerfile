@@ -10,7 +10,7 @@ RUN npm run tag-version && npm run ts-proto
 
 # typescript build
 FROM --platform=$BUILDPLATFORM node:20.18-bullseye-slim AS builder
-ARG NODE_OPTIONS="--max-old-space-size=16384"
+ARG NODE_OPTIONS="--max-old-space-size=7168"
 ARG FAST_BUILD=""
 WORKDIR /usr/src
 RUN apt-get update && apt-get install -y git
@@ -41,8 +41,8 @@ RUN --mount=type=secret,id=SENTRY_RELEASE \
     export SENTRY_ORG=$(cat /run/secrets/SENTRY_ORG) && \
     export SENTRY_PROJECT=$(cat /run/secrets/SENTRY_PROJECT) && \
     export SENTRY_ENVIRONMENT=$(cat /run/secrets/SENTRY_ENVIRONMENT) && \
-    export NODE_OPTIONS="$NODE_OPTIONS" && \
-    export DISABLE_LEGACY_BROWSERS="$FAST_BUILD" && \
+    export NODE_OPTIONS="--max-old-space-size=8192 --expose-gc" && \
+    export DISABLE_LEGACY_BROWSERS="true" && \
     cd play && \
     npm run typesafe-i18n && \
     npm run build-iframe-api && \

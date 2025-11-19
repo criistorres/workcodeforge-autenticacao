@@ -28,10 +28,11 @@ synapse/media_store/*
 
 # Environment-specific files (SECURITY)
 # Never commit these files - they contain secrets!
-.env
-.env.*
-!.env.template
-!.env.example
+# .env
+# .env.*
+# !.env.template
+# !.env.example
+
 
 # Local scripts that may contain sensitive data
 *.local.sh
