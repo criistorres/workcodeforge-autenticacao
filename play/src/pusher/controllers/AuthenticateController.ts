@@ -546,10 +546,15 @@ export class AuthenticateController extends BaseHttpController {
             // 1. DISABLE_ANONYMOUS = false (comportamento padrão)
             // 2. OU estamos carregando o lobby (mesmo com DISABLE_ANONYMOUS = true)
             const referer = req.get("Referer") || "";
-            const isLobbyAccess = LOBBY_MAP_URL && referer.includes("play.workadventure.localhost");
+            // Verifica se é acesso ao lobby - funciona em qualquer domínio (local ou produção)
+            const isLobbyAccess = LOBBY_MAP_URL && (
+                referer.includes("play.workadventure.localhost") ||
+                referer.includes(FRONT_URL) ||
+                referer.includes("/play.")
+            );
 
             if (DISABLE_ANONYMOUS && !isLobbyAccess) {
-                console.log(`[anonymLogin] Acesso negado - DISABLE_ANONYMOUS=true e não é lobby`);
+                console.log(`[anonymLogin] Acesso negado - DISABLE_ANONYMOUS=true e não é lobby. Referer: ${referer}`);
                 res.status(403).send("");
                 return;
             }
