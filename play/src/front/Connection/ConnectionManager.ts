@@ -470,6 +470,17 @@ class ConnectionManager {
                 // Verificar se estamos carregando o lobby (usuário não autenticado)
                 const isLoadingLobby = LOBBY_MAP_URL && roomPath.includes(LOBBY_MAP_URL);
 
+                // Se autenticação é obrigatória, redirecionar para OIDC (mesmo no lobby)
+                if (this._currentRoom.authenticationMandatory) {
+                    console.log(`[ConnectionManager] Autenticação obrigatória, redirecionando para login`);
+                    const redirect = this.loadOpenIDScreen(false);
+                    if (redirect === null) {
+                        throw new Error("Unable to redirect on login page.");
+                    }
+                    return redirect;
+                }
+
+                // Se autenticação não é obrigatória, permitir login anônimo
                 if (!this._currentRoom.authenticationMandatory || isLoadingLobby) {
                     console.log(
                         `[ConnectionManager] ${
