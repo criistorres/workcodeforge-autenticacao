@@ -19,8 +19,10 @@ import {
 import RoomApiServer from "./room-api/RoomApiServer";
 
 // In production, the current working directory is "dist".
-if (fs.existsSync("dist") && !fs.existsSync("src")) {
+// Use NODE_ENV to determine if we should serve from dist (production) or src (development)
+if (process.env.NODE_ENV === "production" && fs.existsSync("dist")) {
     process.chdir("dist");
+    console.log("Running in production mode - serving from dist/");
 }
 
 // Sentry integration
