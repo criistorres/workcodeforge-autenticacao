@@ -1,4 +1,15 @@
-const AUTH_API_URL = "http://auth.workadventure.localhost";
+// Deriva a URL do auth a partir do domínio atual (play.X -> auth.X)
+const AUTH_API_URL = (() => {
+    const currentHost = window.location.hostname;
+    const protocol = window.location.protocol;
+    // Se estiver em localhost ou dev, usa http://auth.workadventure.localhost
+    if (currentHost.includes('workadventure.localhost') || currentHost === 'localhost') {
+        return "http://auth.workadventure.localhost";
+    }
+    // Em produção, substitui 'play.' por 'auth.'
+    const authHost = currentHost.replace(/^play\./, 'auth.');
+    return `${protocol}//${authHost}`;
+})();
 
 export interface UserProfile {
     id: string;
