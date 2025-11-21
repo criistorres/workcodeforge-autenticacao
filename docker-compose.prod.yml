@@ -123,6 +123,7 @@ services:
       NODE_ENV: production
       PLAY_URL: https://play.${DOMAIN}
       PUBLIC_MAP_STORAGE_URL: "https://map-storage.${DOMAIN}"
+      REDIS_HOST: workcodeforge-office-redis-1
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.back.rule=Host(`api.${DOMAIN}`)"
